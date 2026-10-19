@@ -105,7 +105,7 @@ canvas#cropCanvas{width:100%;max-width:320px;aspect-ratio:1;touch-action:none;bo
   <div id="closedBox" class="notice bad" hidden>التسجيل مغلق حاليًا.</div>
   <div id="doneBox" hidden>
     <div class="notice good"><b>تم استلام طلبك بنجاح ✔</b><br>سيتم مراجعة بياناتك، وبعد القبول سيصلك كودك الخاص.</div>
-    <p>للاطمئنان على طلبك استخدم تبويب <b>«استعلام عن حالة التسجيل»</b> بالرقم القومي أو رقم الواتساب.</p>
+    <p>للاطمئنان على طلبك استخدم تبويب <b>«استعلام عن حالة التسجيل»</b> بالرقم القومي.</p>
     <button class="btn pri" id="newReg">تسجيل شخص آخر</button>
   </div>
   <div id="regWrap">
@@ -119,11 +119,8 @@ canvas#cropCanvas{width:100%;max-width:320px;aspect-ratio:1;touch-action:none;bo
 <!-- ============ تبويب الاستعلام ============ -->
 <section class="panel" id="tab-status" hidden>
   <div id="stQuery">
-    <p class="lead">أدخل <b>الرقم القومي أو رقم الواتساب</b> (واحد منهما يكفي) لمعرفة حالة طلبك. لو كتبت أحدهما بشكل خاطئ في التسجيل، استخدم الآخر.</p>
-    <div class="grid2">
-      <div class="field"><label>الرقم القومي</label><input id="stNid" inputmode="numeric" maxlength="14" dir="ltr" placeholder="14 رقم"></div>
-      <div class="field"><label>رقم الواتساب</label><input id="stWa" inputmode="numeric" maxlength="11" dir="ltr" placeholder="01XXXXXXXXX"></div>
-    </div>
+    <p class="lead">أدخل <b>الرقم القومي</b> (14 رقمًا، أرقام إنجليزية فقط) لمعرفة حالة طلبك.</p>
+    <div class="field" style="max-width:380px"><label>الرقم القومي</label><input id="stNid" inputmode="numeric" maxlength="14" dir="ltr" data-t="digits" autocomplete="off" placeholder="14 رقم"></div>
     <div class="formerr" id="stErr" hidden></div>
     <button class="btn pri" id="stBtn">استعلام</button>
     <div id="stResult" style="margin-top:14px"></div>
@@ -144,7 +141,7 @@ canvas#cropCanvas{width:100%;max-width:320px;aspect-ratio:1;touch-action:none;bo
 <section class="panel" id="tab-admin" hidden>
   <div id="admLogin" style="max-width:360px;margin:auto">
     <h3 style="color:var(--navy);text-align:center">دخول الأدمن</h3>
-    <div class="field"><label>اسم المستخدم</label><input id="admUser" dir="ltr" autocomplete="username" autocapitalize="off"></div>
+    <div class="field"><label>اسم المستخدم</label><input id="admUser" data-t="user" dir="ltr" autocomplete="username" autocapitalize="off"></div>
     <div class="field"><label>كلمة المرور</label><input id="admPass" type="password" dir="ltr" autocomplete="current-password"></div>
     <div class="formerr" id="admErr" hidden></div>
     <button class="btn pri wide" id="admBtn">دخول</button>
@@ -165,7 +162,7 @@ canvas#cropCanvas{width:100%;max-width:320px;aspect-ratio:1;touch-action:none;bo
       <div class="stat"><b id="sNo">0</b><span>مرفوض</span></div>
     </div>
     <div class="row" style="margin-bottom:10px">
-      <input id="admSearch" placeholder="بحث بالاسم / الرقم القومي / الكود / الهاتف" style="flex:1;min-width:200px">
+      <input id="admSearch" data-t="text" placeholder="بحث بالاسم / الرقم القومي / الكود / الهاتف" style="flex:1;min-width:200px">
       <select id="admFilter" style="width:auto">
         <option value="">كل الحالات</option><option>قيد المراجعة</option><option>مقبول</option><option>مرفوض</option>
       </select>
@@ -188,20 +185,20 @@ canvas#cropCanvas{width:100%;max-width:320px;aspect-ratio:1;touch-action:none;bo
   <div class="sec">
     <h3>البيانات الشخصية</h3>
     <div class="field"><label>الاسم رباعي <b>*</b></label>
-      <input data-f="fullName" autocomplete="name" placeholder="الاسم الأول والثاني والثالث والرابع"></div>
+      <input data-f="fullName" data-t="name" autocomplete="name" placeholder="الاسم الأول والثاني والثالث والرابع"></div>
     <div class="grid2">
       <div class="field"><label>النوع <b>*</b></label>
         <select data-f="gender"><option value="">اختر</option><option>ذكر</option><option>أنثى</option></select></div>
       <div class="field"><label>الرقم القومي (14 رقم) <b>*</b></label>
-        <input data-f="nid" inputmode="numeric" maxlength="14" dir="ltr"><small class="hint" data-hint="nid"></small></div>
+        <input data-f="nid" data-t="digits" inputmode="numeric" maxlength="14" dir="ltr" autocomplete="off"><small class="hint" data-hint="nid"></small></div>
     </div>
     <div class="grid2">
-      <div class="field"><label>رقم الواتساب (11 رقم) <b>*</b></label><input data-f="whatsapp" inputmode="numeric" maxlength="11" dir="ltr" placeholder="01XXXXXXXXX"></div>
-      <div class="field"><label>رقم الهاتف (11 رقم) <b>*</b></label><input data-f="phone" inputmode="numeric" maxlength="11" dir="ltr" placeholder="01XXXXXXXXX"></div>
+      <div class="field"><label>رقم الواتساب (11 رقم) <b>*</b></label><input data-f="whatsapp" data-t="digits" inputmode="numeric" maxlength="11" dir="ltr" placeholder="01XXXXXXXXX"></div>
+      <div class="field"><label>رقم الهاتف (11 رقم) <b>*</b></label><input data-f="phone" data-t="digits" inputmode="numeric" maxlength="11" dir="ltr" placeholder="01XXXXXXXXX"></div>
     </div>
     <div class="grid2">
-      <div class="field"><label>رقم هاتف آخر (اختياري)</label><input data-f="phone2" inputmode="numeric" maxlength="11" dir="ltr"></div>
-      <div class="field"><label>أب الاعتراف <b>*</b></label><input data-f="father"></div>
+      <div class="field"><label>رقم هاتف آخر (اختياري)</label><input data-f="phone2" data-t="digits" inputmode="numeric" maxlength="11" dir="ltr"></div>
+      <div class="field"><label>أب الاعتراف <b>*</b></label><input data-f="father" data-t="name"></div>
     </div>
   </div>
 
@@ -216,22 +213,22 @@ canvas#cropCanvas{width:100%;max-width:320px;aspect-ratio:1;touch-action:none;bo
         <div class="field"><label>السنة الدراسية <b>*</b></label><select data-f="studyYear"></select></div>
       </div>
       <div class="grid2">
-        <div class="field"><label>جهة الدراسة (المدرسة / الجامعة / المعهد) <b>*</b></label><input data-f="studyPlace"></div>
-        <div class="field"><label>الكلية / القسم <b data-facreq>*</b></label><input data-f="faculty"></div>
+        <div class="field"><label>جهة الدراسة (المدرسة / الجامعة / المعهد) <b>*</b></label><input data-f="studyPlace" data-t="text"></div>
+        <div class="field"><label>الكلية / القسم <b data-facreq>*</b></label><input data-f="faculty" data-t="text"></div>
       </div>
     </div>
 
     <div data-group="employee" hidden>
       <div class="grid2">
         <div class="field"><label>القطاع <b>*</b></label><select data-f="workSector" data-list="sectors"></select></div>
-        <div class="field"><label>المسمى الوظيفي <b>*</b></label><input data-f="jobTitle"></div>
+        <div class="field"><label>المسمى الوظيفي <b>*</b></label><input data-f="jobTitle" data-t="text"></div>
       </div>
-      <div class="field"><label>جهة العمل <b data-wpreq>*</b></label><input data-f="workPlace"></div>
+      <div class="field"><label>جهة العمل <b data-wpreq>*</b></label><input data-f="workPlace" data-t="text"></div>
     </div>
 
     <div data-group="other" hidden>
       <div class="field"><label>الحالة <b>*</b></label><select data-f="otherStatus" data-list="otherStatus"></select></div>
-      <div class="field" data-group="otherText" hidden><label>اكتب التفاصيل <b>*</b></label><input data-f="otherText"></div>
+      <div class="field" data-group="otherText" hidden><label>اكتب التفاصيل <b>*</b></label><input data-f="otherText" data-t="text"></div>
     </div>
   </div>
 
@@ -239,17 +236,17 @@ canvas#cropCanvas{width:100%;max-width:320px;aspect-ratio:1;touch-action:none;bo
     <h3>العنوان</h3>
     <div class="grid2">
       <div class="field"><label>نوع السكن <b>*</b></label><select data-f="housingType" data-list="housing"></select></div>
-      <div class="field" data-group="compound" hidden><label>اسم الكومباوند <b>*</b></label><input data-f="compound"></div>
+      <div class="field" data-group="compound" hidden><label>اسم الكومباوند <b>*</b></label><input data-f="compound" data-t="text"></div>
     </div>
     <div class="grid2">
       <div class="field"><label>الحي / المجاورة <b>*</b></label><select data-f="district" data-list="districts"></select></div>
-      <div class="field" data-group="districtOther" hidden><label>اكتب الحي / المجاورة <b>*</b></label><input data-f="districtOther"></div>
+      <div class="field" data-group="districtOther" hidden><label>اكتب الحي / المجاورة <b>*</b></label><input data-f="districtOther" data-t="text"></div>
     </div>
     <div class="grid2">
-      <div class="field"><label>رقم العمارة <b>*</b></label><input data-f="building"></div>
-      <div class="field"><label>رقم الشقة <b>*</b></label><input data-f="apartment"></div>
+      <div class="field"><label>رقم العمارة <b>*</b></label><input data-f="building" data-t="code"></div>
+      <div class="field"><label>رقم الشقة <b>*</b></label><input data-f="apartment" data-t="code"></div>
     </div>
-    <div class="field"><label>تفاصيل أخرى للعنوان</label><textarea data-f="addressDetails" rows="2" placeholder="علامة مميزة، دور، ..."></textarea></div>
+    <div class="field"><label>تفاصيل أخرى للعنوان</label><textarea data-f="addressDetails" data-t="long" rows="2" placeholder="علامة مميزة، دور، ..."></textarea></div>
   </div>
 
   <div class="sec" data-group="photos">
@@ -311,7 +308,7 @@ canvas#cropCanvas{width:100%;max-width:320px;aspect-ratio:1;touch-action:none;bo
   <div class="box sm">
     <h3 class="mt" id="askTitle"></h3>
     <p id="askMsg"></p>
-    <textarea id="askInput" rows="3" hidden placeholder="اكتب السبب..."></textarea>
+    <textarea id="askInput" data-t="long" rows="3" hidden placeholder="اكتب السبب..."></textarea>
     <div class="row" style="margin-top:10px"><button class="btn pri" id="askOk">تأكيد</button><button class="btn" id="askCancel">إلغاء</button></div>
   </div>
 </div>
@@ -342,13 +339,45 @@ const EXPORT_COLS = [['code','الكود'],['status','الحالة'],['fullName'
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const latin = s => String(s ?? '').replace(/[٠-٩]/g, c => c.charCodeAt(0) - 1632).replace(/[۰-۹]/g, c => c.charCodeAt(0) - 1776);
-const digits = s => latin(s).replace(/\D/g, '');
+const digits = s => String(s ?? '').replace(/[^0-9]/g, '');   // أرقام إنجليزية 0-9 فقط
+
+/* ---------- قواعد الإدخال حسب نوع كل حقل (data-t) ---------- */
+// الحروف المسموحة: عربي (بالتشكيل) + إنجليزي. الأرقام العربية (٠-٩) مرفوضة في كل الحقول.
+const LETTERS = 'a-zA-Z\u0621-\u063A\u0641-\u064A\u0670\u0671\u064B-\u0652';
+const RULES = {
+  digits: { re: /[^0-9]/g, msg: 'أرقام إنجليزية (0-9) فقط' },
+  name:   { re: new RegExp('[^' + LETTERS + ' ]', 'g'), msg: 'حروف فقط (بدون أرقام أو رموز)' },
+  text:   { re: new RegExp('[^' + LETTERS + '0-9 .,\u060C\\-\'/&()]', 'g'), msg: 'حروف وأرقام إنجليزية فقط' },
+  code:   { re: new RegExp('[^' + LETTERS + '0-9 \\-/]', 'g'), msg: 'حروف وأرقام إنجليزية فقط' },
+  long:   { re: new RegExp('[^' + LETTERS + '0-9 .,\u060C\u061B\u061F?!:\\-\'/&()\\n]', 'g'), msg: 'حروف وأرقام إنجليزية ورموز بسيطة فقط' },
+  user:   { re: /[^a-zA-Z0-9._-]/g, msg: 'حروف وأرقام إنجليزية فقط (بدون مسافات)' }
+};
+const RE_NAME = new RegExp('^[' + LETTERS + ' ]+$');
+
+let tipT = 0;
+function sanitizeInput(el) {
+  const rule = RULES[el.dataset.t]; if (!rule) return;
+  const v = el.value, nv = v.replace(rule.re, '');
+  if (nv === v) return;
+  let pos = null; try { pos = el.selectionStart; } catch (e) {}
+  el.value = nv;
+  if (pos != null) { const np = v.slice(0, pos).replace(rule.re, '').length; try { el.setSelectionRange(np, np); } catch (e) {} }
+  const now = Date.now();
+  if (now - tipT > 1500) {
+    tipT = now;
+    const lab = el.closest('.field') && el.closest('.field').querySelector('label');
+    const name = lab ? lab.childNodes[0].textContent.replace(/\(.*?\)/g, '').trim() : '';
+    toast((name ? name + ': ' : '') + rule.msg, 'err', 2400);
+  }
+}
+// capture على document: يعمل قبل باقي المعالجات ويشمل الكتابة واللصق
+document.addEventListener('input', e => { const el = e.target; if (el && el.dataset && el.dataset.t && !e.isComposing) sanitizeInput(el); }, true);
+document.addEventListener('compositionend', e => { const el = e.target; if (el && el.dataset && el.dataset.t) sanitizeInput(el); }, true);
 
 let toastT;
-function toast(msg, type) {
+function toast(msg, type, ms) {
   const t = $('#toast'); t.textContent = msg; t.className = type || ''; t.hidden = false;
-  clearTimeout(toastT); toastT = setTimeout(() => t.hidden = true, 3500);
+  clearTimeout(toastT); toastT = setTimeout(() => t.hidden = true, ms || 3500);
 }
 function showErr(id, msg) { const e = $(id); e.textContent = msg || ''; e.hidden = !msg; }
 
@@ -462,7 +491,7 @@ function validateClient(d, host, needPhotos) {
   const E = (f, m) => ({ f, m });
   const name = d.fullName.replace(/\s+/g, ' ').trim(), words = name.split(' ').filter(Boolean);
   if (words.length < 4 || words.some(w => w.length < 2)) return E('fullName', 'الاسم يجب أن يكون رباعيًا (4 كلمات على الأقل).');
-  if (!/^[\u0600-\u06FFa-zA-Z .'-]+$/.test(name)) return E('fullName', 'الاسم يجب أن يحتوي على حروف فقط.');
+  if (!RE_NAME.test(name)) return E('fullName', 'الاسم يجب أن يحتوي على حروف فقط (بدون أرقام أو رموز).');
   const n = parseNid(d.nid); if (n.error) return E('nid', n.error);
   if (!d.gender) return E('gender', 'اختر النوع.');
   if (d.gender !== n.gender) return E('gender', 'برجاء مراجعة بياناتك: النوع المختار لا يتطابق مع الرقم القومي. راجع النوع والرقم القومي ثم أعد المحاولة.');
@@ -471,6 +500,7 @@ function validateClient(d, host, needPhotos) {
   if (!ph.test(d.phone)) return E('phone', 'رقم الهاتف يجب أن يكون 11 رقمًا ويبدأ بـ 01.');
   if (d.phone2 && !ph.test(d.phone2)) return E('phone2', 'رقم الهاتف الآخر يجب أن يكون 11 رقمًا ويبدأ بـ 01.');
   if (!d.father) return E('father', 'اكتب اسم أب الاعتراف.');
+  if (!RE_NAME.test(d.father.replace(/\s+/g, ' '))) return E('father', 'أب الاعتراف: حروف فقط (بدون أرقام أو رموز).');
   if (!d.occupation) return E('occupation', 'اختر المهنة.');
   if (d.occupation === 'طالب') {
     if (!d.studyStage) return E('studyStage', 'اختر المرحلة الدراسية.');
@@ -598,23 +628,18 @@ $('#regBtn').onclick = async () => {
 $('#newReg').onclick = () => { mountForm(regHost, { photos: true }); $('#doneBox').hidden = true; $('#regWrap').hidden = false; };
 
 /* =========================================================
-   الاستعلام (بالرقم القومي أو الواتساب) + تعديل المرفوض
+   الاستعلام (بالرقم القومي فقط) + تعديل المرفوض
    ========================================================= */
 const resubHost = $('#resubForm');
 let SQ = null, resubBusy = false;
 
 $('#stBtn').onclick = async () => {
   showErr('#stErr', ''); $('#stResult').innerHTML = '';
-  const nid = digits($('#stNid').value), wa = digits($('#stWa').value);
-  const nidOk = nid.length === 14, waOk = wa.length === 11;
-  if (!nid && !wa) return showErr('#stErr', 'أدخل الرقم القومي أو رقم الواتساب.');
-  // يكفي أحدهما صحيح الطول؛ والخانة الناقصة/الخاطئة الطول تُتجاهل
-  if (!nidOk && !waOk) {
-    if (nid && !wa) return showErr('#stErr', 'الرقم القومي يجب أن يكون 14 رقمًا.');
-    if (wa && !nid) return showErr('#stErr', 'رقم الواتساب يجب أن يكون 11 رقمًا.');
-    return showErr('#stErr', 'تأكد من الرقم القومي (14 رقمًا) أو رقم الواتساب (11 رقمًا).');
-  }
-  const q = { nid: nidOk ? nid : '', whatsapp: waOk ? wa : '' };
+  const nid = digits($('#stNid').value);
+  if (!nid) return showErr('#stErr', 'أدخل الرقم القومي.');
+  if (nid.length !== 14) return showErr('#stErr', 'الرقم القومي يجب أن يكون 14 رقمًا.');
+  const pn = parseNid(nid); if (pn.error) return showErr('#stErr', pn.error);
+  const q = { nid };
   const b = $('#stBtn'); b.disabled = true; b.innerHTML = '<span class="spin"></span>';
   const r = await api('status', q);
   b.disabled = false; b.textContent = 'استعلام';
@@ -643,12 +668,12 @@ $('#resubBtn').onclick = async () => {
   const d = readForm(resubHost), err = validateClient(d, resubHost, false);
   if (err) return markError(resubHost, err, '#resubErr');
   resubBusy = true; const b = $('#resubBtn'); b.disabled = true; b.innerHTML = '<span class="spin"></span> جاري الإرسال...';
-  const r = await api('resubmit', { nid: SQ.q.nid, whatsapp: SQ.q.whatsapp, data: d, profile: resubHost._photos.profile || null, idCard: resubHost._photos.idCard || null }, 120000);
+  const r = await api('resubmit', { nid: SQ.q.nid, data: d, profile: resubHost._photos.profile || null, idCard: resubHost._photos.idCard || null }, 120000);
   resubBusy = false; b.disabled = false; b.textContent = 'إعادة الإرسال';
   if (!r.ok) return showErr('#resubErr', r.error);
   toast('تم إعادة إرسال طلبك للمراجعة ✔', 'ok');
   $('#stEdit').hidden = true; $('#stQuery').hidden = false; $('#stResult').innerHTML = '<div class="notice good">تم إعادة إرسال طلبك، وهو الآن <b>قيد المراجعة</b>.</div>';
-  $('#stNid').value = ''; $('#stWa').value = '';
+  $('#stNid').value = '';
 };
 
 /* =========================================================
@@ -706,7 +731,7 @@ $('#admToggle').onclick = async () => {
 const badge = s => `<span class="badge ${s === 'مقبول' ? 'o' : s === 'مرفوض' ? 'n' : 'p'}">${esc(s)}</span>`;
 
 function renderList() {
-  const q = latin($('#admSearch').value).toLowerCase().trim(), f = $('#admFilter').value;
+  const q = $('#admSearch').value.toLowerCase().trim(), f = $('#admFilter').value;
   A.view = A.rows.filter(r => (!f || r.status === f) &&
     (!q || [r.fullName, r.nid, r.code, r.whatsapp, r.phone, r.phone2].join(' ').toLowerCase().includes(q)));
   const c = s => A.rows.filter(r => r.status === s).length;
