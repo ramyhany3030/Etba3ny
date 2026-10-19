@@ -201,7 +201,8 @@ canvas#cropCanvas{width:100%;max-width:320px;aspect-ratio:1;touch-action:none;bo
     </div>
     <div class="grid2">
       <div class="field"><label>تاريخ الميلاد <b>*</b></label>
-        <input type="date" data-f="birthDate" dir="ltr" min="1930-01-01" autocomplete="bday"><small class="hint" data-hint="birth"></small></div>
+        <input type="date" data-f="birthDate" dir="ltr" min="1900-01-01" autocomplete="bday">
+        <small class="hint">اكتب تاريخ ميلادك الفعلي (حتى لو مختلف عن المكتوب في الرقم القومي).</small></div>
       <div class="field"><label>الحالة الاجتماعية <b>*</b></label>
         <select data-f="maritalStatus" data-list="marital"></select></div>
     </div>
@@ -256,8 +257,8 @@ canvas#cropCanvas{width:100%;max-width:320px;aspect-ratio:1;touch-action:none;bo
       <div class="field" data-group="districtOther" hidden><label>اكتب الحي / المجاورة <b>*</b></label><input data-f="districtOther" data-t="text"></div>
     </div>
     <div class="grid2">
-      <div class="field"><label>رقم العمارة <b>*</b></label><input data-f="building" data-t="code"></div>
-      <div class="field"><label>رقم الشقة <b>*</b></label><input data-f="apartment" data-t="code"></div>
+      <div class="field"><label>رقم العمارة (أرقام فقط) <b>*</b></label><input data-f="building" data-t="num" inputmode="numeric" maxlength="6" dir="ltr" autocomplete="off"></div>
+      <div class="field"><label>رقم الشقة (أرقام فقط) <b>*</b></label><input data-f="apartment" data-t="num" inputmode="numeric" maxlength="6" dir="ltr" autocomplete="off"></div>
     </div>
     <div class="field"><label>تفاصيل أخرى للعنوان</label><textarea data-f="addressDetails" data-t="long" rows="2" placeholder="علامة مميزة، دور، ..."></textarea></div>
   </div>
@@ -355,16 +356,19 @@ const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const digits = s => String(s ?? '').replace(/[^0-9]/g, '');   // أرقام إنجليزية 0-9 فقط
+// يحوّل الأرقام العربية (٠-٩) والفارسية (۰-۹) لأرقام إنجليزية
+const toEn = s => String(s ?? '').replace(/[\u0660-\u0669]/g, c => c.charCodeAt(0) - 0x0660).replace(/[\u06F0-\u06F9]/g, c => c.charCodeAt(0) - 0x06F0);
 
 /* ---------- قواعد الإدخال حسب نوع كل حقل (data-t) ---------- */
-// الحروف المسموحة: عربي (بالتشكيل) + إنجليزي. الأرقام العربية (٠-٩) مرفوضة في كل الحقول.
+// الحروف المسموحة: عربي (بالتشكيل) + إنجليزي.
+// conv: true  => الأرقام العربية بتتحوّل لإنجليزي بدل ما تتمسح (رقم العمارة/الشقة وتفاصيل العنوان فقط).
 const LETTERS = 'a-zA-Z\u0621-\u063A\u0641-\u064A\u0670\u0671\u064B-\u0652';
 const RULES = {
   digits: { re: /[^0-9]/g, msg: 'أرقام إنجليزية (0-9) فقط' },
+  num:    { re: /[^0-9]/g, conv: true, msg: 'أرقام فقط' },
   name:   { re: new RegExp('[^' + LETTERS + ' ]', 'g'), msg: 'حروف فقط (بدون أرقام أو رموز)' },
   text:   { re: new RegExp('[^' + LETTERS + '0-9 .,\u060C\\-\'/&()]', 'g'), msg: 'حروف وأرقام إنجليزية فقط' },
-  code:   { re: new RegExp('[^' + LETTERS + '0-9 \\-/]', 'g'), msg: 'حروف وأرقام إنجليزية فقط' },
-  long:   { re: new RegExp('[^' + LETTERS + '0-9 .,\u060C\u061B\u061F?!:\\-\'/&()\\n]', 'g'), msg: 'حروف وأرقام إنجليزية ورموز بسيطة فقط' },
+  long:   { re: new RegExp('[^' + LETTERS + '0-9 .,\u060C\u061B\u061F?!:\\-\'/&()\\n]', 'g'), conv: true, msg: 'حروف وأرقام ورموز بسيطة فقط' },
   user:   { re: /[^a-zA-Z0-9._-]/g, msg: 'حروف وأرقام إنجليزية فقط (بدون مسافات)' }
 };
 const RE_NAME = new RegExp('^[' + LETTERS + ' ]+$');
@@ -372,17 +376,23 @@ const RE_NAME = new RegExp('^[' + LETTERS + ' ]+$');
 let tipT = 0;
 function sanitizeInput(el) {
   const rule = RULES[el.dataset.t]; if (!rule) return;
-  const v = el.value, nv = v.replace(rule.re, '');
+  const v = el.value, conv = rule.conv ? toEn(v) : v, nv = conv.replace(rule.re, '');
   if (nv === v) return;
   let pos = null; try { pos = el.selectionStart; } catch (e) {}
   el.value = nv;
-  if (pos != null) { const np = v.slice(0, pos).replace(rule.re, '').length; try { el.setSelectionRange(np, np); } catch (e) {} }
-  const now = Date.now();
-  if (now - tipT > 1500) {
-    tipT = now;
-    const lab = el.closest('.field') && el.closest('.field').querySelector('label');
-    const name = lab ? lab.childNodes[0].textContent.replace(/\(.*?\)/g, '').trim() : '';
-    toast((name ? name + ': ' : '') + rule.msg, 'err', 2400);
+  if (pos != null) {
+    const pre = rule.conv ? toEn(v.slice(0, pos)) : v.slice(0, pos);
+    const np = pre.replace(rule.re, '').length;
+    try { el.setSelectionRange(np, np); } catch (e) {}
+  }
+  if (nv.length !== conv.length) {                     // اتمسح حرف (التحويل لوحده ما بيظهرش رسالة)
+    const now = Date.now();
+    if (now - tipT > 1500) {
+      tipT = now;
+      const lab = el.closest('.field') && el.closest('.field').querySelector('label');
+      const name = lab ? lab.childNodes[0].textContent.replace(/\(.*?\)/g, '').trim() : '';
+      toast((name ? name + ': ' : '') + rule.msg, 'err', 2400);
+    }
   }
 }
 // capture على document: يعمل قبل باقي المعالجات ويشمل الكتابة واللصق
@@ -638,6 +648,7 @@ const CARD_WHY = {
   not_found: 'ملف صورتك غير موجود في المكان المسجّل له. تواصل مع المنظّمين.',
   read_error: 'تعذّرت قراءة ملف الصورة من الخادم. جرّب إعادة المحاولة، ولو تكررت تواصل مع المنظّمين.',
   decode: 'صيغة الصورة غير مدعومة في المتصفح. تواصل مع المنظّمين لاستبدالها.',
+  old_server: 'الخادم (Apps Script) لسه شغّال بنسخة قديمة من الكود. في Apps Script: Deploy ← Manage deployments ← ✏️ ← Version: New version ← Deploy (بدون إنشاء Deployment جديد). ولو أنشأت Deployment جديد انسخ رابطه الجديد في config.js.',
   unknown: 'سبب غير معروف. جرّب إعادة المحاولة.'
 };
 const loadImage = src => new Promise(res => { const i = new Image(); i.onload = () => res(i); i.onerror = () => res(null); i.src = src; });
@@ -665,7 +676,7 @@ async function buildCard(nid, name, code) {
     const photo = r.photo ? await loadImage(r.photo) : null;
     let warn = '';
     if (!photo) {
-      const why = r.photo ? 'decode' : (r.why || 'unknown');
+      const why = r.photo ? 'decode' : (r.why !== undefined ? (r.why || 'unknown') : 'old_server');   // r.why غير موجود = الخادم بالكود القديم
       warn = (CARD_WHY[why] || CARD_WHY.unknown) + ' (رمز: ' + why + ')';
     }
     const cv = await renderCard({ name: r.name || name, code: r.code || code, photo });
@@ -698,6 +709,12 @@ function fillOptions(sel, arr) {
     ? `<option value="${esc(x[0])}">${esc(x[1])}</option>` : `<option>${esc(x)}</option>`).join('');
 }
 const todayISO = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; };
+// تاريخ yyyy-mm-dd حقيقي (مش 2020-02-31)
+function validISO(s) {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s); if (!m) return false;
+  const y = +m[1], mo = +m[2], d = +m[3], dt = new Date(y, mo - 1, d);
+  return dt.getFullYear() === y && dt.getMonth() === mo - 1 && dt.getDate() === d;
+}
 
 function mountForm(host, opts) {
   opts = opts || {};
@@ -722,22 +739,18 @@ function mountForm(host, opts) {
 function onFormChange(host, e) {
   const f = e.target.closest('[data-f]');
   if (f) { const w = f.closest('.field'); if (w) w.classList.remove('err'); }
-  if (f && (f.dataset.f === 'nid' || f.dataset.f === 'birthDate')) nidHint(host);
+  if (f && f.dataset.f === 'nid') nidHint(host);
   refreshForm(host);
 }
 
-// تلميح الرقم القومي + مطابقة تاريخ الميلاد معه (بدون إظهار التاريخ المستخرج، عشان المطابقة تبقى فحص حقيقي)
 function nidHint(host) {
-  const h = host.querySelector('[data-hint="nid"]'), hb = host.querySelector('[data-hint="birth"]');
-  const v = digits(val(host, 'nid')), b = val(host, 'birthDate');
-  h.className = 'hint'; h.textContent = ''; hb.className = 'hint'; hb.textContent = '';
+  const h = host.querySelector('[data-hint="nid"]');
+  const v = digits(val(host, 'nid'));
+  h.className = 'hint'; h.textContent = '';
   if (v.length !== 14) return;
   const r = parseNid(v);
-  if (r.error) { h.className = 'hint bad'; h.textContent = r.error; return; }
-  h.className = 'hint good'; h.textContent = '✔ الرقم القومي صالح';
-  if (!b) return;
-  if (b === r.birth) { hb.className = 'hint good'; hb.textContent = '✔ يطابق الرقم القومي'; }
-  else { hb.className = 'hint bad'; hb.textContent = 'تاريخ الميلاد لا يطابق الرقم القومي.'; }
+  if (r.error) { h.className = 'hint bad'; h.textContent = r.error; }
+  else { h.className = 'hint good'; h.textContent = '✔ الرقم القومي صالح'; }
 }
 
 function refreshForm(host) {
@@ -765,6 +778,7 @@ function readForm(host) {
   const d = {};
   FORM_KEYS.forEach(k => { const f = fld(host, k); d[k] = f ? f.value.trim() : ''; });
   d.nid = digits(d.nid); d.whatsapp = digits(d.whatsapp); d.phone = digits(d.phone); d.phone2 = digits(d.phone2);
+  d.building = toEn(d.building); d.apartment = toEn(d.apartment); d.addressDetails = toEn(d.addressDetails);
   return d;
 }
 
@@ -787,9 +801,10 @@ function validateClient(d, host, needPhotos) {
   const n = parseNid(d.nid); if (n.error) return E('nid', n.error);
   if (!d.gender) return E('gender', 'اختر النوع.');
   if (d.gender !== n.gender) return E('gender', 'برجاء مراجعة بياناتك: النوع المختار لا يتطابق مع الرقم القومي. راجع النوع والرقم القومي ثم أعد المحاولة.');
+  // تاريخ الميلاد الفعلي: مسموح يختلف عن الرقم القومي، لكن لازم تاريخ حقيقي ومش في المستقبل
   if (!d.birthDate) return E('birthDate', 'اكتب تاريخ الميلاد.');
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(d.birthDate)) return E('birthDate', 'تاريخ الميلاد غير صحيح.');
-  if (d.birthDate !== n.birth) return E('birthDate', 'برجاء مراجعة بياناتك: تاريخ الميلاد لا يتطابق مع الرقم القومي. راجع التاريخ والرقم القومي ثم أعد المحاولة.');
+  if (!validISO(d.birthDate)) return E('birthDate', 'تاريخ الميلاد غير صحيح.');
+  if (d.birthDate < '1900-01-01' || d.birthDate > todayISO()) return E('birthDate', 'تاريخ الميلاد غير منطقي، راجع التاريخ.');
   if (!d.maritalStatus) return E('maritalStatus', 'اختر الحالة الاجتماعية.');
   const ph = /^01[0125]\d{8}$/;
   if (!ph.test(d.whatsapp)) return E('whatsapp', 'رقم الواتساب يجب أن يكون 11 رقمًا ويبدأ بـ 01.');
@@ -816,7 +831,9 @@ function validateClient(d, host, needPhotos) {
   if (!d.district) return E('district', 'اختر الحي / المجاورة.');
   if (d.district === 'أخرى' && !d.districtOther) return E('districtOther', 'اكتب اسم الحي / المجاورة.');
   if (!d.building) return E('building', 'اكتب رقم العمارة.');
+  if (!/^[0-9]{1,6}$/.test(d.building)) return E('building', 'رقم العمارة: أرقام فقط.');
   if (!d.apartment) return E('apartment', 'اكتب رقم الشقة.');
+  if (!/^[0-9]{1,6}$/.test(d.apartment)) return E('apartment', 'رقم الشقة: أرقام فقط.');
   if (needPhotos) {
     if (!host._photos.profile) return { photo: 'profile', m: 'الصورة الشخصية مطلوبة.' };
     if (!host._photos.idCard) return { photo: 'idCard', m: 'صورة البطاقة مطلوبة.' };
