@@ -32,6 +32,7 @@ main{max-width:980px;margin:0 auto;padding:0 10px 40px}
 .field label{display:block;font-weight:600;margin-bottom:3px;font-size:14px}
 .field label b{color:var(--bad)}
 input,select,textarea{width:100%;font:inherit;padding:10px 11px;border:1.5px solid var(--line);border-radius:10px;background:#fff;color:var(--txt)}
+input[type=date]{min-height:46px}
 input:focus,select:focus,textarea:focus{outline:none;border-color:var(--navy2);box-shadow:0 0 0 3px rgba(44,82,130,.15)}
 input[dir=ltr]{text-align:right}
 .field.err input,.field.err select,.field.err textarea,.photo.err{border-color:var(--bad);background:#fff6f5}
@@ -199,6 +200,12 @@ canvas#cropCanvas{width:100%;max-width:320px;aspect-ratio:1;touch-action:none;bo
         <input data-f="nid" data-t="digits" inputmode="numeric" maxlength="14" dir="ltr" autocomplete="off"><small class="hint" data-hint="nid"></small></div>
     </div>
     <div class="grid2">
+      <div class="field"><label>تاريخ الميلاد <b>*</b></label>
+        <input type="date" data-f="birthDate" dir="ltr" min="1930-01-01" autocomplete="bday"><small class="hint" data-hint="birth"></small></div>
+      <div class="field"><label>الحالة الاجتماعية <b>*</b></label>
+        <select data-f="maritalStatus" data-list="marital"></select></div>
+    </div>
+    <div class="grid2">
       <div class="field"><label>رقم الواتساب (11 رقم) <b>*</b></label><input data-f="whatsapp" data-t="digits" inputmode="numeric" maxlength="11" dir="ltr" placeholder="01XXXXXXXXX"></div>
       <div class="field"><label>رقم الهاتف (11 رقم) <b>*</b></label><input data-f="phone" data-t="digits" inputmode="numeric" maxlength="11" dir="ltr" placeholder="01XXXXXXXXX"></div>
     </div>
@@ -336,11 +343,13 @@ const LISTS = {
   sectors: ['حكومي', 'خاص', 'أعمال حرة'],
   otherStatus: ['خريج بدون عمل', 'لا يعمل', 'أخرى'],
   housing: ['اسكان اجتماعي', 'ابني بيتك', 'كومباوند'],
+  // [القيمة المحفوظة, النص الظاهر]  - القيمة المحفوظة ثابتة، والنص الظاهر يناسب الذكر والأنثى
+  marital: [['أعزب', 'أعزب / عزباء'], ['خطوبة', 'خطوبة'], ['متزوج', 'متزوج / متزوجة']],
   districts: ['الحي ال16', 'الحي ال15', 'الحي ال12', 'الحي ال11', 'مجاورة 59', 'مجاورة 60', 'حي الاندلس', 'أخرى']
 };
 const GOV = ['01','02','03','04','11','12','13','14','15','16','17','18','19','21','22','23','24','25','26','27','28','29','31','32','33','34','35','88'];
-const FORM_KEYS = ['fullName','gender','nid','whatsapp','phone','phone2','father','occupation','studyStage','studyYear','studyPlace','faculty','workSector','jobTitle','workPlace','otherStatus','otherText','housingType','compound','district','districtOther','building','apartment','addressDetails'];
-const EXPORT_COLS = [['code','الكود'],['status','الحالة'],['fullName','الاسم'],['gender','النوع'],['nid','الرقم القومي'],['birthDate','تاريخ الميلاد'],['whatsapp','واتساب'],['phone','الهاتف'],['phone2','هاتف آخر'],['father','أب الاعتراف'],['occupation','المهنة'],['studyStage','المرحلة'],['studyYear','السنة الدراسية'],['studyPlace','جهة الدراسة'],['faculty','الكلية / القسم'],['workSector','قطاع العمل'],['jobTitle','المسمى الوظيفي'],['workPlace','جهة العمل'],['otherStatus','حالة (أخرى)'],['otherText','تفاصيل (أخرى)'],['housingType','نوع السكن'],['compound','الكومباوند'],['district','الحي / المجاورة'],['districtOther','حي آخر'],['building','العمارة'],['apartment','الشقة'],['addressDetails','تفاصيل العنوان'],['rejectReason','سبب الرفض'],['createdAt','تاريخ التسجيل'],['reviewedBy','راجعه'],['reviewedAt','تاريخ المراجعة']];
+const FORM_KEYS = ['fullName','gender','nid','birthDate','maritalStatus','whatsapp','phone','phone2','father','occupation','studyStage','studyYear','studyPlace','faculty','workSector','jobTitle','workPlace','otherStatus','otherText','housingType','compound','district','districtOther','building','apartment','addressDetails'];
+const EXPORT_COLS = [['code','الكود'],['status','الحالة'],['fullName','الاسم'],['gender','النوع'],['nid','الرقم القومي'],['birthDate','تاريخ الميلاد'],['maritalStatus','الحالة الاجتماعية'],['whatsapp','واتساب'],['phone','الهاتف'],['phone2','هاتف آخر'],['father','أب الاعتراف'],['occupation','المهنة'],['studyStage','المرحلة'],['studyYear','السنة الدراسية'],['studyPlace','جهة الدراسة'],['faculty','الكلية / القسم'],['workSector','قطاع العمل'],['jobTitle','المسمى الوظيفي'],['workPlace','جهة العمل'],['otherStatus','حالة (أخرى)'],['otherText','تفاصيل (أخرى)'],['housingType','نوع السكن'],['compound','الكومباوند'],['district','الحي / المجاورة'],['districtOther','حي آخر'],['building','العمارة'],['apartment','الشقة'],['addressDetails','تفاصيل العنوان'],['rejectReason','سبب الرفض'],['createdAt','تاريخ التسجيل'],['reviewedBy','راجعه'],['reviewedAt','تاريخ المراجعة']];
 
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
@@ -665,9 +674,12 @@ async function buildCard(nid, name, code) {
 const fld = (h, k) => h.querySelector(`[data-f="${k}"]`);
 const val = (h, k) => fld(h, k).value;
 const grp = (h, k, on) => { const g = h.querySelector(`[data-group="${k}"]`); if (g) g.hidden = !on; };
+// العنصر إمّا نص (القيمة = النص) أو زوج [القيمة, النص الظاهر]
 function fillOptions(sel, arr) {
-  sel.innerHTML = '<option value="">اختر</option>' + arr.map(x => `<option>${esc(x)}</option>`).join('');
+  sel.innerHTML = '<option value="">اختر</option>' + arr.map(x => Array.isArray(x)
+    ? `<option value="${esc(x[0])}">${esc(x[1])}</option>` : `<option>${esc(x)}</option>`).join('');
 }
+const todayISO = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; };
 
 function mountForm(host, opts) {
   opts = opts || {};
@@ -678,6 +690,7 @@ function mountForm(host, opts) {
     const l = LISTS[s.dataset.list];
     fillOptions(s, Array.isArray(l) ? l : Object.keys(l));
   });
+  fld(host, 'birthDate').max = todayISO();
   if (!opts.photos) { host.querySelector('[data-group="photos"]').remove(); }
   else {
     host.querySelector('[data-photonote]').textContent = opts.photoNote || 'الصور تُضغط تلقائيًا قبل الرفع لتكون سريعة حتى مع الإنترنت الضعيف.';
@@ -691,19 +704,22 @@ function mountForm(host, opts) {
 function onFormChange(host, e) {
   const f = e.target.closest('[data-f]');
   if (f) { const w = f.closest('.field'); if (w) w.classList.remove('err'); }
-  if (f && f.dataset.f === 'nid') nidHint(host);
+  if (f && (f.dataset.f === 'nid' || f.dataset.f === 'birthDate')) nidHint(host);
   refreshForm(host);
 }
 
+// تلميح الرقم القومي + مطابقة تاريخ الميلاد معه (بدون إظهار التاريخ المستخرج، عشان المطابقة تبقى فحص حقيقي)
 function nidHint(host) {
-  const h = host.querySelector('[data-hint="nid"]');
-  const v = digits(val(host, 'nid'));
-  h.className = 'hint'; h.textContent = '';
-  if (v.length === 14) {
-    const r = parseNid(v);
-    if (r.error) { h.className = 'hint bad'; h.textContent = r.error; }
-    else { h.className = 'hint good'; h.textContent = '✔ مواليد ' + r.birth; }
-  }
+  const h = host.querySelector('[data-hint="nid"]'), hb = host.querySelector('[data-hint="birth"]');
+  const v = digits(val(host, 'nid')), b = val(host, 'birthDate');
+  h.className = 'hint'; h.textContent = ''; hb.className = 'hint'; hb.textContent = '';
+  if (v.length !== 14) return;
+  const r = parseNid(v);
+  if (r.error) { h.className = 'hint bad'; h.textContent = r.error; return; }
+  h.className = 'hint good'; h.textContent = '✔ الرقم القومي صالح';
+  if (!b) return;
+  if (b === r.birth) { hb.className = 'hint good'; hb.textContent = '✔ يطابق الرقم القومي'; }
+  else { hb.className = 'hint bad'; hb.textContent = 'تاريخ الميلاد لا يطابق الرقم القومي.'; }
 }
 
 function refreshForm(host) {
@@ -753,6 +769,10 @@ function validateClient(d, host, needPhotos) {
   const n = parseNid(d.nid); if (n.error) return E('nid', n.error);
   if (!d.gender) return E('gender', 'اختر النوع.');
   if (d.gender !== n.gender) return E('gender', 'برجاء مراجعة بياناتك: النوع المختار لا يتطابق مع الرقم القومي. راجع النوع والرقم القومي ثم أعد المحاولة.');
+  if (!d.birthDate) return E('birthDate', 'اكتب تاريخ الميلاد.');
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(d.birthDate)) return E('birthDate', 'تاريخ الميلاد غير صحيح.');
+  if (d.birthDate !== n.birth) return E('birthDate', 'برجاء مراجعة بياناتك: تاريخ الميلاد لا يتطابق مع الرقم القومي. راجع التاريخ والرقم القومي ثم أعد المحاولة.');
+  if (!d.maritalStatus) return E('maritalStatus', 'اختر الحالة الاجتماعية.');
   const ph = /^01[0125]\d{8}$/;
   if (!ph.test(d.whatsapp)) return E('whatsapp', 'رقم الواتساب يجب أن يكون 11 رقمًا ويبدأ بـ 01.');
   if (!ph.test(d.phone)) return E('phone', 'رقم الهاتف يجب أن يكون 11 رقمًا ويبدأ بـ 01.');
