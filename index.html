@@ -76,7 +76,7 @@ tr.r:hover td{background:#f5f8fd;cursor:pointer}
 .modal h3.mt{margin:0 0 8px;color:var(--navy)}
 .adm-photos{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}
 .adm-photos figure{margin:0;text-align:center;flex:1;min-width:150px}
-.adm-photos .im{height:190px;border-radius:10px;background:#eef2f8;display:flex;align-items:center;justify-content:center;color:var(--mut);overflow:hidden}
+.adm-photos .im{height:190px;border-radius:10px;background:#eef2f8;display:flex;align-items:center;justify-content:center;color:var(--mut);overflow:hidden;padding:8px;text-align:center;font-size:13px;word-break:break-word}
 .adm-photos img{width:100%;height:100%;object-fit:contain;cursor:zoom-in;background:#000}
 .adm-photos figcaption{font-size:13px;margin-top:3px;color:var(--mut)}
 #toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:#222;color:#fff;padding:10px 18px;border-radius:24px;z-index:99;max-width:92%;text-align:center;box-shadow:0 4px 14px rgba(0,0,0,.3)}
@@ -632,6 +632,14 @@ async function renderCard(d) {
   return cv;
 }
 
+// أسباب عدم ظهور الصورة على الكارت (الرمز بييجي من الخادم)
+const CARD_WHY = {
+  no_path: 'خانة الصورة الشخصية فاضية في سجلك. تواصل مع المنظّمين.',
+  not_found: 'ملف صورتك غير موجود في المكان المسجّل له. تواصل مع المنظّمين.',
+  read_error: 'تعذّرت قراءة ملف الصورة من الخادم. جرّب إعادة المحاولة، ولو تكررت تواصل مع المنظّمين.',
+  decode: 'صيغة الصورة غير مدعومة في المتصفح. تواصل مع المنظّمين لاستبدالها.',
+  unknown: 'سبب غير معروف. جرّب إعادة المحاولة.'
+};
 const loadImage = src => new Promise(res => { const i = new Image(); i.onload = () => res(i); i.onerror = () => res(null); i.src = src; });
 
 function downloadCanvas(cv, filename) {
@@ -655,13 +663,23 @@ async function buildCard(nid, name, code) {
   }
   try {
     const photo = r.photo ? await loadImage(r.photo) : null;
+    let warn = '';
+    if (!photo) {
+      const why = r.photo ? 'decode' : (r.why || 'unknown');
+      warn = (CARD_WHY[why] || CARD_WHY.unknown) + ' (رمز: ' + why + ')';
+    }
     const cv = await renderCard({ name: r.name || name, code: r.code || code, photo });
     if (!host.isConnected) return;
     host.innerHTML = `<div class="card-title">كارت الـ ID الخاص بك</div>
+      ${warn ? `<div class="notice warn">⚠ صورتك لم تظهر على الكارت: ${esc(warn)}</div>` : ''}
       <img class="idcard" alt="ID Card" src="${cv.toDataURL('image/png')}">
-      <div class="row" style="justify-content:center"><button class="btn gold" id="cardDl">⬇ تحميل الكارت (PNG)</button></div>
+      <div class="row" style="justify-content:center">
+        <button class="btn gold" id="cardDl">⬇ تحميل الكارت (PNG)</button>
+        ${warn ? '<button class="btn" id="cardRetry">↻ إعادة المحاولة</button>' : ''}
+      </div>
       <small class="hint" style="text-align:center">لو التحميل لم يبدأ على الموبايل، اضغط مطولًا على الكارت واختر «حفظ الصورة».</small>`;
     $('#cardDl').onclick = () => downloadCanvas(cv, 'ID-Card-' + (r.code || code) + '.png');
+    if (warn) $('#cardRetry').onclick = () => buildCard(nid, name, code);
   } catch (e) {
     host.innerHTML = '<div class="formerr">تعذر تجهيز الكارت.</div><button class="btn" id="cardRetry">إعادة المحاولة</button>';
     $('#cardRetry').onclick = () => buildCard(nid, name, code);
@@ -1118,7 +1136,7 @@ async function loadImg(nid, which, sel) {
   let src = A.img[key];
   if (!src) {
     const r = await adm('adminImage', { nid, which });
-    if (!r.ok) { if (A.cur === nid) box.textContent = 'لا توجد صورة'; return; }
+    if (!r.ok) { if (A.cur === nid) box.textContent = r.error || 'لا توجد صورة'; return; }
     src = A.img[key] = r.image;
   }
   if (A.cur !== nid) return;
