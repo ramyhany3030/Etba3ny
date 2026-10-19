@@ -56,6 +56,8 @@ small.hint.bad{color:var(--bad)} small.hint.good{color:var(--ok)}
 .badge{display:inline-block;padding:2px 10px;border-radius:20px;font-size:12.5px;font-weight:700}
 .badge.p{background:#fff1d6;color:var(--warn)}.badge.o{background:#dff3e7;color:var(--ok)}.badge.n{background:#fbe1de;color:var(--bad)}
 .code{font-size:34px;font-weight:700;letter-spacing:6px;color:var(--navy);direction:ltr;text-align:center;background:#f5f8fd;border:2px dashed var(--gold);border-radius:12px;padding:8px;margin:10px 0}
+.card-title{text-align:center;font-weight:700;color:var(--navy);margin:16px 0 4px}
+img.idcard{display:block;width:100%;max-width:560px;margin:8px auto 12px;border-radius:14px;box-shadow:0 6px 22px rgba(31,58,95,.28);-webkit-touch-callout:default}
 .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:10px 0}
 @media(max-width:640px){.stats{grid-template-columns:repeat(2,1fr)}}
@@ -82,7 +84,6 @@ canvas#cropCanvas{width:100%;max-width:320px;aspect-ratio:1;touch-action:none;bo
 .spin{display:inline-block;width:16px;height:16px;border:3px solid #ccd;border-top-color:var(--navy);border-radius:50%;animation:sp 1s linear infinite;vertical-align:middle}
 @keyframes sp{to{transform:rotate(360deg)}}
 .lead{color:var(--mut);margin:0 0 12px}
-.or{text-align:center;color:var(--mut);font-weight:700;margin:-2px 0 6px}
 </style>
 </head>
 <body>
@@ -120,9 +121,12 @@ canvas#cropCanvas{width:100%;max-width:320px;aspect-ratio:1;touch-action:none;bo
 <section class="panel" id="tab-status" hidden>
   <div id="stQuery">
     <p class="lead">أدخل <b>الرقم القومي</b> (14 رقمًا، أرقام إنجليزية فقط) لمعرفة حالة طلبك.</p>
-    <div class="field" style="max-width:380px"><label>الرقم القومي</label><input id="stNid" inputmode="numeric" maxlength="14" dir="ltr" data-t="digits" autocomplete="off" placeholder="14 رقم"></div>
-    <div class="formerr" id="stErr" hidden></div>
-    <button class="btn pri" id="stBtn">استعلام</button>
+    <form id="stForm" novalidate autocomplete="off">
+      <div class="field" style="max-width:380px"><label>الرقم القومي</label>
+        <input id="stNid" data-t="digits" inputmode="numeric" enterkeyhint="go" maxlength="14" dir="ltr" autocomplete="off" placeholder="14 رقم"></div>
+      <div class="formerr" id="stErr" hidden></div>
+      <button class="btn pri" id="stBtn" type="submit">استعلام</button>
+    </form>
     <div id="stResult" style="margin-top:14px"></div>
   </div>
   <div id="stEdit" hidden>
@@ -141,10 +145,12 @@ canvas#cropCanvas{width:100%;max-width:320px;aspect-ratio:1;touch-action:none;bo
 <section class="panel" id="tab-admin" hidden>
   <div id="admLogin" style="max-width:360px;margin:auto">
     <h3 style="color:var(--navy);text-align:center">دخول الأدمن</h3>
-    <div class="field"><label>اسم المستخدم</label><input id="admUser" data-t="user" dir="ltr" autocomplete="username" autocapitalize="off"></div>
-    <div class="field"><label>كلمة المرور</label><input id="admPass" type="password" dir="ltr" autocomplete="current-password"></div>
-    <div class="formerr" id="admErr" hidden></div>
-    <button class="btn pri wide" id="admBtn">دخول</button>
+    <form id="admForm" novalidate>
+      <div class="field"><label>اسم المستخدم</label><input id="admUser" data-t="user" dir="ltr" autocomplete="username" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="next"></div>
+      <div class="field"><label>كلمة المرور</label><input id="admPass" type="password" dir="ltr" autocomplete="current-password" enterkeyhint="go"></div>
+      <div class="formerr" id="admErr" hidden></div>
+      <button class="btn pri wide" id="admBtn" type="submit">دخول</button>
+    </form>
   </div>
 
   <div id="admDash" hidden>
@@ -402,6 +408,258 @@ $$('nav button').forEach(b => b.onclick = () => {
 });
 
 /* =========================================================
+   QR Code (إصدار 1 - تصحيح M - يكفي حتى 14 حرفًا) - مدمج بدون مكتبات خارجية
+   ========================================================= */
+const QR = (function () {
+  const SIZE = 21, DATA_CW = 16, EC_CW = 10;
+  const MASKS = [
+    (x, y) => (x + y) % 2 === 0,
+    (x, y) => y % 2 === 0,
+    (x, y) => x % 3 === 0,
+    (x, y) => (x + y) % 3 === 0,
+    (x, y) => (Math.floor(x / 3) + Math.floor(y / 2)) % 2 === 0,
+    (x, y) => (x * y) % 2 + (x * y) % 3 === 0,
+    (x, y) => ((x * y) % 2 + (x * y) % 3) % 2 === 0,
+    (x, y) => ((x + y) % 2 + (x * y) % 3) % 2 === 0
+  ];
+  function mul(x, y) { let z = 0; for (let i = 7; i >= 0; i--) { z = (z << 1) ^ ((z >>> 7) * 0x11D); z ^= ((y >>> i) & 1) * x; } return z; }
+  function divisor(deg) {
+    const r = new Array(deg).fill(0); r[deg - 1] = 1; let root = 1;
+    for (let i = 0; i < deg; i++) {
+      for (let j = 0; j < r.length; j++) { r[j] = mul(r[j], root); if (j + 1 < r.length) r[j] ^= r[j + 1]; }
+      root = mul(root, 2);
+    }
+    return r;
+  }
+  function remainder(data, div) {
+    const r = new Array(div.length).fill(0);
+    for (const b of data) { const f = b ^ r.shift(); r.push(0); div.forEach((c, i) => { r[i] ^= mul(c, f); }); }
+    return r;
+  }
+  function build(cw, mask) {
+    const m = [], fn = [];
+    for (let i = 0; i < SIZE; i++) { m.push(new Array(SIZE).fill(false)); fn.push(new Array(SIZE).fill(false)); }
+    const set = (x, y, d) => { m[y][x] = d; fn[y][x] = true; };
+    for (let i = 0; i < SIZE; i++) { set(6, i, i % 2 === 0); set(i, 6, i % 2 === 0); }
+    [[3, 3], [SIZE - 4, 3], [3, SIZE - 4]].forEach(c => {
+      for (let dy = -4; dy <= 4; dy++) for (let dx = -4; dx <= 4; dx++) {
+        const d = Math.max(Math.abs(dx), Math.abs(dy)), x = c[0] + dx, y = c[1] + dy;
+        if (x >= 0 && x < SIZE && y >= 0 && y < SIZE) set(x, y, d !== 2 && d !== 4);
+      }
+    });
+    const fd = mask; let rem = fd;                           // مستوى التصحيح M = 00
+    for (let i = 0; i < 10; i++) rem = (rem << 1) ^ ((rem >>> 9) * 0x537);
+    const bits = ((fd << 10) | rem) ^ 0x5412, gb = i => ((bits >>> i) & 1) !== 0;
+    for (let i = 0; i <= 5; i++) set(8, i, gb(i));
+    set(8, 7, gb(6)); set(8, 8, gb(7)); set(7, 8, gb(8));
+    for (let i = 9; i < 15; i++) set(14 - i, 8, gb(i));
+    for (let i = 0; i < 8; i++) set(SIZE - 1 - i, 8, gb(i));
+    for (let i = 8; i < 15; i++) set(8, SIZE - 15 + i, gb(i));
+    set(8, SIZE - 8, true);
+    let k = 0; const total = cw.length * 8;
+    for (let right = SIZE - 1; right >= 1; right -= 2) {
+      if (right === 6) right = 5;
+      for (let vert = 0; vert < SIZE; vert++) for (let j = 0; j < 2; j++) {
+        const x = right - j, up = ((right + 1) & 2) === 0, y = up ? SIZE - 1 - vert : vert;
+        if (!fn[y][x] && k < total) { m[y][x] = ((cw[k >>> 3] >>> (7 - (k & 7))) & 1) !== 0; k++; }
+      }
+    }
+    for (let y = 0; y < SIZE; y++) for (let x = 0; x < SIZE; x++) if (!fn[y][x] && MASKS[mask](x, y)) m[y][x] = !m[y][x];
+    return m;
+  }
+  function penalty(m) {
+    let p = 0; const lines = [];
+    for (let y = 0; y < SIZE; y++) lines.push(m[y].map(b => b ? '1' : '0').join(''));
+    for (let x = 0; x < SIZE; x++) lines.push(m.map(r => r[x] ? '1' : '0').join(''));
+    lines.forEach(s => {
+      (s.match(/0+|1+/g) || []).forEach(r => { if (r.length >= 5) p += 3 + r.length - 5; });
+      ['10111010000', '00001011101'].forEach(pat => { let k = -1; while ((k = s.indexOf(pat, k + 1)) >= 0) p += 40; });
+    });
+    for (let y = 0; y < SIZE - 1; y++) for (let x = 0; x < SIZE - 1; x++) {
+      const c = m[y][x]; if (c === m[y][x + 1] && c === m[y + 1][x] && c === m[y + 1][x + 1]) p += 3;
+    }
+    let dark = 0; m.forEach(r => r.forEach(b => { if (b) dark++; }));
+    p += Math.max(0, Math.ceil(Math.abs(dark * 20 - SIZE * SIZE * 10) / (SIZE * SIZE)) - 1) * 10;
+    return p;
+  }
+  function make(text) {
+    const bytes = [];
+    for (let i = 0; i < text.length; i++) { const c = text.charCodeAt(i); if (c > 127) throw new Error('QR: ASCII only'); bytes.push(c); }
+    if (bytes.length > 14) throw new Error('QR: data too long');
+    const bits = [], put = (v, n) => { for (let i = n - 1; i >= 0; i--) bits.push((v >>> i) & 1); };
+    put(4, 4); put(bytes.length, 8); bytes.forEach(b => put(b, 8));
+    const cap = DATA_CW * 8; put(0, Math.min(4, cap - bits.length));
+    while (bits.length % 8) bits.push(0);
+    for (let pad = 0xEC; bits.length < cap; pad ^= 0xEC ^ 0x11) put(pad, 8);
+    const data = []; for (let i = 0; i < bits.length; i += 8) data.push(parseInt(bits.slice(i, i + 8).join(''), 2));
+    const cw = data.concat(remainder(data, divisor(EC_CW)));
+    let best = null, bp = Infinity;
+    for (let mk = 0; mk < 8; mk++) { const mm = build(cw, mk), p = penalty(mm); if (p < bp) { bp = p; best = mm; } }
+    return { size: SIZE, dark: (r, c) => best[r][c] };
+  }
+  return { make };
+})();
+
+/* =========================================================
+   كارت الـ ID (مقاس CR80: 85.6×54 مم بدقة 300 dpi = 1011×638 بكسل)
+   ========================================================= */
+const CARD_W = 1011, CARD_H = 638;
+const CARD_TITLE = 'اجتماع شباب «اتبعني»';
+const CARD_SUB = 'كاتدرائية مارمينا والبابا كيرلس - العاشر من رمضان';
+const CARD_FONT = "'Cairo', Tahoma, Arial, sans-serif";
+
+function rrect(g, x, y, w, h, r) {
+  g.beginPath(); g.moveTo(x + r, y);
+  g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r);
+  g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath();
+}
+function crossShape(g, cx, cy, s) {
+  g.fillStyle = '#c8a24a';
+  rrect(g, cx - s * 0.14, cy - s * 0.5, s * 0.28, s, s * 0.05); g.fill();
+  rrect(g, cx - s * 0.38, cy - s * 0.22, s * 0.76, s * 0.26, s * 0.05); g.fill();
+}
+function nameLines(g, name, maxW) {
+  for (let s = 42; s >= 28; s -= 2) {
+    g.font = `700 ${s}px ${CARD_FONT}`;
+    if (g.measureText(name).width <= maxW) return { size: s, lines: [name] };
+  }
+  const size = 28; g.font = `700 ${size}px ${CARD_FONT}`;
+  const lines = []; let cur = '';
+  name.split(' ').forEach(w => {
+    const t = cur ? cur + ' ' + w : w;
+    if (!cur || g.measureText(t).width <= maxW) cur = t; else { lines.push(cur); cur = w; }
+  });
+  if (cur) lines.push(cur);
+  return { size, lines: lines.slice(0, 3) };
+}
+
+// d = { name, code, photo (Image أو null) }
+function drawCard(g, d) {
+  const W = CARD_W, H = CARD_H, NAVY = '#1f3a5f', GOLD = '#c8a24a';
+  g.save();
+  g.clearRect(0, 0, W, H);
+  rrect(g, 0, 0, W, H, 34); g.clip();
+  g.fillStyle = '#fffdf6'; g.fillRect(0, 0, W, H);
+
+  // الهيدر
+  const gr = g.createLinearGradient(0, 0, W, 0); gr.addColorStop(0, NAVY); gr.addColorStop(1, '#2c5282');
+  g.fillStyle = gr; g.fillRect(0, 0, W, 130);
+  g.fillStyle = GOLD; g.fillRect(0, 130, W, 6);
+  crossShape(g, 64, 62, 54); crossShape(g, W - 64, 62, 54);
+  g.direction = 'rtl'; g.textBaseline = 'middle'; g.textAlign = 'center';
+  g.fillStyle = '#ffffff'; g.font = `700 46px ${CARD_FONT}`; g.fillText(CARD_TITLE, W / 2, 56);
+  g.fillStyle = '#f1e2b0'; g.font = `400 24px ${CARD_FONT}`; g.fillText(CARD_SUB, W / 2, 102);
+
+  // الصورة الشخصية (يمين)
+  const PS = 300, px = W - 40 - PS, py = 205;
+  g.fillStyle = GOLD; rrect(g, px - 7, py - 7, PS + 14, PS + 14, 28); g.fill();
+  g.save(); rrect(g, px, py, PS, PS, 22); g.clip();
+  if (d.photo) {
+    const iw = d.photo.naturalWidth || d.photo.width, ih = d.photo.naturalHeight || d.photo.height, s = Math.min(iw, ih);
+    g.drawImage(d.photo, (iw - s) / 2, (ih - s) / 2, s, s, px, py, PS, PS);
+  } else {
+    g.fillStyle = '#e7ecf4'; g.fillRect(px, py, PS, PS);
+    g.fillStyle = '#b8c3d4';
+    g.beginPath(); g.arc(px + PS / 2, py + PS * 0.38, PS * 0.17, 0, Math.PI * 2); g.fill();
+    g.beginPath(); g.ellipse(px + PS / 2, py + PS * 0.98, PS * 0.36, PS * 0.32, 0, 0, Math.PI * 2); g.fill();
+  }
+  g.restore();
+
+  // QR (يسار)
+  const QS = 250, qx = 40, qy = 205, qr = QR.make(d.code), n = qr.size;
+  const pad = 14, mod = Math.floor((QS - pad * 2) / n), side = mod * n, off = Math.floor((QS - side) / 2);
+  g.fillStyle = '#ffffff'; rrect(g, qx, qy, QS, QS, 16); g.fill();
+  g.strokeStyle = '#d9dfea'; g.lineWidth = 2; g.stroke();
+  g.fillStyle = '#000000';
+  for (let r = 0; r < n; r++) for (let c = 0; c < n; c++) if (qr.dark(r, c)) g.fillRect(qx + off + c * mod, qy + off + r * mod, mod, mod);
+  g.fillStyle = '#6b7785'; g.font = `400 22px ${CARD_FONT}`; g.textAlign = 'center';
+  g.fillText('امسح الكود عند الدخول', qx + QS / 2, qy + QS + 34);
+
+  // الاسم والكود (المنتصف)
+  const cx = Math.round((qx + QS + px) / 2), zw = px - (qx + QS) - 40;
+  g.fillStyle = '#6b7785'; g.font = `400 22px ${CARD_FONT}`; g.fillText('الاسم', cx, 232);
+  const nl = nameLines(g, d.name, zw), lh = nl.size * (nl.lines.length > 1 ? 1.3 : 1.4);
+  g.fillStyle = NAVY; g.font = `700 ${nl.size}px ${CARD_FONT}`;
+  nl.lines.forEach((t, i) => g.fillText(t, cx, 300 + (i - (nl.lines.length - 1) / 2) * lh));
+  g.fillStyle = GOLD; g.fillRect(cx - 70, 366, 140, 4);
+
+  g.fillStyle = '#6b7785'; g.font = `400 22px ${CARD_FONT}`; g.fillText('الكود', cx, 400);
+  g.direction = 'ltr'; g.textAlign = 'left';
+  let cs = 56, ws, tw; const gap = 10;
+  for (; cs >= 36; cs -= 2) {                       // صغّر الخط لو الكود أعرض من المساحة
+    g.font = `700 ${cs}px ${CARD_FONT}`;
+    ws = d.code.split('').map(ch => g.measureText(ch).width);
+    tw = ws.reduce((a, b) => a + b, 0) + gap * (ws.length - 1);
+    if (tw + 44 <= zw) break;
+  }
+  const bw = Math.min(zw, tw + 44);
+  g.fillStyle = '#f5f8fd'; rrect(g, cx - bw / 2, 418, bw, 84, 16); g.fill();
+  g.setLineDash([10, 7]); g.strokeStyle = GOLD; g.lineWidth = 3; g.stroke(); g.setLineDash([]);
+  g.fillStyle = NAVY; let tx = cx - tw / 2;
+  d.code.split('').forEach((ch, i) => { g.fillText(ch, tx, 461); tx += ws[i] + gap; });
+
+  // الفوتر
+  g.direction = 'rtl'; g.textAlign = 'center';
+  g.fillStyle = NAVY; g.fillRect(0, 582, W, 56);
+  g.fillStyle = '#ffffff'; g.font = `400 22px ${CARD_FONT}`;
+  g.fillText('كارت شخصي - يُرجى إبراز الكارت عند الدخول', W / 2, 611);
+
+  // إطار ذهبي رفيع
+  rrect(g, 3, 3, W - 6, H - 6, 32); g.strokeStyle = GOLD; g.lineWidth = 6; g.stroke();
+  g.restore();
+}
+
+async function renderCard(d) {
+  try {
+    if (document.fonts && document.fonts.load) {
+      await Promise.all([
+        document.fonts.load('700 46px Cairo', d.name + CARD_TITLE + '0123456789'),
+        document.fonts.load('400 24px Cairo', CARD_SUB + 'الاسم الكود امسح عند الدخول كارت شخصي يُرجى إبراز')
+      ]);
+    }
+  } catch (e) { /* نكمل بخط بديل */ }
+  const cv = document.createElement('canvas'); cv.width = CARD_W; cv.height = CARD_H;
+  drawCard(cv.getContext('2d'), d);
+  return cv;
+}
+
+const loadImage = src => new Promise(res => { const i = new Image(); i.onload = () => res(i); i.onerror = () => res(null); i.src = src; });
+
+function downloadCanvas(cv, filename) {
+  const save = href => { const a = document.createElement('a'); a.href = href; a.download = filename; document.body.appendChild(a); a.click(); a.remove(); };
+  if (cv.toBlob) cv.toBlob(b => {
+    if (!b) return save(cv.toDataURL('image/png'));
+    const u = URL.createObjectURL(b); save(u); setTimeout(() => URL.revokeObjectURL(u), 5000);
+  }, 'image/png');
+  else save(cv.toDataURL('image/png'));
+}
+
+async function buildCard(nid, name, code) {
+  const host = $('#cardBox'); if (!host) return;
+  host.innerHTML = '<p class="lead" style="text-align:center"><span class="spin"></span> جاري تجهيز الكارت...</p>';
+  const r = await api('cardPhoto', { nid }, 60000);
+  if (!host.isConnected) return;
+  if (!r.ok) {
+    host.innerHTML = `<div class="formerr">${esc(r.error)}</div><button class="btn" id="cardRetry">إعادة المحاولة</button>`;
+    $('#cardRetry').onclick = () => buildCard(nid, name, code);
+    return;
+  }
+  try {
+    const photo = r.photo ? await loadImage(r.photo) : null;
+    const cv = await renderCard({ name: r.name || name, code: r.code || code, photo });
+    if (!host.isConnected) return;
+    host.innerHTML = `<div class="card-title">كارت الـ ID الخاص بك</div>
+      <img class="idcard" alt="ID Card" src="${cv.toDataURL('image/png')}">
+      <div class="row" style="justify-content:center"><button class="btn gold" id="cardDl">⬇ تحميل الكارت (PNG)</button></div>
+      <small class="hint" style="text-align:center">لو التحميل لم يبدأ على الموبايل، اضغط مطولًا على الكارت واختر «حفظ الصورة».</small>`;
+    $('#cardDl').onclick = () => downloadCanvas(cv, 'ID-Card-' + (r.code || code) + '.png');
+  } catch (e) {
+    host.innerHTML = '<div class="formerr">تعذر تجهيز الكارت.</div><button class="btn" id="cardRetry">إعادة المحاولة</button>';
+    $('#cardRetry').onclick = () => buildCard(nid, name, code);
+  }
+}
+
+/* =========================================================
    النموذج المشترك
    ========================================================= */
 const fld = (h, k) => h.querySelector(`[data-f="${k}"]`);
@@ -629,10 +887,12 @@ $('#newReg').onclick = () => { mountForm(regHost, { photos: true }); $('#doneBox
 
 /* =========================================================
    الاستعلام (بالرقم القومي فقط) + تعديل المرفوض
+   زر Enter (كمبيوتر) أو Go (موبايل) يشغّل الاستعلام عن طريق <form>
    ========================================================= */
 const resubHost = $('#resubForm');
 let SQ = null, resubBusy = false;
 
+$('#stForm').onsubmit = e => e.preventDefault();      // منع إعادة تحميل الصفحة (الاستعلام يتم عبر زر الإرسال)
 $('#stBtn').onclick = async () => {
   showErr('#stErr', ''); $('#stResult').innerHTML = '';
   const nid = digits($('#stNid').value);
@@ -647,7 +907,8 @@ $('#stBtn').onclick = async () => {
   SQ = { q, r };
   const box = $('#stResult');
   if (r.status === 'مقبول') {
-    box.innerHTML = `<div class="notice good"><b>${esc(r.name)}</b><br>تم قبول طلبك ✔ وهذا كودك الخاص، احتفظ به:</div><div class="code">${esc(r.code)}</div>`;
+    box.innerHTML = `<div class="notice good"><b>${esc(r.name)}</b><br>تم قبول طلبك ✔ وهذا كودك الخاص، احتفظ به:</div><div class="code">${esc(r.code)}</div><div id="cardBox"></div>`;
+    buildCard(nid, r.name, r.code);
   } else if (r.status === 'مرفوض') {
     box.innerHTML = `<div class="notice bad"><b>${esc(r.name)}</b><br>تم رفض الطلب.<br><b>السبب:</b> ${esc(r.reason)}</div><button class="btn pri" id="goEdit">تعديل البيانات وإعادة الإرسال</button>`;
     $('#goEdit').onclick = startResubmit;
@@ -693,10 +954,16 @@ function logout(msg) {
   if (msg) showErr('#admErr', msg);
 }
 
+// Enter من لوحة مفاتيح الكمبيوتر أو الموبايل (Go) يشغّل الدخول عن طريق <form>
+$('#admForm').onsubmit = e => e.preventDefault();
 $('#admBtn').onclick = async () => {
   showErr('#admErr', '');
   const u = $('#admUser').value.trim(), p = $('#admPass').value;
-  if (!u || !p) return showErr('#admErr', 'أدخل اسم المستخدم وكلمة المرور.');
+  if (!u || !p) {
+    showErr('#admErr', !u ? 'أدخل اسم المستخدم.' : 'أدخل كلمة المرور.');
+    (!u ? $('#admUser') : $('#admPass')).focus();      // Enter في خانة اليوزر ينقلك لكلمة المرور
+    return;
+  }
   const b = $('#admBtn'); b.disabled = true; b.innerHTML = '<span class="spin"></span>';
   const r = await api('login', { username: u, password: p });
   b.disabled = false; b.textContent = 'دخول';
@@ -704,7 +971,6 @@ $('#admBtn').onclick = async () => {
   A.token = r.token; A.user = r.username; sessionStorage.setItem('adm_tok', A.token); sessionStorage.setItem('adm_user', A.user);
   $('#admPass').value = ''; enterDash();
 };
-$('#admPass').addEventListener('keydown', e => { if (e.key === 'Enter') $('#admBtn').click(); });
 $('#admLogout').onclick = () => logout();
 $('#admRefresh').onclick = () => loadList();
 
