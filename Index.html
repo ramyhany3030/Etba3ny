@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>اجتماع شباب اتبعني - التسجيل</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" defer></script>
+<style>
+:root{--navy:#1f3a5f;--navy2:#2c5282;--gold:#c8a24a;--bg:#f2f5fa;--card:#fff;--txt:#1d2733;--mut:#6b7785;--line:#dfe5ee;--ok:#1f8a4c;--warn:#c27c0e;--bad:#c0392b}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0}
+body{font-family:'Cairo',Tahoma,Arial,sans-serif;background:var(--bg);color:var(--txt);line-height:1.7;font-size:15px}
+header{background:linear-gradient(135deg,var(--navy),var(--navy2));color:#fff;text-align:center;padding:22px 14px 18px}
+header h1{margin:0;font-size:22px}
+header p{margin:4px 0 0;opacity:.9;font-size:14px}
+header .cross{color:var(--gold);font-size:26px;line-height:1}
+nav{display:flex;gap:6px;max-width:980px;margin:-14px auto 0;padding:0 10px;position:relative}
+nav button{flex:1;border:0;background:#fff;color:var(--navy);padding:11px 6px;border-radius:12px 12px 0 0;font:inherit;font-weight:700;cursor:pointer;box-shadow:0 -2px 8px rgba(0,0,0,.05)}
+nav button.on{background:var(--gold);color:#fff}
+main{max-width:980px;margin:0 auto;padding:0 10px 40px}
+.panel{background:var(--card);border-radius:0 0 14px 14px;box-shadow:0 4px 18px rgba(31,58,95,.08);padding:18px}
+.sec{border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:14px;background:#fcfdff}
+.sec h3{margin:0 0 10px;color:var(--navy);font-size:16px;border-right:4px solid var(--gold);padding-right:8px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:640px){.grid2{grid-template-columns:1fr}}
+.field{margin-bottom:10px}
+.field label{display:block;font-weight:600;margin-bottom:3px;font-size:14px}
+.field label b{color:var(--bad)}
+input,select,textarea{width:100%;font:inherit;padding:10px 11px;border:1.5px solid var(--line);border-radius:10px;background:#fff;color:var(--txt)}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--navy2);box-shadow:0 0 0 3px rgba(44,82,130,.15)}
+input[dir=ltr]{text-align:right}
+.field.err input,.field.err select,.field.err textarea,.photo.err{border-color:var(--bad);background:#fff6f5}
+small.hint{display:block;color:var(--mut);font-size:12.5px;min-height:18px}
+small.hint.bad{color:var(--bad)} small.hint.good{color:var(--ok)}
+.btn{border:0;border-radius:10px;padding:10px 16px;font:inherit;font-weight:700;cursor:pointer;background:#e9eef6;color:var(--navy)}
+.btn:disabled{opacity:.55;cursor:not-allowed}
+.btn.pri{background:var(--navy);color:#fff}.btn.gold{background:var(--gold);color:#fff}
+.btn.ok{background:var(--ok);color:#fff}.btn.bad{background:var(--bad);color:#fff}.btn.sm{padding:5px 10px;font-size:13px}
+.btn.wide{width:100%;padding:13px;font-size:16px}
+.formerr{background:#fdecea;color:var(--bad);border:1px solid #f5c6c1;border-radius:10px;padding:9px 12px;margin:8px 0;font-weight:600}
+.notice{border-radius:10px;padding:10px 13px;margin-bottom:12px}
+.notice.warn{background:#fff6e0;border:1px solid #f0d9a0;color:#7a5a05}
+.notice.good{background:#e8f6ee;border:1px solid #b7e1c6;color:#16653a}
+.notice.bad{background:#fdecea;border:1px solid #f5c6c1;color:#8f2a20}
+.photo{border:1.5px dashed var(--line);border-radius:12px;padding:10px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.photo .prev{width:130px;height:130px;border-radius:10px;background:#eef2f8;display:flex;align-items:center;justify-content:center;color:var(--mut);font-size:12.5px;overflow:hidden;flex:none;text-align:center}
+.photo.idc .prev{width:190px;height:130px}
+.photo .prev img{width:100%;height:100%;object-fit:cover;display:block}
+.photo .btns{display:flex;flex-direction:column;gap:6px}
+.photo-title{font-weight:700;margin:6px 0 4px}
+.badge{display:inline-block;padding:2px 10px;border-radius:20px;font-size:12.5px;font-weight:700}
+.badge.p{background:#fff1d6;color:var(--warn)}.badge.o{background:#dff3e7;color:var(--ok)}.badge.n{background:#fbe1de;color:var(--bad)}
+.code{font-size:34px;font-weight:700;letter-spacing:6px;color:var(--navy);direction:ltr;text-align:center;background:#f5f8fd;border:2px dashed var(--gold);border-radius:12px;padding:8px;margin:10px 0}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:10px 0}
+@media(max-width:640px){.stats{grid-template-columns:repeat(2,1fr)}}
+.stat{background:#f5f8fd;border:1px solid var(--line);border-radius:12px;text-align:center;padding:8px}
+.stat b{display:block;font-size:22px;color:var(--navy)}.stat span{font-size:13px;color:var(--mut)}
+.tbl-wrap{overflow:auto;border:1px solid var(--line);border-radius:12px;max-height:68vh}
+table{width:100%;border-collapse:collapse;font-size:13.5px;min-width:720px}
+th{position:sticky;top:0;background:var(--navy);color:#fff;padding:8px;text-align:right;white-space:nowrap}
+td{padding:7px 8px;border-top:1px solid var(--line);white-space:nowrap}
+tr.r:hover td{background:#f5f8fd;cursor:pointer}
+.ltr{direction:ltr;unicode-bidi:plaintext}
+.modal{position:fixed;inset:0;background:rgba(15,25,40,.55);z-index:50;display:flex;align-items:flex-start;justify-content:center;overflow:auto;padding:14px}
+.modal .box{background:#fff;border-radius:14px;max-width:760px;width:100%;padding:16px;margin:auto}
+.modal .box.sm{max-width:420px}
+.modal h3.mt{margin:0 0 8px;color:var(--navy)}
+.adm-photos{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.adm-photos figure{margin:0;text-align:center;flex:1;min-width:150px}
+.adm-photos .im{height:190px;border-radius:10px;background:#eef2f8;display:flex;align-items:center;justify-content:center;color:var(--mut);overflow:hidden}
+.adm-photos img{width:100%;height:100%;object-fit:contain;cursor:zoom-in;background:#000}
+.adm-photos figcaption{font-size:13px;margin-top:3px;color:var(--mut)}
+#toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:#222;color:#fff;padding:10px 18px;border-radius:24px;z-index:99;max-width:92%;text-align:center;box-shadow:0 4px 14px rgba(0,0,0,.3)}
+#toast.err{background:var(--bad)}#toast.ok{background:var(--ok)}
+canvas#cropCanvas{width:100%;max-width:320px;aspect-ratio:1;touch-action:none;border-radius:10px;background:#000;display:block;margin:0 auto;cursor:grab}
+.spin{display:inline-block;width:16px;height:16px;border:3px solid #ccd;border-top-color:var(--navy);border-radius:50%;animation:sp 1s linear infinite;vertical-align:middle}
+@keyframes sp{to{transform:rotate(360deg)}}
+.lead{color:var(--mut);margin:0 0 12px}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="cross">✝</div>
+  <h1>اجتماع شباب «اتبعني»</h1>
+  <p>كاتدرائية مارمينا والبابا كيرلس - العاشر من رمضان</p>
+</header>
+
+<nav>
+  <button class="on" data-tab="register">التسجيل</button>
+  <button data-tab="status">استعلام عن حالة التسجيل</button>
+  <button data-tab="admin">الأدمن</button>
+</nav>
+
+<main>
+<!-- ============ تبويب التسجيل ============ -->
+<section class="panel" id="tab-register">
+  <div id="closedBox" class="notice bad" hidden>التسجيل مغلق حاليًا.</div>
+  <div id="doneBox" hidden>
+    <div class="notice good"><b>تم استلام طلبك بنجاح ✔</b><br>سيتم مراجعة بياناتك، وبعد القبول سيصلك كودك الخاص.</div>
+    <p>للاطمئنان على طلبك استخدم تبويب <b>«استعلام عن حالة التسجيل»</b> بالرقم القومي ورقم الواتساب.</p>
+    <button class="btn pri" id="newReg">تسجيل شخص آخر</button>
+  </div>
+  <div id="regWrap">
+    <p class="lead">املأ البيانات التالية بدقة. الحقول التي بعلامة <b style="color:var(--bad)">*</b> إجبارية.</p>
+    <div id="regForm"></div>
+    <div class="formerr" id="regErr" hidden></div>
+    <button class="btn pri wide" id="regBtn">إرسال الطلب</button>
+  </div>
+</section>
+
+<!-- ============ تبويب الاستعلام ============ -->
+<section class="panel" id="tab-status" hidden>
+  <div id="stQuery">
+    <p class="lead">أدخل الرقم القومي ورقم الواتساب المسجلين لمعرفة حالة طلبك.</p>
+    <div class="grid2">
+      <div class="field"><label>الرقم القومي</label><input id="stNid" inputmode="numeric" maxlength="14" dir="ltr"></div>
+      <div class="field"><label>رقم الواتساب</label><input id="stWa" inputmode="numeric" maxlength="11" dir="ltr"></div>
+    </div>
+    <div class="formerr" id="stErr" hidden></div>
+    <button class="btn pri" id="stBtn">استعلام</button>
+    <div id="stResult" style="margin-top:14px"></div>
+  </div>
+  <div id="stEdit" hidden>
+    <div class="notice bad" id="stReason"></div>
+    <h3 style="color:var(--navy)">عدّل بياناتك ثم أعد الإرسال</h3>
+    <div id="resubForm"></div>
+    <div class="formerr" id="resubErr" hidden></div>
+    <div class="row">
+      <button class="btn pri" id="resubBtn">إعادة الإرسال</button>
+      <button class="btn" id="resubCancel">رجوع</button>
+    </div>
+  </div>
+</section>
+
+<!-- ============ تبويب الأدمن ============ -->
+<section class="panel" id="tab-admin" hidden>
+  <div id="admLogin" style="max-width:360px;margin:auto">
+    <h3 style="color:var(--navy);text-align:center">دخول الأدمن</h3>
+    <div class="field"><label>اسم المستخدم</label><input id="admUser" dir="ltr" autocomplete="username" autocapitalize="off"></div>
+    <div class="field"><label>كلمة المرور</label><input id="admPass" type="password" dir="ltr" autocomplete="current-password"></div>
+    <div class="formerr" id="admErr" hidden></div>
+    <button class="btn pri wide" id="admBtn">دخول</button>
+  </div>
+
+  <div id="admDash" hidden>
+    <div class="row" style="justify-content:space-between">
+      <div>مرحبًا <b id="admName"></b></div>
+      <div class="row">
+        <button class="btn sm" id="admRefresh">تحديث</button>
+        <button class="btn sm bad" id="admLogout">خروج</button>
+      </div>
+    </div>
+    <div class="stats">
+      <div class="stat"><b id="sTotal">0</b><span>إجمالي المسجلين</span></div>
+      <div class="stat"><b id="sPend">0</b><span>قيد المراجعة</span></div>
+      <div class="stat"><b id="sOk">0</b><span>مقبول</span></div>
+      <div class="stat"><b id="sNo">0</b><span>مرفوض</span></div>
+    </div>
+    <div class="row" style="margin-bottom:10px">
+      <input id="admSearch" placeholder="بحث بالاسم / الرقم القومي / الكود / الهاتف" style="flex:1;min-width:200px">
+      <select id="admFilter" style="width:auto">
+        <option value="">كل الحالات</option><option>قيد المراجعة</option><option>مقبول</option><option>مرفوض</option>
+      </select>
+      <button class="btn gold" id="admExport">تصدير Excel</button>
+      <button class="btn" id="admToggle">...</button>
+    </div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>#</th><th>الكود</th><th>الاسم</th><th>الرقم القومي</th><th>واتساب</th><th>الحالة</th><th>التاريخ</th><th>إجراءات</th></tr></thead>
+        <tbody id="admBody"></tbody>
+      </table>
+    </div>
+    <p class="lead" id="admCount" style="margin-top:6px"></p>
+  </div>
+</section>
+</main>
+
+<!-- ============ قالب النموذج (يُستخدم في التسجيل وإعادة الإرسال وتعديل الأدمن) ============ -->
+<template id="tplForm">
+  <div class="sec">
+    <h3>البيانات الشخصية</h3>
+    <div class="field"><label>الاسم رباعي <b>*</b></label>
+      <input data-f="fullName" autocomplete="name" placeholder="الاسم الأول والثاني والثالث والرابع"></div>
+    <div class="grid2">
+      <div class="field"><label>النوع <b>*</b></label>
+        <select data-f="gender"><option value="">اختر</option><option>ذكر</option><option>أنثى</option></select></div>
+      <div class="field"><label>الرقم القومي (14 رقم) <b>*</b></label>
+        <input data-f="nid" inputmode="numeric" maxlength="14" dir="ltr"><small class="hint" data-hint="nid"></small></div>
+    </div>
+    <div class="grid2">
+      <div class="field"><label>رقم الواتساب (11 رقم) <b>*</b></label><input data-f="whatsapp" inputmode="numeric" maxlength="11" dir="ltr" placeholder="01XXXXXXXXX"></div>
+      <div class="field"><label>رقم الهاتف (11 رقم) <b>*</b></label><input data-f="phone" inputmode="numeric" maxlength="11" dir="ltr" placeholder="01XXXXXXXXX"></div>
+    </div>
+    <div class="grid2">
+      <div class="field"><label>رقم هاتف آخر (اختياري)</label><input data-f="phone2" inputmode="numeric" maxlength="11" dir="ltr"></div>
+      <div class="field"><label>أب الاعتراف <b>*</b></label><input data-f="father"></div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <h3>المهنة</h3>
+    <div class="field"><label>المهنة <b>*</b></label>
+      <select data-f="occupation"><option value="">اختر</option><option>طالب</option><option>موظف</option><option>أخرى</option></select></div>
+
+    <div data-group="student" hidden>
+      <div class="grid2">
+        <div class="field"><label>المرحلة <b>*</b></label><select data-f="studyStage" data-list="stages"></select></div>
+        <div class="field"><label>السنة الدراسية <b>*</b></label><select data-f="studyYear"></select></div>
+      </div>
+      <div class="grid2">
+        <div class="field"><label>جهة الدراسة (المدرسة / الجامعة / المعهد) <b>*</b></label><input data-f="studyPlace"></div>
+        <div class="field"><label>الكلية / القسم <b data-facreq>*</b></label><input data-f="faculty"></div>
+      </div>
+    </div>
+
+    <div data-group="employee" hidden>
+      <div class="grid2">
+        <div class="field"><label>القطاع <b>*</b></label><select data-f="workSector" data-list="sectors"></select></div>
+        <div class="field"><label>المسمى الوظيفي <b>*</b></label><input data-f="jobTitle"></div>
+      </div>
+      <div class="field"><label>جهة العمل <b data-wpreq>*</b></label><input data-f="workPlace"></div>
+    </div>
+
+    <div data-group="other" hidden>
+      <div class="field"><label>الحالة <b>*</b></label><select data-f="otherStatus" data-list="otherStatus"></select></div>
+      <div class="field" data-group="otherText" hidden><label>اكتب التفاصيل <b>*</b></label><input data-f="otherText"></div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <h3>العنوان</h3>
+    <div class="grid2">
+      <div class="field"><label>نوع السكن <b>*</b></label><select data-f="housingType" data-list="housing"></select></div>
+      <div class="field" data-group="compound" hidden><label>اسم الكومباوند <b>*</b></label><input data-f="compound"></div>
+    </div>
+    <div class="grid2">
+      <div class="field"><label>الحي / المجاورة <b>*</b></label><select data-f="district" data-list="districts"></select></div>
+      <div class="field" data-group="districtOther" hidden><label>اكتب الحي / المجاورة <b>*</b></label><input data-f="districtOther"></div>
+    </div>
+    <div class="grid2">
+      <div class="field"><label>رقم العمارة <b>*</b></label><input data-f="building"></div>
+      <div class="field"><label>رقم الشقة <b>*</b></label><input data-f="apartment"></div>
+    </div>
+    <div class="field"><label>تفاصيل أخرى للعنوان</label><textarea data-f="addressDetails" rows="2" placeholder="علامة مميزة، دور، ..."></textarea></div>
+  </div>
+
+  <div class="sec" data-group="photos">
+    <h3>الصور</h3>
+    <p class="lead" data-photonote style="margin:0 0 6px"></p>
+    <div class="photo-title">الصورة الشخصية (تُقص مربعة) <b style="color:var(--bad)" data-photostar>*</b></div>
+    <div class="photo" data-photo="profile">
+      <div class="prev"><span>لا توجد صورة</span></div>
+      <div class="btns">
+        <button type="button" class="btn sm" data-cam>📷 التقاط صورة</button>
+        <button type="button" class="btn sm" data-gal>🖼️ من المعرض</button>
+      </div>
+      <input type="file" accept="image/*" capture="user" hidden data-in-cam>
+      <input type="file" accept="image/*" hidden data-in-gal>
+    </div>
+    <div class="photo-title" style="margin-top:12px">صورة بطاقة الرقم القومي (الوجه) <b style="color:var(--bad)" data-photostar>*</b></div>
+    <div class="photo idc" data-photo="idCard">
+      <div class="prev"><span>لا توجد صورة</span></div>
+      <div class="btns">
+        <button type="button" class="btn sm" data-cam>📷 التقاط صورة</button>
+        <button type="button" class="btn sm" data-gal>🖼️ من المعرض</button>
+      </div>
+      <input type="file" accept="image/*" capture="environment" hidden data-in-cam>
+      <input type="file" accept="image/*" hidden data-in-gal>
+    </div>
+    <small class="hint">صورة البطاقة سرية ولا يراها إلا الأدمن.</small>
+  </div>
+</template>
+
+<!-- ============ نوافذ ============ -->
+<div class="modal" id="cropModal" hidden>
+  <div class="box sm">
+    <h3 class="mt">اضبط الصورة الشخصية</h3>
+    <p class="lead" style="margin:0 0 8px">اسحب الصورة لتحريكها، واستخدم الشريط للتكبير.</p>
+    <canvas id="cropCanvas"></canvas>
+    <input type="range" id="cropZoom" min="1" max="4" step="0.01" value="1" style="margin:12px 0">
+    <div class="row"><button class="btn pri" id="cropOk">تأكيد</button><button class="btn" id="cropCancel">إلغاء</button></div>
+  </div>
+</div>
+
+<div class="modal" id="detailModal" hidden>
+  <div class="box">
+    <div class="row" style="justify-content:space-between">
+      <h3 class="mt" id="dName"></h3>
+      <button class="btn sm" id="dClose">إغلاق ✕</button>
+    </div>
+    <div class="row" id="dHead" style="margin-bottom:8px"></div>
+    <div class="adm-photos">
+      <figure><div class="im" id="dImgP"><span class="spin"></span></div><figcaption>الصورة الشخصية</figcaption></figure>
+      <figure><div class="im" id="dImgI"><span class="spin"></span></div><figcaption>صورة البطاقة (اضغط للتكبير)</figcaption></figure>
+    </div>
+    <div id="dForm"></div>
+    <div class="formerr" id="dErr" hidden></div>
+    <div class="row" id="dActions"></div>
+  </div>
+</div>
+
+<div class="modal" id="askModal" hidden style="z-index:70">
+  <div class="box sm">
+    <h3 class="mt" id="askTitle"></h3>
+    <p id="askMsg"></p>
+    <textarea id="askInput" rows="3" hidden placeholder="اكتب السبب..."></textarea>
+    <div class="row" style="margin-top:10px"><button class="btn pri" id="askOk">تأكيد</button><button class="btn" id="askCancel">إلغاء</button></div>
+  </div>
+</div>
+
+<div class="modal" id="lightbox" hidden style="z-index:80;background:rgba(0,0,0,.88)"><img id="lbImg" style="max-width:100%;max-height:100%;margin:auto"></div>
+<div id="toast" hidden></div>
+
+<script>
+/* =========================================================
+   ضع هنا رابط الـ Web App المنتهي بـ /exec  (مرة واحدة فقط)
+   ========================================================= */
+const API_URL = 'https://script.google.com/macros/s/AKfycbxypCBeZBAqBZvdfFGYG9nmBvgqrUouyK08E_7Y76QMhOt59ltvhmpIEQjV3Y2ic7lY/exec';
+
+const LISTS = {
+  stages: {
+    'فني أو دبلوم': ['الأولى','الثانية','الثالثة','الرابعة','الخامسة'],
+    'جامعي': ['الأولى','الثانية','الثالثة','الرابعة','الخامسة','السادسة','امتياز'],
+    'معهد': ['الأولى','الثانية','الثالثة','الرابعة','الخامسة'],
+    'دراسات عليا': ['دبلومة','تمهيدي ماجستير','ماجستير','تمهيدي دكتوراه','دكتوراه']
+  },
+  sectors: ['حكومي','خاص','أعمال حرة'],
+  otherStatus: ['خريج بدون عمل','لا يعمل','أخرى'],
+  housing: ['اسكان اجتماعي','ابني بيتك','كومباوند'],
+  districts: ['الحي ال16','الحي ال15','الحي ال12','الحي ال11','مجاورة 59','مجاورة 60','حي الاندلس','أخرى']
+};
+const GOV = ['01','02','03','04','11','12','13','14','15','16','17','18','19','21','22','23','24','25','26','27','28','29','31','32','33','34','35','88'];
+const FORM_KEYS = ['fullName','gender','nid','whatsapp','phone','phone2','father','occupation','studyStage','studyYear','studyPlace','faculty','workSector','jobTitle','workPlace','otherStatus','otherText','housingType','compound','district','districtOther','building','apartment','addressDetails'];
+const EXPORT_COLS = [['code','الكود'],['status','الحالة'],['fullName','الاسم'],['gender','النوع'],['nid','الرقم القومي'],['birthDate','تاريخ الميلاد'],['whatsapp','واتساب'],['phone','الهاتف'],['phone2','هاتف آخر'],['father','أب الاعتراف'],['occupation','المهنة'],['studyStage','المرحلة'],['studyYear','السنة الدراسية'],['studyPlace','جهة الدراسة'],['faculty','الكلية / القسم'],['workSector','قطاع العمل'],['jobTitle','المسمى الوظيفي'],['workPlace','جهة العمل'],['otherStatus','حالة (أخرى)'],['otherText','تفاصيل (أخرى)'],['housingType','نوع السكن'],['compound','الكومباوند'],['district','الحي / المجاورة'],['districtOther','حي آخر'],['building','العمارة'],['apartment','الشقة'],['addressDetails','تفاصيل العنوان'],['rejectReason','سبب الرفض'],['createdAt','تاريخ التسجيل'],['reviewedBy','راجعه'],['reviewedAt','تاريخ المراجعة']];
+
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const latin = s => String(s ?? '').replace(/[٠-٩]/g, c => c.charCodeAt(0) - 1632).replace(/[۰-۹]/g, c => c.charCodeAt(0) - 1776);
+const digits = s => latin(s).replace(/\D/g, '');
+
+let toastT;
+function toast(msg, type) {
+  const t = $('#toast'); t.textContent = msg; t.className = type || ''; t.hidden = false;
+  clearTimeout(toastT); toastT = setTimeout(() => t.hidden = true, 3500);
+}
+function showErr(id, msg) { const e = $(id); e.textContent = msg || ''; e.hidden = !msg; }
+
+/* ---------------- الاتصال بالخادم ---------------- */
+async function api(action, payload, timeoutMs) {
+  if (API_URL.indexOf('PASTE_') === 0) return { ok: false, error: 'لم يتم ضبط API_URL داخل الملف.' };
+  const ctrl = new AbortController();
+  const t = setTimeout(() => ctrl.abort(), timeoutMs || 45000);
+  try {
+    // بدون headers مخصصة لتجنب preflight مع Apps Script
+    const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action, ...(payload || {}) }), signal: ctrl.signal });
+    return await res.json();
+  } catch (e) {
+    return { ok: false, error: e.name === 'AbortError' ? 'انتهت مهلة الاتصال. تأكد من الإنترنت ثم حاول مرة أخرى.' : 'تعذر الاتصال بالخادم. تأكد من الإنترنت ثم حاول مرة أخرى.' };
+  } finally { clearTimeout(t); }
+}
+
+/* ---------------- التبويبات ---------------- */
+$$('nav button').forEach(b => b.onclick = () => {
+  $$('nav button').forEach(x => x.classList.toggle('on', x === b));
+  ['register', 'status', 'admin'].forEach(k => $('#tab-' + k).hidden = (k !== b.dataset.tab));
+});
+
+/* =========================================================
+   النموذج المشترك
+   ========================================================= */
+const fld = (h, k) => h.querySelector(`[data-f="${k}"]`);
+const val = (h, k) => fld(h, k).value;
+const grp = (h, k, on) => { const g = h.querySelector(`[data-group="${k}"]`); if (g) g.hidden = !on; };
+function fillOptions(sel, arr, keepFirst) {
+  sel.innerHTML = (keepFirst ? '<option value="">اختر</option>' : '<option value="">اختر</option>') + arr.map(x => `<option>${esc(x)}</option>`).join('');
+}
+
+function mountForm(host, opts) {
+  opts = opts || {};
+  host.innerHTML = '';
+  host.appendChild($('#tplForm').content.cloneNode(true));
+  host._photos = {}; host._opts = opts;
+  $$('[data-list]', host).forEach(s => {
+    const l = LISTS[s.dataset.list];
+    fillOptions(s, Array.isArray(l) ? l : Object.keys(l));
+  });
+  if (!opts.photos) { host.querySelector('[data-group="photos"]').remove(); }
+  else {
+    host.querySelector('[data-photonote]').textContent = opts.photoNote || 'الصور تُضغط تلقائيًا قبل الرفع لتكون سريعة حتى مع الإنترنت الضعيف.';
+    if (opts.optionalPhotos) $$('[data-photostar]', host).forEach(x => x.remove());
+    ['profile', 'idCard'].forEach(k => bindPhoto(host, k));
+  }
+  host.oninput = host.onchange = e => onFormChange(host, e);
+  refreshForm(host);
+}
+
+function onFormChange(host, e) {
+  const f = e.target.closest('[data-f]');
+  if (f) { const w = f.closest('.field'); if (w) w.classList.remove('err'); }
+  if (f && f.dataset.f === 'nid') nidHint(host);
+  refreshForm(host);
+}
+
+function nidHint(host) {
+  const h = host.querySelector('[data-hint="nid"]');
+  const v = digits(val(host, 'nid'));
+  h.className = 'hint'; h.textContent = '';
+  if (v.length === 14) {
+    const r = parseNid(v);
+    if (r.error) { h.className = 'hint bad'; h.textContent = r.error; }
+    else { h.className = 'hint good'; h.textContent = '✔ مواليد ' + r.birth; }
+  }
+}
+
+function refreshForm(host) {
+  const occ = val(host, 'occupation');
+  grp(host, 'student', occ === 'طالب'); grp(host, 'employee', occ === 'موظف'); grp(host, 'other', occ === 'أخرى');
+  grp(host, 'otherText', occ === 'أخرى' && val(host, 'otherStatus') === 'أخرى');
+  const st = val(host, 'studyStage'), ys = fld(host, 'studyYear');
+  if (ys.dataset.stage !== st) { ys.dataset.stage = st; fillOptions(ys, LISTS.stages[st] || []); }
+  host.querySelector('[data-facreq]').hidden = (st === 'فني أو دبلوم');
+  host.querySelector('[data-wpreq]').hidden = (val(host, 'workSector') === 'أعمال حرة');
+  grp(host, 'compound', val(host, 'housingType') === 'كومباوند');
+  grp(host, 'districtOther', val(host, 'district') === 'أخرى');
+}
+
+function fillForm(host, d) {
+  d = d || {};
+  for (let pass = 0; pass < 2; pass++) {
+    FORM_KEYS.forEach(k => { const f = fld(host, k); if (f && d[k] != null) f.value = d[k]; });
+    refreshForm(host);
+  }
+  nidHint(host);
+}
+
+function readForm(host) {
+  const d = {};
+  FORM_KEYS.forEach(k => { const f = fld(host, k); d[k] = f ? f.value.trim() : ''; });
+  d.nid = digits(d.nid); d.whatsapp = digits(d.whatsapp); d.phone = digits(d.phone); d.phone2 = digits(d.phone2);
+  return d;
+}
+
+function parseNid(n) {
+  if (!/^\d{14}$/.test(n)) return { error: 'الرقم القومي يجب أن يكون 14 رقمًا.' };
+  const c = n[0]; if (c !== '2' && c !== '3') return { error: 'الرقم القومي غير صحيح.' };
+  const y = (c === '2' ? 1900 : 2000) + +n.substr(1, 2), m = +n.substr(3, 2), d = +n.substr(5, 2);
+  const dt = new Date(y, m - 1, d);
+  if (dt.getFullYear() !== y || dt.getMonth() !== m - 1 || dt.getDate() !== d || dt > new Date()) return { error: 'الرقم القومي غير صحيح (تاريخ الميلاد).' };
+  if (!GOV.includes(n.substr(7, 2))) return { error: 'الرقم القومي غير صحيح (كود المحافظة).' };
+  return { gender: (+n[12]) % 2 === 1 ? 'ذكر' : 'أنثى', birth: `${y}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}` };
+}
+
+// يرجع أول خطأ {f, m} أو null
+function validateClient(d, host, needPhotos) {
+  const E = (f, m) => ({ f, m });
+  const name = d.fullName.replace(/\s+/g, ' ').trim(), words = name.split(' ').filter(Boolean);
+  if (words.length < 4 || words.some(w => w.length < 2)) return E('fullName', 'الاسم يجب أن يكون رباعيًا (4 كلمات على الأقل).');
+  if (!/^[\u0600-\u06FFa-zA-Z .'-]+$/.test(name)) return E('fullName', 'الاسم يجب أن يحتوي على حروف فقط.');
+  const n = parseNid(d.nid); if (n.error) return E('nid', n.error);
+  if (!d.gender) return E('gender', 'اختر النوع.');
+  if (d.gender !== n.gender) return E('gender', 'برجاء مراجعة بياناتك: النوع المختار لا يتطابق مع الرقم القومي. راجع النوع والرقم القومي ثم أعد المحاولة.');
+  const ph = /^01[0125]\d{8}$/;
+  if (!ph.test(d.whatsapp)) return E('whatsapp', 'رقم الواتساب يجب أن يكون 11 رقمًا ويبدأ بـ 01.');
+  if (!ph.test(d.phone)) return E('phone', 'رقم الهاتف يجب أن يكون 11 رقمًا ويبدأ بـ 01.');
+  if (d.phone2 && !ph.test(d.phone2)) return E('phone2', 'رقم الهاتف الآخر يجب أن يكون 11 رقمًا ويبدأ بـ 01.');
+  if (!d.father) return E('father', 'اكتب اسم أب الاعتراف.');
+  if (!d.occupation) return E('occupation', 'اختر المهنة.');
+  if (d.occupation === 'طالب') {
+    if (!d.studyStage) return E('studyStage', 'اختر المرحلة الدراسية.');
+    if (!d.studyYear) return E('studyYear', 'اختر السنة الدراسية.');
+    if (!d.studyPlace) return E('studyPlace', 'اكتب جهة الدراسة.');
+    if (!d.faculty && d.studyStage !== 'فني أو دبلوم') return E('faculty', 'اكتب الكلية / القسم.');
+  } else if (d.occupation === 'موظف') {
+    if (!d.workSector) return E('workSector', 'اختر قطاع العمل.');
+    if (!d.jobTitle) return E('jobTitle', 'اكتب المسمى الوظيفي.');
+    if (!d.workPlace && d.workSector !== 'أعمال حرة') return E('workPlace', 'اكتب جهة العمل.');
+  } else {
+    if (!d.otherStatus) return E('otherStatus', 'اختر الحالة.');
+    if (d.otherStatus === 'أخرى' && !d.otherText) return E('otherText', 'اكتب التفاصيل.');
+  }
+  if (!d.housingType) return E('housingType', 'اختر نوع السكن.');
+  if (d.housingType === 'كومباوند' && !d.compound) return E('compound', 'اكتب اسم الكومباوند.');
+  if (!d.district) return E('district', 'اختر الحي / المجاورة.');
+  if (d.district === 'أخرى' && !d.districtOther) return E('districtOther', 'اكتب اسم الحي / المجاورة.');
+  if (!d.building) return E('building', 'اكتب رقم العمارة.');
+  if (!d.apartment) return E('apartment', 'اكتب رقم الشقة.');
+  if (needPhotos) {
+    if (!host._photos.profile) return { photo: 'profile', m: 'الصورة الشخصية مطلوبة.' };
+    if (!host._photos.idCard) return { photo: 'idCard', m: 'صورة البطاقة مطلوبة.' };
+  }
+  return null;
+}
+
+function markError(host, err, errBoxSel) {
+  $$('.err', host).forEach(x => x.classList.remove('err'));
+  showErr(errBoxSel, err.m);
+  let el;
+  if (err.photo) el = host.querySelector(`[data-photo="${err.photo}"]`);
+  else { const f = fld(host, err.f); el = f && (f.closest('.field') || f); }
+  if (el) { el.classList.add('err'); el.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+}
+
+/* ---------------- الصور ---------------- */
+async function loadBitmap(file) {
+  if (window.createImageBitmap) { try { return await createImageBitmap(file, { imageOrientation: 'from-image' }); } catch (e) {} }
+  return await new Promise((res, rej) => {
+    const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = URL.createObjectURL(file);
+  });
+}
+const bw = b => b.naturalWidth || b.width, bh = b => b.naturalHeight || b.height;
+
+function resizeToJpeg(bmp, maxSide, q) {
+  const k = Math.min(1, maxSide / Math.max(bw(bmp), bh(bmp)));
+  const c = document.createElement('canvas'); c.width = Math.round(bw(bmp) * k); c.height = Math.round(bh(bmp) * k);
+  const x = c.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, c.width, c.height); x.drawImage(bmp, 0, 0, c.width, c.height);
+  return c.toDataURL('image/jpeg', q);
+}
+
+function bindPhoto(host, kind) {
+  const box = host.querySelector(`[data-photo="${kind}"]`), prev = box.querySelector('.prev');
+  box.querySelector('[data-cam]').onclick = () => box.querySelector('[data-in-cam]').click();
+  box.querySelector('[data-gal]').onclick = () => box.querySelector('[data-in-gal]').click();
+  $$('input[type=file]', box).forEach(inp => inp.addEventListener('change', async () => {
+    const file = inp.files[0]; inp.value = ''; if (!file) return;
+    try {
+      const bmp = await loadBitmap(file);
+      const url = kind === 'profile' ? await openCropper(bmp) : resizeToJpeg(bmp, 1280, 0.78);
+      if (!url) return;
+      host._photos[kind] = url; prev.innerHTML = `<img src="${url}" alt="">`; box.classList.remove('err');
+    } catch (e) { toast('تعذر قراءة الصورة. جرّب صورة أخرى.', 'err'); }
+  }));
+}
+
+function openCropper(bmp) {
+  return new Promise(resolve => {
+    const modal = $('#cropModal'), cv = $('#cropCanvas'), ctx = cv.getContext('2d'), zoom = $('#cropZoom');
+    const S = 320; cv.width = cv.height = S;
+    const iw = bw(bmp), ih = bh(bmp), base = S / Math.min(iw, ih);
+    let z = 1, ox, oy; const sc = () => base * z;
+    const clamp = () => { ox = Math.min(0, Math.max(S - iw * sc(), ox)); oy = Math.min(0, Math.max(S - ih * sc(), oy)); };
+    const draw = () => { ctx.fillStyle = '#000'; ctx.fillRect(0, 0, S, S); ctx.drawImage(bmp, ox, oy, iw * sc(), ih * sc()); };
+    ox = (S - iw * sc()) / 2; oy = (S - ih * sc()) / 2; zoom.value = 1; clamp(); draw();
+    let drag = null;
+    cv.onpointerdown = e => { cv.setPointerCapture(e.pointerId); drag = { x: e.clientX, y: e.clientY }; cv.style.cursor = 'grabbing'; };
+    cv.onpointermove = e => {
+      if (!drag) return; const r = S / cv.clientWidth;
+      ox += (e.clientX - drag.x) * r; oy += (e.clientY - drag.y) * r; drag = { x: e.clientX, y: e.clientY }; clamp(); draw();
+    };
+    cv.onpointerup = cv.onpointercancel = () => { drag = null; cv.style.cursor = 'grab'; };
+    zoom.oninput = () => {
+      const cx = (S / 2 - ox) / sc(), cy = (S / 2 - oy) / sc();
+      z = +zoom.value; ox = S / 2 - cx * sc(); oy = S / 2 - cy * sc(); clamp(); draw();
+    };
+    const done = v => { modal.hidden = true; resolve(v); };
+    $('#cropCancel').onclick = () => done(null);
+    $('#cropOk').onclick = () => {
+      const o = document.createElement('canvas'); o.width = o.height = 800; const k = 800 / S, x = o.getContext('2d');
+      x.fillStyle = '#fff'; x.fillRect(0, 0, 800, 800); x.drawImage(bmp, ox * k, oy * k, iw * sc() * k, ih * sc() * k);
+      done(o.toDataURL('image/jpeg', 0.82));
+    };
+    modal.hidden = false;
+  });
+}
+
+/* =========================================================
+   التسجيل
+   ========================================================= */
+const regHost = $('#regForm');
+mountForm(regHost, { photos: true });
+let regBusy = false, regOpen = true;
+
+function setOpenUI(open) {
+  regOpen = open;
+  $('#closedBox').hidden = open; $('#regBtn').disabled = !open;
+}
+api('info').then(r => { if (r.ok) setOpenUI(r.open); });
+
+$('#regBtn').onclick = async () => {
+  if (regBusy) return;
+  if (!regOpen) return toast('التسجيل مغلق حاليًا.', 'err');
+  showErr('#regErr', '');
+  const d = readForm(regHost), err = validateClient(d, regHost, true);
+  if (err) return markError(regHost, err, '#regErr');
+  regBusy = true; const btn = $('#regBtn'); btn.disabled = true; btn.innerHTML = '<span class="spin"></span> جاري الإرسال... لا تغلق الصفحة';
+  const r = await api('register', { data: d, profile: regHost._photos.profile, idCard: regHost._photos.idCard }, 120000);
+  regBusy = false; btn.disabled = !regOpen; btn.textContent = 'إرسال الطلب';
+  if (r.ok) {
+    $('#regWrap').hidden = true; $('#doneBox').hidden = false; window.scrollTo({ top: 0, behavior: 'smooth' });
+  } else showErr('#regErr', r.error + ((r.error || '').includes('الاتصال') || (r.error || '').includes('مهلة') ? ' (قد يكون طلبك وصل، تحقق من تبويب الاستعلام قبل إعادة الإرسال).' : ''));
+};
+$('#newReg').onclick = () => { mountForm(regHost, { photos: true }); $('#doneBox').hidden = true; $('#regWrap').hidden = false; };
+
+/* =========================================================
+   الاستعلام + تعديل المرفوض
+   ========================================================= */
+const resubHost = $('#resubForm');
+let SQ = null, resubBusy = false;
+
+$('#stBtn').onclick = async () => {
+  showErr('#stErr', ''); $('#stResult').innerHTML = '';
+  const nid = digits($('#stNid').value), wa = digits($('#stWa').value);
+  if (nid.length !== 14) return showErr('#stErr', 'الرقم القومي يجب أن يكون 14 رقمًا.');
+  if (wa.length !== 11) return showErr('#stErr', 'رقم الواتساب يجب أن يكون 11 رقمًا.');
+  const b = $('#stBtn'); b.disabled = true; b.innerHTML = '<span class="spin"></span>';
+  const r = await api('status', { nid, whatsapp: wa });
+  b.disabled = false; b.textContent = 'استعلام';
+  if (!r.ok) return showErr('#stErr', r.error);
+  SQ = { nid, wa, r };
+  const box = $('#stResult');
+  if (r.status === 'مقبول') {
+    box.innerHTML = `<div class="notice good"><b>${esc(r.name)}</b><br>تم قبول طلبك ✔ وهذا كودك الخاص، احتفظ به:</div><div class="code">${esc(r.code)}</div>`;
+  } else if (r.status === 'مرفوض') {
+    box.innerHTML = `<div class="notice bad"><b>${esc(r.name)}</b><br>تم رفض الطلب.<br><b>السبب:</b> ${esc(r.reason)}</div><button class="btn pri" id="goEdit">تعديل البيانات وإعادة الإرسال</button>`;
+    $('#goEdit').onclick = startResubmit;
+  } else {
+    box.innerHTML = `<div class="notice warn"><b>${esc(r.name)}</b><br>طلبك <b>قيد المراجعة</b>. سيتم إبلاغك بعد القبول.</div>`;
+  }
+};
+
+function startResubmit() {
+  mountForm(resubHost, { photos: true, optionalPhotos: true, photoNote: 'اترك الصور كما هي للإبقاء على الصور الحالية، أو اختر صورة جديدة لاستبدالها.' });
+  fillForm(resubHost, SQ.r.data);
+  $('#stReason').innerHTML = '<b>سبب الرفض:</b> ' + esc(SQ.r.reason);
+  $('#stQuery').hidden = true; $('#stEdit').hidden = false; showErr('#resubErr', '');
+}
+$('#resubCancel').onclick = () => { $('#stEdit').hidden = true; $('#stQuery').hidden = false; };
+$('#resubBtn').onclick = async () => {
+  if (resubBusy) return; showErr('#resubErr', '');
+  const d = readForm(resubHost), err = validateClient(d, resubHost, false);
+  if (err) return markError(resubHost, err, '#resubErr');
+  resubBusy = true; const b = $('#resubBtn'); b.disabled = true; b.innerHTML = '<span class="spin"></span> جاري الإرسال...';
+  const r = await api('resubmit', { nid: SQ.nid, whatsapp: SQ.wa, data: d, profile: resubHost._photos.profile || null, idCard: resubHost._photos.idCard || null }, 120000);
+  resubBusy = false; b.disabled = false; b.textContent = 'إعادة الإرسال';
+  if (!r.ok) return showErr('#resubErr', r.error);
+  toast('تم إعادة إرسال طلبك للمراجعة ✔', 'ok');
+  $('#stEdit').hidden = true; $('#stQuery').hidden = false; $('#stResult').innerHTML = '<div class="notice good">تم إعادة إرسال طلبك، وهو الآن <b>قيد المراجعة</b>.</div>';
+  $('#stNid').value = ''; $('#stWa').value = '';
+};
+
+/* =========================================================
+   الأدمن
+   ========================================================= */
+const A = { token: sessionStorage.getItem('adm_tok') || '', user: sessionStorage.getItem('adm_user') || '', rows: [], view: [], open: true, cur: null, img: {} };
+
+async function adm(action, payload, t) {
+  const r = await api(action, { token: A.token, ...(payload || {}) }, t);
+  if (r.auth) { logout('انتهت الجلسة، سجّل الدخول مرة أخرى.'); }
+  return r;
+}
+
+function logout(msg) {
+  A.token = ''; A.user = ''; sessionStorage.removeItem('adm_tok'); sessionStorage.removeItem('adm_user');
+  $('#admDash').hidden = true; $('#admLogin').hidden = false; $('#detailModal').hidden = true; A.rows = []; A.img = {};
+  if (msg) showErr('#admErr', msg);
+}
+
+$('#admBtn').onclick = async () => {
+  showErr('#admErr', '');
+  const u = $('#admUser').value.trim(), p = $('#admPass').value;
+  if (!u || !p) return showErr('#admErr', 'أدخل اسم المستخدم وكلمة المرور.');
+  const b = $('#admBtn'); b.disabled = true; b.innerHTML = '<span class="spin"></span>';
+  const r = await api('login', { username: u, password: p });
+  b.disabled = false; b.textContent = 'دخول';
+  if (!r.ok) return showErr('#admErr', r.error);
+  A.token = r.token; A.user = r.username; sessionStorage.setItem('adm_tok', A.token); sessionStorage.setItem('adm_user', A.user);
+  $('#admPass').value = ''; enterDash();
+};
+$('#admPass').addEventListener('keydown', e => { if (e.key === 'Enter') $('#admBtn').click(); });
+$('#admLogout').onclick = () => logout();
+$('#admRefresh').onclick = () => loadList();
+
+function enterDash() {
+  $('#admLogin').hidden = true; $('#admDash').hidden = false; $('#admName').textContent = A.user; loadList();
+}
+
+async function loadList() {
+  $('#admBody').innerHTML = '<tr><td colspan="8" style="text-align:center;padding:20px"><span class="spin"></span> جاري التحميل...</td></tr>';
+  const r = await adm('adminList');
+  if (!r.ok) { $('#admBody').innerHTML = ''; return toast(r.error, 'err'); }
+  A.rows = r.rows; setToggle(r.open); renderList();
+}
+
+function setToggle(open) {
+  A.open = open; const b = $('#admToggle');
+  b.textContent = open ? '🟢 التسجيل مفتوح (اضغط للإغلاق)' : '🔴 التسجيل مغلق (اضغط للفتح)';
+}
+$('#admToggle').onclick = async () => {
+  const r = await adm('adminSetOpen', { open: !A.open });
+  if (r.ok) { setToggle(r.open); toast(r.open ? 'تم فتح التسجيل' : 'تم غلق التسجيل', 'ok'); } else toast(r.error, 'err');
+};
+
+const badge = s => `<span class="badge ${s === 'مقبول' ? 'o' : s === 'مرفوض' ? 'n' : 'p'}">${esc(s)}</span>`;
+
+function renderList() {
+  const q = latin($('#admSearch').value).toLowerCase().trim(), f = $('#admFilter').value;
+  A.view = A.rows.filter(r => (!f || r.status === f) &&
+    (!q || [r.fullName, r.nid, r.code, r.whatsapp, r.phone, r.phone2].join(' ').toLowerCase().includes(q)));
+  const c = s => A.rows.filter(r => r.status === s).length;
+  $('#sTotal').textContent = A.rows.length; $('#sPend').textContent = c('قيد المراجعة'); $('#sOk').textContent = c('مقبول'); $('#sNo').textContent = c('مرفوض');
+  $('#admBody').innerHTML = A.view.map((r, i) => `<tr class="r" data-nid="${esc(r.nid)}">
+    <td>${i + 1}</td><td class="ltr"><b>${esc(r.code) || '-'}</b></td><td>${esc(r.fullName)}</td><td class="ltr">${esc(r.nid)}</td>
+    <td class="ltr">${esc(r.whatsapp)}</td><td>${badge(r.status)}</td><td class="ltr">${esc((r.createdAt || '').slice(0, 10))}</td>
+    <td>${r.status !== 'مقبول' ? `<button class="btn sm ok" data-a="acc">قبول</button> ` : ''}${r.status !== 'مرفوض' ? `<button class="btn sm bad" data-a="rej">رفض</button> ` : ''}<button class="btn sm" data-a="del">🗑</button></td></tr>`).join('') ||
+    '<tr><td colspan="8" style="text-align:center;padding:20px;color:var(--mut)">لا توجد نتائج</td></tr>';
+  $('#admCount').textContent = `المعروض: ${A.view.length} من ${A.rows.length}`;
+}
+$('#admSearch').oninput = renderList; $('#admFilter').onchange = renderList;
+
+$('#admBody').onclick = e => {
+  const tr = e.target.closest('tr.r'); if (!tr) return;
+  const nid = tr.dataset.nid, a = e.target.closest('[data-a]');
+  if (!a) return openDetail(nid);
+  if (a.dataset.a === 'acc') doAccept(nid); else if (a.dataset.a === 'rej') doReject(nid); else doDelete(nid);
+};
+
+function upsertRow(row, oldNid) {
+  const i = A.rows.findIndex(r => r.nid === (oldNid || row.nid));
+  if (i >= 0) A.rows[i] = row; else A.rows.unshift(row);
+  renderList();
+}
+const byNid = n => A.rows.find(r => r.nid === n);
+
+/* نافذة تأكيد/إدخال */
+function ask({ title, msg, input, okText }) {
+  return new Promise(res => {
+    $('#askTitle').textContent = title; $('#askMsg').textContent = msg || '';
+    const ta = $('#askInput'); ta.hidden = !input; ta.value = '';
+    $('#askOk').textContent = okText || 'تأكيد'; $('#askModal').hidden = false; if (input) ta.focus();
+    const close = v => { $('#askModal').hidden = true; res(v); };
+    $('#askOk').onclick = () => { if (input && !ta.value.trim()) return toast('اكتب السبب أولًا', 'err'); close(input ? ta.value.trim() : true); };
+    $('#askCancel').onclick = () => close(null);
+  });
+}
+
+async function doAccept(nid) {
+  const r0 = byNid(nid); if (!r0) return;
+  if (!await ask({ title: 'قبول التسجيل', msg: `قبول «${r0.fullName}» وإنشاء كود خاص به؟`, okText: 'قبول' })) return;
+  const r = await adm('adminAccept', { nid });
+  if (r.ok) { upsertRow(r.row); toast('تم القبول. الكود: ' + r.row.code, 'ok'); refreshDetail(); } else toast(r.error, 'err');
+}
+async function doReject(nid) {
+  const r0 = byNid(nid); if (!r0) return;
+  const reason = await ask({ title: 'رفض التسجيل', msg: `سبب رفض «${r0.fullName}» (سيظهر للشخص):`, input: true, okText: 'رفض' });
+  if (!reason) return;
+  const r = await adm('adminReject', { nid, reason });
+  if (r.ok) { upsertRow(r.row); toast('تم الرفض', 'ok'); refreshDetail(); } else toast(r.error, 'err');
+}
+async function doDelete(nid) {
+  const r0 = byNid(nid); if (!r0) return;
+  if (!await ask({ title: 'حذف نهائي', msg: `سيتم حذف «${r0.fullName}» وصوره نهائيًا، ويصبح الرقم القومي متاحًا للتسجيل من جديد. متأكد؟`, okText: 'حذف' })) return;
+  const r = await adm('adminDelete', { nid });
+  if (r.ok) { A.rows = A.rows.filter(x => x.nid !== nid); renderList(); toast('تم الحذف', 'ok'); if (A.cur === nid) $('#detailModal').hidden = true; } else toast(r.error, 'err');
+}
+
+/* نافذة التفاصيل */
+const dHost = $('#dForm');
+function openDetail(nid) {
+  const r = byNid(nid); if (!r) return;
+  A.cur = nid; $('#detailModal').hidden = false; showErr('#dErr', '');
+  mountForm(dHost, { photos: false }); fillForm(dHost, r);
+  refreshDetail();
+  loadImg(nid, 'profile', '#dImgP'); loadImg(nid, 'idCard', '#dImgI');
+}
+function refreshDetail() {
+  const r = byNid(A.cur); if (!r || $('#detailModal').hidden) return;
+  $('#dName').textContent = r.fullName;
+  $('#dHead').innerHTML = badge(r.status) + (r.code ? ` <span class="ltr"><b>الكود: ${esc(r.code)}</b></span>` : '') +
+    (r.status === 'مرفوض' && r.rejectReason ? ` <span style="color:var(--bad)">السبب: ${esc(r.rejectReason)}</span>` : '');
+  const wa = 'https://wa.me/2' + digits(r.whatsapp) + '?text=' + encodeURIComponent(
+    `أهلًا ${r.fullName.split(' ')[0]}،\nتم قبول تسجيلك في اجتماع شباب «اتبعني» - كاتدرائية مارمينا والبابا كيرلس بالعاشر من رمضان ✝️\nكودك الخاص: ${r.code}\nاحتفظ به، وستحتاجه عند الحضور.`);
+  $('#dActions').innerHTML = `<button class="btn pri" id="dSave">💾 حفظ التعديلات</button>` +
+    (r.status !== 'مقبول' ? `<button class="btn ok" id="dAcc">قبول</button>` : '') +
+    (r.status !== 'مرفوض' ? `<button class="btn bad" id="dRej">رفض</button>` : '') +
+    `<button class="btn" id="dDel">🗑 حذف</button>` +
+    (r.status === 'مقبول' ? `<a class="btn gold" style="text-decoration:none" target="_blank" rel="noopener" href="${wa}">إرسال الكود واتساب</a>` : '');
+  $('#dSave').onclick = saveDetail; $('#dDel').onclick = () => doDelete(A.cur);
+  if ($('#dAcc')) $('#dAcc').onclick = () => doAccept(A.cur);
+  if ($('#dRej')) $('#dRej').onclick = () => doReject(A.cur);
+}
+async function saveDetail() {
+  showErr('#dErr', '');
+  const d = readForm(dHost), err = validateClient(d, dHost, false);
+  if (err) return markError(dHost, err, '#dErr');
+  const b = $('#dSave'); b.disabled = true; b.innerHTML = '<span class="spin"></span>';
+  const r = await adm('adminUpdate', { nid: A.cur, data: d });
+  b.disabled = false; b.textContent = '💾 حفظ التعديلات';
+  if (!r.ok) return showErr('#dErr', r.error);
+  const old = A.cur; A.cur = r.row.nid; upsertRow(r.row, old); refreshDetail(); toast('تم حفظ التعديلات', 'ok');
+}
+async function loadImg(nid, which, sel) {
+  const box = $(sel), key = nid + which;
+  box.innerHTML = '<span class="spin"></span>';
+  let src = A.img[key];
+  if (!src) {
+    const r = await adm('adminImage', { nid, which });
+    if (!r.ok) { if (A.cur === nid) box.textContent = 'لا توجد صورة'; return; }
+    src = A.img[key] = r.image;
+  }
+  if (A.cur !== nid) return;
+  box.innerHTML = `<img src="${src}" alt="">`;
+  box.querySelector('img').onclick = () => { $('#lbImg').src = src; $('#lightbox').hidden = false; };
+}
+$('#dClose').onclick = () => { $('#detailModal').hidden = true; A.cur = null; };
+$('#lightbox').onclick = () => $('#lightbox').hidden = true;
+
+/* تصدير Excel (حسب الفلتر الحالي) */
+$('#admExport').onclick = () => {
+  if (!A.view.length) return toast('لا توجد بيانات للتصدير', 'err');
+  const aoa = [EXPORT_COLS.map(c => c[1])].concat(A.view.map(r => EXPORT_COLS.map(c => String(r[c[0]] ?? ''))));
+  const stamp = new Date().toISOString().slice(0, 10);
+  if (window.XLSX) {
+    const ws = XLSX.utils.aoa_to_sheet(aoa);
+    ws['!cols'] = EXPORT_COLS.map(c => ({ wch: Math.max(12, c[1].length + 4) }));
+    const wb = XLSX.utils.book_new(); wb.Workbook = { Views: [{ RTL: true }] };
+    XLSX.utils.book_append_sheet(wb, ws, 'التسجيلات'); XLSX.writeFile(wb, `registrations_${stamp}.xlsx`);
+  } else {
+    const csv = '\uFEFF' + aoa.map(r => r.map(v => '"' + v.replace(/"/g, '""') + '"').join(',')).join('\n');
+    const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
+    a.download = `registrations_${stamp}.csv`; a.click();
+  }
+};
+
+if (A.token) enterDash();
+</script>
+</body>
+</html>
