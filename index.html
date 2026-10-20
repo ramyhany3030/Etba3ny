@@ -3,1184 +3,977 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="robots" content="noindex, nofollow">
 <title>اجتماع شباب اتبعني - التسجيل</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
-<script src="config.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" defer></script>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+<script>
+  // ضع هنا رابط الـ Web App المنتهي بـ /exec (مرة واحدة فقط)
+  window.API_URL = 'PASTE_YOUR_WEB_APP_EXEC_URL_HERE';
+
+  // لازم يطابق VERSION في Code.gs (لو مختلف هيظهر تنبيه "الخادم قديم")
+  window.EXPECTED_VERSION = 'v3-superadmin';
+
+  // نص رسالة الواتساب بعد القبول ({name} = الاسم الأول، {code} = الكود)
+  window.WA_TEMPLATE = 'سلام ونعمة {name} 🙏\nتم قبول تسجيلك في اجتماع شباب اتبعني - كاتدرائية مارمينا والبابا كيرلس - العاشر من رمضان.\nالكود الخاص بك: {code}\nاحتفظ بالكود ولا تشاركه مع أحد.';
+</script>
+
 <style>
-:root{--navy:#1f3a5f;--navy2:#2c5282;--gold:#c8a24a;--bg:#f2f5fa;--card:#fff;--txt:#1d2733;--mut:#6b7785;--line:#dfe5ee;--ok:#1f8a4c;--warn:#c27c0e;--bad:#c0392b}
-*{box-sizing:border-box}
+:root{
+  --navy:#1e3a5f; --navy2:#2c5282; --gold:#c9a227; --bg:#f3f5f9; --card:#fff;
+  --text:#1f2937; --muted:#6b7280; --line:#d9dee7; --ok:#15803d; --warn:#b45309; --bad:#b91c1c;
+  --radius:14px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 [hidden]{display:none!important}
 html,body{margin:0}
-body{font-family:'Cairo',Tahoma,Arial,sans-serif;background:var(--bg);color:var(--txt);line-height:1.7;font-size:15px}
-header{background:linear-gradient(135deg,var(--navy),var(--navy2));color:#fff;text-align:center;padding:22px 14px 18px}
-header h1{margin:0;font-size:22px}
-header p{margin:4px 0 0;opacity:.9;font-size:14px}
-header .cross{color:var(--gold);font-size:26px;line-height:1}
-nav{display:flex;gap:6px;max-width:980px;margin:-14px auto 0;padding:0 10px;position:relative}
-nav button{flex:1;border:0;background:#fff;color:var(--navy);padding:11px 6px;border-radius:12px 12px 0 0;font:inherit;font-weight:700;cursor:pointer;box-shadow:0 -2px 8px rgba(0,0,0,.05)}
-nav button.on{background:var(--gold);color:#fff}
-main{max-width:980px;margin:0 auto;padding:0 10px 40px}
-.panel{background:var(--card);border-radius:0 0 14px 14px;box-shadow:0 4px 18px rgba(31,58,95,.08);padding:18px}
-.sec{border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:14px;background:#fcfdff}
-.sec h3{margin:0 0 10px;color:var(--navy);font-size:16px;border-right:4px solid var(--gold);padding-right:8px}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-@media(max-width:640px){.grid2{grid-template-columns:1fr}}
-.field{margin-bottom:10px}
-.field label{display:block;font-weight:600;margin-bottom:3px;font-size:14px}
-.field label b{color:var(--bad)}
-input,select,textarea{width:100%;font:inherit;padding:10px 11px;border:1.5px solid var(--line);border-radius:10px;background:#fff;color:var(--txt)}
-input[type=date]{min-height:46px}
+body{font-family:'Cairo',Tahoma,Arial,sans-serif;background:var(--bg);color:var(--text);line-height:1.7;font-size:16px;overflow-x:hidden}
+header.top{background:linear-gradient(135deg,var(--navy),var(--navy2));color:#fff;text-align:center;padding:22px 16px 18px}
+header.top .cross{font-size:30px;color:var(--gold);line-height:1}
+header.top h1{margin:4px 0 2px;font-size:24px;font-weight:800}
+header.top p{margin:0;font-size:14px;opacity:.9}
+nav.tabs{display:flex;gap:6px;max-width:980px;margin:-14px auto 0;padding:0 12px;position:relative}
+nav.tabs button{flex:1;border:0;background:#e6ebf3;color:var(--navy);font:inherit;font-weight:700;padding:11px 6px;border-radius:12px 12px 0 0;cursor:pointer;font-size:15px}
+nav.tabs button.active{background:var(--card);box-shadow:0 -2px 0 var(--gold) inset}
+main{max-width:980px;margin:0 auto;padding:0 12px 60px}
+.panel{background:var(--card);border-radius:0 0 var(--radius) var(--radius);padding:18px;box-shadow:0 4px 18px rgba(30,58,95,.08)}
+.sec{border:1px solid var(--line);border-radius:var(--radius);padding:14px 14px 4px;margin:0 0 16px;background:#fcfdff;min-width:0}
+.sec legend{font-weight:800;color:var(--navy);padding:0 8px;font-size:17px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:0 14px}
+.field{margin-bottom:13px}
+.field.full{grid-column:1/-1}
+label.l{display:block;font-weight:700;font-size:14px;margin-bottom:4px;color:#374151}
+input[type=text],input[type=tel],input[type=date],input[type=password],select,textarea{
+  width:100%;padding:11px 12px;border:1.5px solid var(--line);border-radius:10px;font:inherit;font-size:16px;background:#fff;color:var(--text)}
 input:focus,select:focus,textarea:focus{outline:none;border-color:var(--navy2);box-shadow:0 0 0 3px rgba(44,82,130,.15)}
-input[dir=ltr]{text-align:right}
-.field.err input,.field.err select,.field.err textarea,.photo.err{border-color:var(--bad);background:#fff6f5}
-small.hint{display:block;color:var(--mut);font-size:12.5px;min-height:18px}
-small.hint.bad{color:var(--bad)} small.hint.good{color:var(--ok)}
-.btn{border:0;border-radius:10px;padding:10px 16px;font:inherit;font-weight:700;cursor:pointer;background:#e9eef6;color:var(--navy)}
+input[inputmode=numeric],.ltr{direction:ltr;text-align:right}
+.hint{font-size:12.5px;color:var(--muted);margin-top:3px}
+.err{color:var(--bad);font-size:13px;margin-top:3px;min-height:0}
+.field.bad input,.field.bad select,.field.bad textarea,.field.bad .photo-prev{border-color:var(--bad)}
+.hp{position:absolute;top:0;right:0;width:1px;height:1px;overflow:hidden;opacity:0;pointer-events:none}
+.btn{border:0;border-radius:10px;padding:11px 18px;font:inherit;font-weight:700;cursor:pointer;font-size:15px;transition:.15s}
+.btn.primary{background:var(--navy);color:#fff}.btn.primary:hover{background:var(--navy2)}
+.btn.ok{background:var(--ok);color:#fff}
+.btn.danger{background:var(--bad);color:#fff}
+.btn.warn{background:var(--warn);color:#fff}
+.btn.ghost{background:#eef1f6;color:var(--navy)}
+.btn.wa{background:#25d366;color:#063}
+.btn.sm{padding:7px 12px;font-size:13.5px}
 .btn:disabled{opacity:.55;cursor:not-allowed}
-.btn.pri{background:var(--navy);color:#fff}.btn.gold{background:var(--gold);color:#fff}
-.btn.ok{background:var(--ok);color:#fff}.btn.bad{background:var(--bad);color:#fff}.btn.sm{padding:5px 10px;font-size:13px}
-.btn.wide{width:100%;padding:13px;font-size:16px}
-.formerr{background:#fdecea;color:var(--bad);border:1px solid #f5c6c1;border-radius:10px;padding:9px 12px;margin:8px 0;font-weight:600}
-.notice{border-radius:10px;padding:10px 13px;margin-bottom:12px}
-.notice.warn{background:#fff6e0;border:1px solid #f0d9a0;color:#7a5a05}
-.notice.good{background:#e8f6ee;border:1px solid #b7e1c6;color:#16653a}
-.notice.bad{background:#fdecea;border:1px solid #f5c6c1;color:#8f2a20}
-.photo{border:1.5px dashed var(--line);border-radius:12px;padding:10px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
-.photo .prev{width:130px;height:130px;border-radius:10px;background:#eef2f8;display:flex;align-items:center;justify-content:center;color:var(--mut);font-size:12.5px;overflow:hidden;flex:none;text-align:center}
-.photo.idc .prev{width:190px;height:130px}
-.photo .prev img{width:100%;height:100%;object-fit:cover;display:block}
-.photo .btns{display:flex;flex-direction:column;gap:6px}
-.photo-title{font-weight:700;margin:6px 0 4px}
-.badge{display:inline-block;padding:2px 10px;border-radius:20px;font-size:12.5px;font-weight:700}
-.badge.p{background:#fff1d6;color:var(--warn)}.badge.o{background:#dff3e7;color:var(--ok)}.badge.n{background:#fbe1de;color:var(--bad)}
-.code{font-size:34px;font-weight:700;letter-spacing:6px;color:var(--navy);direction:ltr;text-align:center;background:#f5f8fd;border:2px dashed var(--gold);border-radius:12px;padding:8px;margin:10px 0}
-.card-title{text-align:center;font-weight:700;color:var(--navy);margin:16px 0 4px}
-img.idcard{display:block;width:100%;max-width:560px;margin:8px auto 12px;border-radius:14px;box-shadow:0 6px 22px rgba(31,58,95,.28);-webkit-touch-callout:default}
-.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:10px 0}
-@media(max-width:640px){.stats{grid-template-columns:repeat(2,1fr)}}
-.stat{background:#f5f8fd;border:1px solid var(--line);border-radius:12px;text-align:center;padding:8px}
-.stat b{display:block;font-size:22px;color:var(--navy)}.stat span{font-size:13px;color:var(--mut)}
-.tbl-wrap{overflow:auto;border:1px solid var(--line);border-radius:12px;max-height:68vh}
-table{width:100%;border-collapse:collapse;font-size:13.5px;min-width:720px}
-th{position:sticky;top:0;background:var(--navy);color:#fff;padding:8px;text-align:right;white-space:nowrap}
-td{padding:7px 8px;border-top:1px solid var(--line);white-space:nowrap}
-tr.r:hover td{background:#f5f8fd;cursor:pointer}
-.ltr{direction:ltr;unicode-bidi:plaintext}
-.modal{position:fixed;inset:0;background:rgba(15,25,40,.55);z-index:50;display:flex;align-items:flex-start;justify-content:center;overflow:auto;padding:14px}
-.modal .box{background:#fff;border-radius:14px;max-width:760px;width:100%;padding:16px;margin:auto}
-.modal .box.sm{max-width:420px}
-.modal h3.mt{margin:0 0 8px;color:var(--navy)}
-.adm-photos{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}
-.adm-photos figure{margin:0;text-align:center;flex:1;min-width:150px}
-.adm-photos .im{height:190px;border-radius:10px;background:#eef2f8;display:flex;align-items:center;justify-content:center;color:var(--mut);overflow:hidden;padding:8px;text-align:center;font-size:13px;word-break:break-word}
-.adm-photos img{width:100%;height:100%;object-fit:contain;cursor:zoom-in;background:#000}
-.adm-photos figcaption{font-size:13px;margin-top:3px;color:var(--mut)}
-#toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:#222;color:#fff;padding:10px 18px;border-radius:24px;z-index:99;max-width:92%;text-align:center;box-shadow:0 4px 14px rgba(0,0,0,.3)}
-#toast.err{background:var(--bad)}#toast.ok{background:var(--ok)}
-canvas#cropCanvas{width:100%;max-width:320px;aspect-ratio:1;touch-action:none;border-radius:10px;background:#000;display:block;margin:0 auto;cursor:grab}
-.spin{display:inline-block;width:16px;height:16px;border:3px solid #ccd;border-top-color:var(--navy);border-radius:50%;animation:sp 1s linear infinite;vertical-align:middle}
+.btn.block{width:100%;padding:14px;font-size:17px}
+.photo{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.photo-prev{width:130px;height:130px;border:2px dashed var(--line);border-radius:12px;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:13px;overflow:hidden;background:#f8fafc;text-align:center}
+.photo-prev.card{width:200px;height:130px}
+.photo-prev img{width:100%;height:100%;object-fit:cover;display:block}
+.photo-prev.card img{object-fit:contain;background:#fff}
+.photo .btns{display:flex;flex-direction:column;gap:8px}
+.photo.busy{opacity:.6;pointer-events:none}
+.banner{padding:12px 14px;border-radius:10px;margin-bottom:14px;font-size:15px}
+.banner.err{background:#fef2f2;color:var(--bad);border:1px solid #fecaca}
+.banner.info{background:#eff6ff;color:#1e40af;border:1px solid #bfdbfe}
+.banner.okb{background:#f0fdf4;color:var(--ok);border:1px solid #bbf7d0}
+.center{text-align:center;padding:30px 10px}
+.center .big{font-size:56px}
+.code-box{display:inline-block;direction:ltr;font-size:34px;font-weight:800;letter-spacing:6px;background:#fff8dc;border:2px dashed var(--gold);border-radius:14px;padding:8px 24px;margin:10px 0;color:var(--navy)}
+.badge{display:inline-block;padding:2px 10px;border-radius:999px;font-size:13px;font-weight:700}
+.badge.p{background:#fef3c7;color:#92400e}.badge.a{background:#dcfce7;color:#166534}.badge.r{background:#fee2e2;color:#991b1b}
+.badge.s{background:#ede9fe;color:#5b21b6}
+/* admin */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+.stat{background:#f4f7fb;border:1px solid var(--line);border-radius:12px;padding:10px;text-align:center;cursor:pointer}
+.stat b{display:block;font-size:26px;color:var(--navy)}
+.stat span{font-size:13px;color:var(--muted)}
+.stat.on{outline:2px solid var(--gold)}
+.bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+.bar input[type=text]{flex:1;min-width:180px}
+.bar select{width:auto}
+.tbl-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:12px}
+table{width:100%;border-collapse:collapse;font-size:14px;min-width:720px}
+th,td{padding:9px 10px;text-align:right;border-bottom:1px solid #edf0f5;white-space:nowrap}
+th{background:#f1f4f9;color:var(--navy);position:sticky;top:0}
+tbody tr{cursor:pointer}tbody tr:hover{background:#f8fafd}
+tbody tr.static{cursor:default}tbody tr.static:hover{background:none}
+td.nm{white-space:normal;min-width:170px;font-weight:600}
+.ltr-cell{direction:ltr;text-align:right}
+.toolbar-top{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.pwrow{display:flex;gap:8px;align-items:center}
+.pwrow input{flex:1}
+.chk{display:flex;gap:6px;align-items:center;font-size:13.5px;color:var(--muted);margin-top:4px;cursor:pointer}
+.chk input{width:auto}
+/* modal */
+.overlay{position:fixed;inset:0;background:rgba(15,23,42,.55);display:flex;align-items:flex-start;justify-content:center;padding:16px;overflow:auto;z-index:50}
+.overlay.top{z-index:80;align-items:center}
+.modal{background:#fff;border-radius:16px;width:100%;max-width:760px;margin:auto;box-shadow:0 20px 60px rgba(0,0,0,.35)}
+.modal.narrow{max-width:460px}
+.modal header{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;border-bottom:1px solid var(--line);position:sticky;top:0;background:#fff;border-radius:16px 16px 0 0;z-index:2}
+.modal header h3{margin:0;font-size:18px;color:var(--navy)}
+.modal .body{padding:16px 18px}
+.modal .foot{padding:12px 18px;border-top:1px solid var(--line);display:flex;gap:8px;flex-wrap:wrap;position:sticky;bottom:0;background:#fff;border-radius:0 0 16px 16px}
+.xbtn{border:0;background:#eef1f6;border-radius:8px;width:34px;height:34px;font-size:20px;cursor:pointer}
+.dlg{background:#fff;border-radius:14px;padding:20px;max-width:420px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.4)}
+.dlg h3{margin:0 0 6px;color:var(--navy)}
+.dlg .row{display:flex;gap:8px;margin-top:14px}
+.dlg .row .btn{flex:1}
+.kv{display:grid;grid-template-columns:150px 1fr;gap:6px 12px;font-size:15px}
+.kv .k{color:var(--muted);font-weight:600}
+.kv .v{word-break:break-word}
+.imgs{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.imgs figure{margin:0;text-align:center}
+.imgs .im{width:170px;height:170px;border:1px solid var(--line);border-radius:12px;background:#f1f5f9;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:13px;overflow:hidden;cursor:zoom-in}
+.imgs .im.card{width:260px;height:170px}
+.imgs .im img{width:100%;height:100%;object-fit:cover}
+.imgs .im.card img{object-fit:contain;background:#fff}
+.imgs figcaption{font-size:13px;color:var(--muted);margin-top:3px}
+.lightbox img{max-width:96vw;max-height:92vh;border-radius:8px;background:#fff}
+.toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:#111827;color:#fff;padding:11px 18px;border-radius:10px;z-index:120;font-size:15px;max-width:92vw;box-shadow:0 8px 24px rgba(0,0,0,.3)}
+.toast.err{background:var(--bad)}.toast.ok{background:var(--ok)}
+.spin{display:inline-block;width:18px;height:18px;border:3px solid #cbd5e1;border-top-color:var(--navy);border-radius:50%;animation:sp .8s linear infinite;vertical-align:middle}
 @keyframes sp{to{transform:rotate(360deg)}}
-.lead{color:var(--mut);margin:0 0 12px}
+@media(max-width:640px){
+  .grid{grid-template-columns:1fr}
+  .stats{grid-template-columns:repeat(2,1fr)}
+  .kv{grid-template-columns:110px 1fr}
+  header.top h1{font-size:20px}
+  .photo-prev.card{width:100%;max-width:240px}
+}
 </style>
 </head>
 <body>
 
-<header>
+<header class="top">
   <div class="cross">✝</div>
-  <h1>اجتماع شباب «اتبعني»</h1>
+  <h1>اجتماع شباب اتبعني</h1>
   <p>كاتدرائية مارمينا والبابا كيرلس - العاشر من رمضان</p>
 </header>
 
-<nav>
-  <button class="on" data-tab="register">التسجيل</button>
-  <button data-tab="status">استعلام عن حالة التسجيل</button>
+<nav class="tabs">
+  <button class="active" data-tab="register">التسجيل</button>
+  <button data-tab="status">استعلام عن الحالة</button>
   <button data-tab="admin">الأدمن</button>
 </nav>
 
 <main>
-<!-- ============ تبويب التسجيل ============ -->
-<section class="panel" id="tab-register">
-  <div id="closedBox" class="notice bad" hidden>التسجيل مغلق حاليًا.</div>
-  <div id="doneBox" hidden>
-    <div class="notice good"><b>تم استلام طلبك بنجاح ✔</b><br>سيتم مراجعة بياناتك، وبعد القبول سيصلك كودك الخاص.</div>
-    <p>للاطمئنان على طلبك استخدم تبويب <b>«استعلام عن حالة التسجيل»</b> بالرقم القومي.</p>
-    <button class="btn pri" id="newReg">تسجيل شخص آخر</button>
-  </div>
-  <div id="regWrap">
-    <p class="lead">املأ البيانات التالية بدقة. الحقول التي بعلامة <b style="color:var(--bad)">*</b> إجبارية.</p>
-    <div id="regForm"></div>
-    <div class="formerr" id="regErr" hidden></div>
-    <button class="btn pri wide" id="regBtn">إرسال الطلب</button>
-  </div>
-</section>
-
-<!-- ============ تبويب الاستعلام ============ -->
-<section class="panel" id="tab-status" hidden>
-  <div id="stQuery">
-    <p class="lead">أدخل <b>الرقم القومي</b> (14 رقمًا، أرقام إنجليزية فقط) لمعرفة حالة طلبك.</p>
-    <form id="stForm" novalidate autocomplete="off">
-      <div class="field" style="max-width:380px"><label>الرقم القومي</label>
-        <input id="stNid" data-t="digits" inputmode="numeric" enterkeyhint="go" maxlength="14" dir="ltr" autocomplete="off" placeholder="14 رقم"></div>
-      <div class="formerr" id="stErr" hidden></div>
-      <button class="btn pri" id="stBtn" type="submit">استعلام</button>
-    </form>
-    <div id="stResult" style="margin-top:14px"></div>
-  </div>
-  <div id="stEdit" hidden>
-    <div class="notice bad" id="stReason"></div>
-    <h3 style="color:var(--navy)">عدّل بياناتك ثم أعد الإرسال</h3>
-    <div id="resubForm"></div>
-    <div class="formerr" id="resubErr" hidden></div>
-    <div class="row">
-      <button class="btn pri" id="resubBtn">إعادة الإرسال</button>
-      <button class="btn" id="resubCancel">رجوع</button>
+  <!-- ===== تسجيل ===== -->
+  <section class="panel" id="tab-register">
+    <div id="regLoading" class="center"><span class="spin"></span> جاري التحميل...</div>
+    <div id="regError" class="banner err" hidden></div>
+    <div id="regClosed" class="center" hidden><div class="big">🔒</div><h2>التسجيل مغلق حاليًا</h2><p>سيتم الإعلان عند فتح باب التسجيل.</p></div>
+    <div id="regSuccess" class="center" hidden>
+      <div class="big">✅</div>
+      <h2>تم استلام طلبك بنجاح</h2>
+      <p>سيتم مراجعة بياناتك، وبعد القبول هيوصلك الكود الخاص بك.<br>تقدر تستعلم عن حالتك من تبويب "استعلام عن الحالة" بالرقم القومي ورقم الواتساب.</p>
+      <button class="btn ghost" id="btnNewReg">تسجيل شخص آخر</button>
     </div>
-  </div>
-</section>
-
-<!-- ============ تبويب الأدمن ============ -->
-<section class="panel" id="tab-admin" hidden>
-  <div id="admLogin" style="max-width:360px;margin:auto">
-    <h3 style="color:var(--navy);text-align:center">دخول الأدمن</h3>
-    <form id="admForm" novalidate>
-      <div class="field"><label>اسم المستخدم</label><input id="admUser" data-t="user" dir="ltr" autocomplete="username" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="next"></div>
-      <div class="field"><label>كلمة المرور</label><input id="admPass" type="password" dir="ltr" autocomplete="current-password" enterkeyhint="go"></div>
-      <div class="formerr" id="admErr" hidden></div>
-      <button class="btn pri wide" id="admBtn" type="submit">دخول</button>
+    <form id="regFormWrap" hidden novalidate>
+      <div id="regFormBox"></div>
+      <div id="regSubmitErr" class="banner err" hidden></div>
+      <button type="submit" class="btn primary block" id="btnSubmit">إرسال الطلب</button>
+      <div class="hint" style="text-align:center;margin-top:8px" id="submitHint"></div>
     </form>
-  </div>
+  </section>
 
-  <div id="admDash" hidden>
-    <div class="row" style="justify-content:space-between">
-      <div>مرحبًا <b id="admName"></b></div>
-      <div class="row">
-        <button class="btn sm" id="admRefresh">تحديث</button>
-        <button class="btn sm bad" id="admLogout">خروج</button>
+  <!-- ===== استعلام ===== -->
+  <section class="panel" id="tab-status" hidden>
+    <h2 style="margin-top:0;color:var(--navy)">استعلام عن حالة التسجيل</h2>
+    <form id="statusForm" novalidate style="max-width:480px">
+      <div class="field"><label class="l">الرقم القومي</label><input type="text" id="stNid" inputmode="numeric" maxlength="14" placeholder="14 رقم"></div>
+      <div class="field"><label class="l">رقم الواتساب المسجّل</label><input type="text" id="stWa" inputmode="numeric" maxlength="11" placeholder="01xxxxxxxxx"></div>
+      <button class="btn primary" type="submit" id="btnStatus">استعلام</button>
+    </form>
+    <div id="stResult" style="margin-top:16px"></div>
+  </section>
+
+  <!-- ===== أدمن ===== -->
+  <section class="panel" id="tab-admin" hidden>
+    <div id="adLogin" style="max-width:380px;margin:10px auto">
+      <h2 style="margin-top:0;color:var(--navy);text-align:center">دخول الأدمن</h2>
+      <form id="loginForm" autocomplete="on">
+        <div class="field"><label class="l">اسم المستخدم</label><input type="text" id="adUser" autocomplete="username" class="ltr" autocapitalize="none" autocorrect="off"></div>
+        <div class="field"><label class="l">كلمة المرور</label><input type="password" id="adPass" autocomplete="current-password" class="ltr"></div>
+        <div id="loginErr" class="banner err" hidden></div>
+        <button class="btn primary block" type="submit" id="btnLogin">دخول</button>
+      </form>
+    </div>
+
+    <div id="adDash" hidden>
+      <div class="toolbar-top">
+        <div>مرحبًا <b id="adName"></b> <span class="badge s" id="adRole" hidden>سوبر أدمن</span></div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <button class="btn sm primary" id="btnAdmins" hidden>👥 إدارة الأدمنز</button>
+          <button class="btn sm ghost" id="btnMyAccount">🔑 حسابي</button>
+          <button class="btn sm ghost" id="btnRefresh">تحديث</button>
+          <button class="btn sm ghost" id="btnExport">تصدير Excel</button>
+          <button class="btn sm warn" id="btnToggleReg">...</button>
+          <button class="btn sm danger" id="btnLogout">خروج</button>
+        </div>
       </div>
+      <div class="stats" id="adStats"></div>
+      <div class="bar">
+        <input type="text" id="adSearch" placeholder="بحث بالاسم / الرقم القومي / الهاتف / الكود">
+        <select id="adFilter"></select>
+      </div>
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>#</th><th>الاسم</th><th>الرقم القومي</th><th>الواتساب</th><th>الحي</th><th>الحالة</th><th>الكود</th><th>تاريخ التسجيل</th></tr></thead>
+        <tbody id="adBody"></tbody>
+      </table></div>
+      <div style="text-align:center;margin-top:10px"><button class="btn ghost sm" id="btnMore" hidden>عرض المزيد</button></div>
+      <div class="hint" id="adCount" style="margin-top:8px"></div>
     </div>
-    <div class="stats">
-      <div class="stat"><b id="sTotal">0</b><span>إجمالي المسجلين</span></div>
-      <div class="stat"><b id="sPend">0</b><span>قيد المراجعة</span></div>
-      <div class="stat"><b id="sOk">0</b><span>مقبول</span></div>
-      <div class="stat"><b id="sNo">0</b><span>مرفوض</span></div>
-    </div>
-    <div class="row" style="margin-bottom:10px">
-      <input id="admSearch" data-t="text" placeholder="بحث بالاسم / الرقم القومي / الكود / الهاتف" style="flex:1;min-width:200px">
-      <select id="admFilter" style="width:auto">
-        <option value="">كل الحالات</option><option>قيد المراجعة</option><option>مقبول</option><option>مرفوض</option>
-      </select>
-      <button class="btn gold" id="admExport">تصدير Excel</button>
-      <button class="btn" id="admToggle">...</button>
-    </div>
-    <div class="tbl-wrap">
-      <table>
-        <thead><tr><th>#</th><th>الكود</th><th>الاسم</th><th>الرقم القومي</th><th>واتساب</th><th>الحالة</th><th>التاريخ</th><th>إجراءات</th></tr></thead>
-        <tbody id="admBody"></tbody>
-      </table>
-    </div>
-    <p class="lead" id="admCount" style="margin-top:6px"></p>
-  </div>
-</section>
+  </section>
 </main>
 
-<!-- ============ قالب النموذج (يُستخدم في التسجيل وإعادة الإرسال وتعديل الأدمن) ============ -->
-<template id="tplForm">
-  <div class="sec">
-    <h3>البيانات الشخصية</h3>
-    <div class="field"><label>الاسم رباعي <b>*</b></label>
-      <input data-f="fullName" data-t="name" autocomplete="name" placeholder="الاسم الأول والثاني والثالث والرابع"></div>
-    <div class="grid2">
-      <div class="field"><label>النوع <b>*</b></label>
-        <select data-f="gender"><option value="">اختر</option><option>ذكر</option><option>أنثى</option></select></div>
-      <div class="field"><label>الرقم القومي (14 رقم) <b>*</b></label>
-        <input data-f="nid" data-t="digits" inputmode="numeric" maxlength="14" dir="ltr" autocomplete="off"><small class="hint" data-hint="nid"></small></div>
-    </div>
-    <div class="grid2">
-      <div class="field"><label>تاريخ الميلاد <b>*</b></label>
-        <input type="date" data-f="birthDate" dir="ltr" min="1900-01-01" autocomplete="bday">
-        <small class="hint">اكتب تاريخ ميلادك الفعلي (حتى لو مختلف عن المكتوب في الرقم القومي).</small></div>
-      <div class="field"><label>الحالة الاجتماعية <b>*</b></label>
-        <select data-f="maritalStatus" data-list="marital"></select></div>
-    </div>
-    <div class="grid2">
-      <div class="field"><label>رقم الواتساب (11 رقم) <b>*</b></label><input data-f="whatsapp" data-t="digits" inputmode="numeric" maxlength="11" dir="ltr" placeholder="01XXXXXXXXX"></div>
-      <div class="field"><label>رقم الهاتف (11 رقم) <b>*</b></label><input data-f="phone" data-t="digits" inputmode="numeric" maxlength="11" dir="ltr" placeholder="01XXXXXXXXX"></div>
-    </div>
-    <div class="grid2">
-      <div class="field"><label>رقم هاتف آخر (اختياري)</label><input data-f="phone2" data-t="digits" inputmode="numeric" maxlength="11" dir="ltr"></div>
-      <div class="field"><label>أب الاعتراف <b>*</b></label><input data-f="father" data-t="name"></div>
-    </div>
-  </div>
-
-  <div class="sec">
-    <h3>المهنة</h3>
-    <div class="field"><label>المهنة <b>*</b></label>
-      <select data-f="occupation"><option value="">اختر</option><option>طالب</option><option>موظف</option><option>أخرى</option></select></div>
-
-    <div data-group="student" hidden>
-      <div class="grid2">
-        <div class="field"><label>المرحلة <b>*</b></label><select data-f="studyStage" data-list="stages"></select></div>
-        <div class="field"><label>السنة الدراسية <b>*</b></label><select data-f="studyYear"></select></div>
-      </div>
-      <div class="grid2">
-        <div class="field"><label>جهة الدراسة (المدرسة / الجامعة / المعهد) <b>*</b></label><input data-f="studyPlace" data-t="text"></div>
-        <div class="field"><label>الكلية / القسم <b data-facreq>*</b></label><input data-f="faculty" data-t="text"></div>
-      </div>
-    </div>
-
-    <div data-group="employee" hidden>
-      <div class="grid2">
-        <div class="field"><label>القطاع <b>*</b></label><select data-f="workSector" data-list="sectors"></select></div>
-        <div class="field"><label>المسمى الوظيفي <b>*</b></label><input data-f="jobTitle" data-t="text"></div>
-      </div>
-      <div class="field"><label>جهة العمل <b data-wpreq>*</b></label><input data-f="workPlace" data-t="text"></div>
-    </div>
-
-    <div data-group="other" hidden>
-      <div class="field"><label>الحالة <b>*</b></label><select data-f="otherStatus" data-list="otherStatus"></select></div>
-      <div class="field" data-group="otherText" hidden><label>اكتب التفاصيل <b>*</b></label><input data-f="otherText" data-t="text"></div>
-    </div>
-  </div>
-
-  <div class="sec">
-    <h3>العنوان</h3>
-    <div class="grid2">
-      <div class="field"><label>نوع السكن <b>*</b></label><select data-f="housingType" data-list="housing"></select></div>
-      <div class="field" data-group="compound" hidden><label>اسم الكومباوند <b>*</b></label><input data-f="compound" data-t="text"></div>
-    </div>
-    <div class="grid2">
-      <div class="field"><label>الحي / المجاورة <b>*</b></label><select data-f="district" data-list="districts"></select></div>
-      <div class="field" data-group="districtOther" hidden><label>اكتب الحي / المجاورة <b>*</b></label><input data-f="districtOther" data-t="text"></div>
-    </div>
-    <div class="grid2">
-      <div class="field"><label>رقم العمارة (أرقام فقط) <b>*</b></label><input data-f="building" data-t="num" inputmode="numeric" maxlength="6" dir="ltr" autocomplete="off"></div>
-      <div class="field"><label>رقم الشقة (أرقام فقط) <b>*</b></label><input data-f="apartment" data-t="num" inputmode="numeric" maxlength="6" dir="ltr" autocomplete="off"></div>
-    </div>
-    <div class="field"><label>تفاصيل أخرى للعنوان</label><textarea data-f="addressDetails" data-t="long" rows="2" placeholder="علامة مميزة، دور، ..."></textarea></div>
-  </div>
-
-  <div class="sec" data-group="photos">
-    <h3>الصور</h3>
-    <p class="lead" data-photonote style="margin:0 0 6px"></p>
-    <div class="photo-title">الصورة الشخصية (تُقص مربعة) <b style="color:var(--bad)" data-photostar>*</b></div>
-    <div class="photo" data-photo="profile">
-      <div class="prev"><span>لا توجد صورة</span></div>
-      <div class="btns">
-        <button type="button" class="btn sm" data-cam>📷 التقاط صورة</button>
-        <button type="button" class="btn sm" data-gal>🖼️ من المعرض</button>
-      </div>
-      <input type="file" accept="image/*" capture="user" hidden data-in-cam>
-      <input type="file" accept="image/*" hidden data-in-gal>
-    </div>
-    <div class="photo-title" style="margin-top:12px">صورة بطاقة الرقم القومي (الوجه) <b style="color:var(--bad)" data-photostar>*</b></div>
-    <div class="photo idc" data-photo="idCard">
-      <div class="prev"><span>لا توجد صورة</span></div>
-      <div class="btns">
-        <button type="button" class="btn sm" data-cam>📷 التقاط صورة</button>
-        <button type="button" class="btn sm" data-gal>🖼️ من المعرض</button>
-      </div>
-      <input type="file" accept="image/*" capture="environment" hidden data-in-cam>
-      <input type="file" accept="image/*" hidden data-in-gal>
-    </div>
-    <small class="hint">صورة البطاقة سرية ولا يراها إلا الأدمن.</small>
-  </div>
-</template>
-
-<!-- ============ نوافذ ============ -->
-<div class="modal" id="cropModal" hidden>
-  <div class="box sm">
-    <h3 class="mt">اضبط الصورة الشخصية</h3>
-    <p class="lead" style="margin:0 0 8px">اسحب الصورة لتحريكها، واستخدم الشريط للتكبير.</p>
-    <canvas id="cropCanvas"></canvas>
-    <input type="range" id="cropZoom" min="1" max="4" step="0.01" value="1" style="margin:12px 0">
-    <div class="row"><button class="btn pri" id="cropOk">تأكيد</button><button class="btn" id="cropCancel">إلغاء</button></div>
-  </div>
-</div>
-
-<div class="modal" id="detailModal" hidden>
-  <div class="box">
-    <div class="row" style="justify-content:space-between">
-      <h3 class="mt" id="dName"></h3>
-      <button class="btn sm" id="dClose">إغلاق ✕</button>
-    </div>
-    <div class="row" id="dHead" style="margin-bottom:8px"></div>
-    <div class="adm-photos">
-      <figure><div class="im" id="dImgP"><span class="spin"></span></div><figcaption>الصورة الشخصية</figcaption></figure>
-      <figure><div class="im" id="dImgI"><span class="spin"></span></div><figcaption>صورة البطاقة (اضغط للتكبير)</figcaption></figure>
-    </div>
-    <div id="dForm"></div>
-    <div class="formerr" id="dErr" hidden></div>
-    <div class="row" id="dActions"></div>
-  </div>
-</div>
-
-<div class="modal" id="askModal" hidden style="z-index:70">
-  <div class="box sm">
-    <h3 class="mt" id="askTitle"></h3>
-    <p id="askMsg"></p>
-    <textarea id="askInput" data-t="long" rows="3" hidden placeholder="اكتب السبب..."></textarea>
-    <div class="row" style="margin-top:10px"><button class="btn pri" id="askOk">تأكيد</button><button class="btn" id="askCancel">إلغاء</button></div>
-  </div>
-</div>
-
-<div class="modal" id="lightbox" hidden style="z-index:80;background:rgba(0,0,0,.88)"><img id="lbImg" style="max-width:100%;max-height:100%;margin:auto"></div>
-<div id="toast" hidden></div>
-
 <script>
-// رابط الـ Web App يُقرأ من ملف config.js (لا تعدّل هنا)
-const API_URL = (window.APP_CONFIG && window.APP_CONFIG.API_URL) || '';
-
-const LISTS = {
-  stages: {
-    'فني أو دبلوم': ['الأولى', 'الثانية', 'الثالثة', 'الرابعة', 'الخامسة'],
-    'جامعي': ['الأولى', 'الثانية', 'الثالثة', 'الرابعة', 'الخامسة', 'السادسة', 'امتياز'],
-    'معهد': ['الأولى', 'الثانية', 'الثالثة', 'الرابعة', 'الخامسة'],
-    'دراسات عليا': ['دبلومة', 'تمهيدي ماجستير', 'ماجستير', 'تمهيدي دكتوراه', 'دكتوراه']
-  },
-  sectors: ['حكومي', 'خاص', 'أعمال حرة'],
-  otherStatus: ['خريج بدون عمل', 'لا يعمل', 'أخرى'],
-  housing: ['اسكان اجتماعي', 'ابني بيتك', 'كومباوند'],
-  // [القيمة المحفوظة, النص الظاهر]  - القيمة المحفوظة ثابتة، والنص الظاهر يناسب الذكر والأنثى
-  marital: [['أعزب', 'أعزب / عزباء'], ['خطوبة', 'خطوبة'], ['متزوج', 'متزوج / متزوجة']],
-  districts: ['الحي ال16', 'الحي ال15', 'الحي ال12', 'الحي ال11', 'مجاورة 59', 'مجاورة 60', 'حي الاندلس', 'أخرى']
-};
-const GOV = ['01','02','03','04','11','12','13','14','15','16','17','18','19','21','22','23','24','25','26','27','28','29','31','32','33','34','35','88'];
-const FORM_KEYS = ['fullName','gender','nid','birthDate','maritalStatus','whatsapp','phone','phone2','father','occupation','studyStage','studyYear','studyPlace','faculty','workSector','jobTitle','workPlace','otherStatus','otherText','housingType','compound','district','districtOther','building','apartment','addressDetails'];
-const EXPORT_COLS = [['code','الكود'],['status','الحالة'],['fullName','الاسم'],['gender','النوع'],['nid','الرقم القومي'],['birthDate','تاريخ الميلاد'],['maritalStatus','الحالة الاجتماعية'],['whatsapp','واتساب'],['phone','الهاتف'],['phone2','هاتف آخر'],['father','أب الاعتراف'],['occupation','المهنة'],['studyStage','المرحلة'],['studyYear','السنة الدراسية'],['studyPlace','جهة الدراسة'],['faculty','الكلية / القسم'],['workSector','قطاع العمل'],['jobTitle','المسمى الوظيفي'],['workPlace','جهة العمل'],['otherStatus','حالة (أخرى)'],['otherText','تفاصيل (أخرى)'],['housingType','نوع السكن'],['compound','الكومباوند'],['district','الحي / المجاورة'],['districtOther','حي آخر'],['building','العمارة'],['apartment','الشقة'],['addressDetails','تفاصيل العنوان'],['rejectReason','سبب الرفض'],['createdAt','تاريخ التسجيل'],['reviewedBy','راجعه'],['reviewedAt','تاريخ المراجعة']];
-
+/* ============================ أدوات ============================ */
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
-const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const digits = s => String(s ?? '').replace(/[^0-9]/g, '');   // أرقام إنجليزية 0-9 فقط
-// يحوّل الأرقام العربية (٠-٩) والفارسية (۰-۹) لأرقام إنجليزية
-const toEn = s => String(s ?? '').replace(/[\u0660-\u0669]/g, c => c.charCodeAt(0) - 0x0660).replace(/[\u06F0-\u06F9]/g, c => c.charCodeAt(0) - 0x06F0);
-
-/* ---------- قواعد الإدخال حسب نوع كل حقل (data-t) ---------- */
-// الحروف المسموحة: عربي (بالتشكيل) + إنجليزي.
-// conv: true  => الأرقام العربية بتتحوّل لإنجليزي بدل ما تتمسح (رقم العمارة/الشقة وتفاصيل العنوان فقط).
-const LETTERS = 'a-zA-Z\u0621-\u063A\u0641-\u064A\u0670\u0671\u064B-\u0652';
-const RULES = {
-  digits: { re: /[^0-9]/g, msg: 'أرقام إنجليزية (0-9) فقط' },
-  num:    { re: /[^0-9]/g, conv: true, msg: 'أرقام فقط' },
-  name:   { re: new RegExp('[^' + LETTERS + ' ]', 'g'), msg: 'حروف فقط (بدون أرقام أو رموز)' },
-  text:   { re: new RegExp('[^' + LETTERS + '0-9 .,\u060C\\-\'/&()]', 'g'), msg: 'حروف وأرقام إنجليزية فقط' },
-  long:   { re: new RegExp('[^' + LETTERS + '0-9 .,\u060C\u061B\u061F?!:\\-\'/&()\\n]', 'g'), conv: true, msg: 'حروف وأرقام ورموز بسيطة فقط' },
-  user:   { re: /[^a-zA-Z0-9._-]/g, msg: 'حروف وأرقام إنجليزية فقط (بدون مسافات)' }
-};
-const RE_NAME = new RegExp('^[' + LETTERS + ' ]+$');
-
-let tipT = 0;
-function sanitizeInput(el) {
-  const rule = RULES[el.dataset.t]; if (!rule) return;
-  const v = el.value, conv = rule.conv ? toEn(v) : v, nv = conv.replace(rule.re, '');
-  if (nv === v) return;
-  let pos = null; try { pos = el.selectionStart; } catch (e) {}
-  el.value = nv;
-  if (pos != null) {
-    const pre = rule.conv ? toEn(v.slice(0, pos)) : v.slice(0, pos);
-    const np = pre.replace(rule.re, '').length;
-    try { el.setSelectionRange(np, np); } catch (e) {}
-  }
-  if (nv.length !== conv.length) {                     // اتمسح حرف (التحويل لوحده ما بيظهرش رسالة)
-    const now = Date.now();
-    if (now - tipT > 1500) {
-      tipT = now;
-      const lab = el.closest('.field') && el.closest('.field').querySelector('label');
-      const name = lab ? lab.childNodes[0].textContent.replace(/\(.*?\)/g, '').trim() : '';
-      toast((name ? name + ': ' : '') + rule.msg, 'err', 2400);
-    }
-  }
-}
-// capture على document: يعمل قبل باقي المعالجات ويشمل الكتابة واللصق
-document.addEventListener('input', e => { const el = e.target; if (el && el.dataset && el.dataset.t && !e.isComposing) sanitizeInput(el); }, true);
-document.addEventListener('compositionend', e => { const el = e.target; if (el && el.dataset && el.dataset.t) sanitizeInput(el); }, true);
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+// تحويل الأرقام العربية/الفارسية إلى إنجليزية
+const toEn = s => String(s == null ? '' : s).replace(/[\u0660-\u0669]/g, d => d.charCodeAt(0) - 0x0660).replace(/[\u06F0-\u06F9]/g, d => d.charCodeAt(0) - 0x06F0);
 
 let toastT;
-function toast(msg, type, ms) {
-  const t = $('#toast'); t.textContent = msg; t.className = type || ''; t.hidden = false;
-  clearTimeout(toastT); toastT = setTimeout(() => t.hidden = true, ms || 3500);
+function toast(msg, type = '') {
+  $$('.toast').forEach(t => t.remove());
+  const t = document.createElement('div');
+  t.className = 'toast ' + type; t.textContent = msg;
+  document.body.appendChild(t);
+  clearTimeout(toastT); toastT = setTimeout(() => t.remove(), 3500);
 }
-function showErr(id, msg) { const e = $(id); e.textContent = msg || ''; e.hidden = !msg; }
 
-/* ---------------- الاتصال بالخادم ---------------- */
-async function api(action, payload, timeoutMs) {
-  if (!API_URL || API_URL.indexOf('PASTE_') === 0) return { ok: false, error: 'لم يتم ضبط رابط الخادم داخل ملف config.js.' };
+async function api(action, payload = {}, timeoutMs = 90000) {
+  if (!window.API_URL || window.API_URL.indexOf('PASTE_') === 0) throw new Error('لم يتم ضبط رابط API_URL في أعلى الملف');
   const ctrl = new AbortController();
-  const t = setTimeout(() => ctrl.abort(), timeoutMs || 45000);
+  const timer = setTimeout(() => ctrl.abort(), timeoutMs);
   try {
-    // بدون headers مخصصة لتجنب preflight مع Apps Script
-    const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action, ...(payload || {}) }), signal: ctrl.signal });
-    return await res.json();
+    const res = await fetch(window.API_URL, {
+      method: 'POST', redirect: 'follow', signal: ctrl.signal,
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // بدون preflight
+      body: JSON.stringify(Object.assign({ action }, payload))
+    });
+    let j;
+    try { j = await res.json(); } catch (e) { throw new Error('استجابة غير متوقعة من الخادم. تأكد من نشر الـ Web App (Anyone) واستخدام رابط /exec'); }
+    if (!j.ok) { const err = new Error(j.error || 'حدث خطأ'); err.code = j.error; throw err; }
+    return j;
   } catch (e) {
-    return { ok: false, error: e.name === 'AbortError' ? 'انتهت مهلة الاتصال. تأكد من الإنترنت ثم حاول مرة أخرى.' : 'تعذر الاتصال بالخادم. تأكد من الإنترنت ثم حاول مرة أخرى.' };
-  } finally { clearTimeout(t); }
+    if (e.name === 'AbortError') throw new Error('انتهت مهلة الاتصال، تأكد من الإنترنت وحاول مرة أخرى');
+    if (e instanceof TypeError) throw new Error('تعذر الاتصال بالخادم، تأكد من الإنترنت');
+    throw e;
+  } finally { clearTimeout(timer); }
 }
 
-/* ---------------- التبويبات ---------------- */
-$$('nav button').forEach(b => b.onclick = () => {
-  $$('nav button').forEach(x => x.classList.toggle('on', x === b));
-  ['register', 'status', 'admin'].forEach(k => $('#tab-' + k).hidden = (k !== b.dataset.tab));
+/* نافذة تأكيد. input: false | true (مربع نص كبير) | 'text' (سطر واحد LTR) */
+function ask({ title = 'تأكيد', message = '', input = false, placeholder = '', okText = 'تأكيد', danger = false }) {
+  return new Promise(res => {
+    const ov = document.createElement('div');
+    ov.className = 'overlay top';
+    const field = input === 'text'
+      ? `<input type="text" class="ltr" autocomplete="off" autocapitalize="none" placeholder="${esc(placeholder)}">`
+      : input ? `<textarea rows="3" placeholder="${esc(placeholder)}"></textarea>` : '';
+    ov.innerHTML = `<div class="dlg"><h3>${esc(title)}</h3><p style="margin:6px 0">${esc(message)}</p>${field}
+      <div class="row"><button class="btn ${danger ? 'danger' : 'primary'}" data-ok>${esc(okText)}</button><button class="btn ghost" data-no>إلغاء</button></div></div>`;
+    document.body.appendChild(ov);
+    const done = v => { ov.remove(); res(v); };
+    $('[data-ok]', ov).onclick = () => done(input ? $('textarea, input', ov).value.trim() : true);
+    $('[data-no]', ov).onclick = () => done(null);
+    const f = $('textarea, input', ov); if (f) f.focus();
+  });
+}
+
+function openModal(title, bodyHTML, footHTML = '', narrow = false) {
+  const ov = document.createElement('div');
+  ov.className = 'overlay';
+  ov.innerHTML = `<div class="modal${narrow ? ' narrow' : ''}"><header><h3>${esc(title)}</h3><button class="xbtn" data-x>×</button></header>
+    <div class="body">${bodyHTML}</div>${footHTML ? `<div class="foot">${footHTML}</div>` : ''}</div>`;
+  document.body.appendChild(ov);
+  document.body.style.overflow = 'hidden';
+  const close = () => { ov.remove(); if (!$('.overlay')) document.body.style.overflow = ''; };
+  $('[data-x]', ov).onclick = close;
+  return { el: ov, close };
+}
+
+function lightbox(src) {
+  if (!src) return;
+  const ov = document.createElement('div');
+  ov.className = 'overlay top lightbox';
+  ov.style.alignItems = 'center';
+  ov.innerHTML = `<img src="${src}" alt="">`;
+  ov.onclick = () => ov.remove();
+  document.body.appendChild(ov);
+}
+
+/* معالجة الصور: ضغط في المتصفح (الشخصية: مربعة 600px | البطاقة: حتى 1200px) */
+function loadImage(url) {
+  return new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = url; });
+}
+async function processImage(file, square) {
+  const url = URL.createObjectURL(file);
+  try {
+    const img = await loadImage(url);
+    const w = img.naturalWidth, h = img.naturalHeight;
+    const cv = document.createElement('canvas');
+    const ctx = cv.getContext('2d');
+    if (square) {
+      const s = Math.min(w, h), out = 600;
+      cv.width = cv.height = out;
+      ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, out, out);
+      ctx.drawImage(img, (w - s) / 2, (h - s) / 2, s, s, 0, 0, out, out);
+    } else {
+      const sc = Math.min(1, 1200 / Math.max(w, h));
+      cv.width = Math.round(w * sc); cv.height = Math.round(h * sc);
+      ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, cv.width, cv.height);
+      ctx.drawImage(img, 0, 0, cv.width, cv.height);
+    }
+    return cv.toDataURL('image/jpeg', 0.82);
+  } finally { URL.revokeObjectURL(url); }
+}
+
+/* ============================ نموذج التسجيل (يُستخدم في التسجيل وتعديل الأدمن) ============================ */
+const FIELD_KEYS = ['fullName','gender','nationalId','birthDate','whatsapp','phone','otherPhone','confessor','confessorOther',
+  'occupation','studyStage','studyYear','institution','faculty','jobSector','jobTitle','workplace','otherStatus','otherStatusText',
+  'housingType','compoundName','district','districtOther','building','apartment','addressDetails'];
+const NUMERIC_ONLY = { nationalId: 14, whatsapp: 11, phone: 11, otherPhone: 11, building: 5, apartment: 5 };
+
+class RegForm {
+  constructor(root, cfg, opts = {}) {
+    this.root = root; this.cfg = cfg;
+    this.mode = opts.mode || 'register';
+    this.photos = { profile: null, id: null };
+    this.existing = { profile: !!opts.hasProfile, id: !!opts.hasId }; // في وضع التعديل: الصور الحالية محفوظة
+    root.innerHTML = this.template();
+    this.bind();
+    if (opts.initial) this.fill(opts.initial);
+    this.layout();
+  }
+
+  f(k) { return this.root.querySelector(`[data-f="${k}"]`); }
+  w(k) { return this.root.querySelector(`[data-w="${k}"]`); }
+
+  template() {
+    const c = this.cfg;
+    const opt = (arr, ph) => `<option value="">${ph || 'اختر...'}</option>` + arr.map(x => `<option value="${esc(x)}">${esc(x)}</option>`).join('');
+    const F = (k, label, inner, hint, full) => `<div class="field${full ? ' full' : ''}" data-w="${k}"><label class="l">${label}</label>${inner}${hint ? `<div class="hint">${hint}</div>` : ''}<div class="err"></div></div>`;
+    const num = (k, ph) => `<input data-f="${k}" type="text" inputmode="numeric" autocomplete="off" placeholder="${ph || ''}">`;
+    const txt = (k, ph) => `<input data-f="${k}" type="text" autocomplete="off" placeholder="${ph || ''}">`;
+    const sel = (k, arr, ph) => `<select data-f="${k}">${opt(arr, ph)}</select>`;
+    const photo = (kind, label, camAttr, card) => `
+      <div class="field full" data-w="${kind}Photo"><label class="l">${label}</label>
+        <div class="photo" data-photo="${kind}">
+          <div class="photo-prev${card ? ' card' : ''}" data-prev>${card ? 'لم يتم اختيار صورة' : 'لم يتم<br>اختيار صورة'}</div>
+          <div class="btns">
+            <button type="button" class="btn ghost sm" data-cam>📷 التقاط صورة</button>
+            <button type="button" class="btn ghost sm" data-gal>🖼️ اختيار من المعرض</button>
+          </div>
+          <input type="file" accept="image/*" capture="${camAttr}" hidden data-cam-input>
+          <input type="file" accept="image/*" hidden data-gal-input>
+        </div><div class="err"></div></div>`;
+
+    return `
+    <div class="hp" aria-hidden="true"><input data-hp tabindex="-1" autocomplete="off"></div>
+
+    <fieldset class="sec"><legend>البيانات الشخصية</legend><div class="grid">
+      ${F('fullName', 'الاسم رباعي *', txt('fullName', 'الاسم الأول والثاني والثالث والرابع'), '', true)}
+      ${F('gender', 'النوع *', sel('gender', c.genders))}
+      ${F('birthDate', 'تاريخ الميلاد الفعلي *', '<input data-f="birthDate" type="date" class="ltr">', 'اكتب تاريخ ميلادك الحقيقي حتى لو اختلف عن المكتوب في الرقم القومي')}
+      ${F('nationalId', 'الرقم القومي (14 رقم) *', num('nationalId', '14 رقم'), '', true)}
+    </div></fieldset>
+
+    <fieldset class="sec"><legend>بيانات التواصل</legend><div class="grid">
+      ${F('whatsapp', 'رقم الواتساب (11 رقم) *', num('whatsapp', '01xxxxxxxxx'))}
+      ${F('phone', 'رقم الهاتف (11 رقم) *', num('phone', '01xxxxxxxxx'))}
+      ${F('otherPhone', 'رقم هاتف آخر (اختياري)', num('otherPhone', '01xxxxxxxxx'))}
+    </div></fieldset>
+
+    <fieldset class="sec"><legend>الصور</legend>
+      ${photo('profile', 'الصورة الشخصية *' + (this.mode === 'edit' ? ' (اتركها كما هي إن لم ترد التغيير)' : ''), 'user', false)}
+      ${photo('id', 'صورة بطاقة الرقم القومي *' + (this.mode === 'edit' ? ' (اتركها كما هي إن لم ترد التغيير)' : ''), 'environment', true)}
+      <div class="hint" style="margin-bottom:12px">الصورة الشخصية بتتقص تلقائيًا لشكل مربع من المنتصف. صورة البطاقة تظهر للإدارة فقط.</div>
+    </fieldset>
+
+    <fieldset class="sec"><legend>الكنيسة</legend><div class="grid">
+      ${F('confessor', 'أب الاعتراف *', sel('confessor', c.confessors))}
+      ${F('confessorOther', 'اسم أب الاعتراف *', txt('confessorOther', 'اكتب الاسم'))}
+    </div></fieldset>
+
+    <fieldset class="sec"><legend>المهنة</legend><div class="grid">
+      ${F('occupation', 'المهنة *', sel('occupation', c.occupations), '', true)}
+      <div class="full" data-panel="طالب"><div class="grid">
+        ${F('studyStage', 'المرحلة الدراسية *', sel('studyStage', c.studyStages.map(s => s.name)))}
+        ${F('studyYear', 'السنة الدراسية / الدرجة *', '<select data-f="studyYear"><option value="">اختر المرحلة أولًا</option></select>')}
+        ${F('institution', 'جهة الدراسة *', txt('institution', 'اسم المدرسة / الجامعة / المعهد'))}
+        ${F('faculty', 'الكلية / القسم *', txt('faculty', 'مثال: هندسة - قسم ميكانيكا'))}
+      </div></div>
+      <div class="full" data-panel="موظف"><div class="grid">
+        ${F('jobSector', 'قطاع العمل *', sel('jobSector', c.jobSectors))}
+        ${F('jobTitle', 'المسمى الوظيفي *', txt('jobTitle', 'مثال: محاسب / مهندس / مدرس'))}
+        ${F('workplace', 'جهة العمل *', txt('workplace', 'اسم الشركة أو المؤسسة'), '', true)}
+      </div></div>
+      <div class="full" data-panel="أخرى"><div class="grid">
+        ${F('otherStatus', 'الحالة *', sel('otherStatus', c.otherStatuses))}
+        ${F('otherStatusText', 'اكتب التفاصيل *', txt('otherStatusText'))}
+      </div></div>
+    </div></fieldset>
+
+    <fieldset class="sec"><legend>العنوان</legend><div class="grid">
+      ${F('housingType', 'نوع السكن *', sel('housingType', c.housingTypes))}
+      ${F('compoundName', 'اسم الكومباوند *', txt('compoundName'))}
+      ${F('district', 'الحي / المجاورة *', sel('district', c.districts))}
+      ${F('districtOther', 'اكتب الحي / المنطقة *', txt('districtOther'))}
+      ${F('building', 'رقم العمارة *', num('building', 'أرقام فقط'))}
+      ${F('apartment', 'رقم الشقة *', num('apartment', 'أرقام فقط'))}
+      ${F('addressDetails', 'تفاصيل أخرى للعنوان', '<textarea data-f="addressDetails" rows="2" maxlength="300" placeholder="علامة مميزة، دور، شارع..."></textarea>', 'مسموح بالأرقام العربية، وبتتحول لإنجليزية تلقائيًا', true)}
+    </div></fieldset>`;
+  }
+
+  bind() {
+    // الحقول الرقمية: تحويل الأرقام العربية + حذف أي حرف غير رقم
+    Object.keys(NUMERIC_ONLY).forEach(k => {
+      const el = this.f(k);
+      el.maxLength = NUMERIC_ONLY[k];
+      el.addEventListener('input', () => {
+        const v = toEn(el.value).replace(/\D/g, '').slice(0, NUMERIC_ONLY[k]);
+        if (v !== el.value) el.value = v;
+      });
+    });
+    // تفاصيل العنوان: تحويل الأرقام العربية فقط
+    const ad = this.f('addressDetails');
+    ad.addEventListener('input', () => {
+      const v = toEn(ad.value);
+      if (v !== ad.value) { const p = ad.selectionStart; ad.value = v; ad.setSelectionRange(p, p); }
+    });
+    ['confessor', 'occupation', 'studyStage', 'housingType', 'district', 'otherStatus'].forEach(k => {
+      this.f(k).addEventListener('change', () => { if (k === 'studyStage') this.updateYears(); this.layout(); });
+    });
+    $$('[data-photo]', this.root).forEach(box => this.bindPhoto(box));
+    $$('[data-f]', this.root).forEach(el => el.addEventListener('input', () => this.clearErr(el.dataset.f)));
+    $$('[data-f]', this.root).forEach(el => el.addEventListener('change', () => this.clearErr(el.dataset.f)));
+  }
+
+  stage() { return this.cfg.studyStages.find(s => s.name === this.f('studyStage').value); }
+
+  updateYears(keep) {
+    const st = this.stage(), sel = this.f('studyYear');
+    sel.innerHTML = st ? '<option value="">اختر...</option>' + st.years.map(y => `<option>${esc(y)}</option>`).join('') : '<option value="">اختر المرحلة أولًا</option>';
+    if (keep) sel.value = keep;
+  }
+
+  layout() {
+    const show = (k, on) => { const w = this.w(k); if (w) w.hidden = !on; };
+    const v = k => this.f(k).value;
+    show('confessorOther', v('confessor') === 'أخرى');
+    $$('[data-panel]', this.root).forEach(p => p.hidden = p.dataset.panel !== v('occupation'));
+    const st = this.stage();
+    show('faculty', !!(st && st.faculty));
+    show('otherStatusText', v('otherStatus') === 'أخرى');
+    show('compoundName', v('housingType') === 'كومباوند');
+    show('districtOther', v('district') === 'أخرى');
+  }
+
+  fill(d) {
+    FIELD_KEYS.forEach(k => { const el = this.f(k); if (el && k !== 'studyYear') el.value = d[k] || ''; });
+    this.updateYears(d.studyYear || '');
+    this.layout();
+  }
+
+  /* ---- الصور ---- */
+  bindPhoto(box) {
+    const kind = box.dataset.photo;
+    const cam = $('[data-cam-input]', box), gal = $('[data-gal-input]', box);
+    $('[data-cam]', box).onclick = () => cam.click();
+    $('[data-gal]', box).onclick = () => gal.click();
+    const handle = async file => {
+      if (!file) return;
+      box.classList.add('busy');
+      try {
+        const url = await processImage(file, kind === 'profile');
+        this.photos[kind] = url; this.setPreview(kind, url); this.clearErr(kind + 'Photo');
+      } catch (e) { toast('تعذر قراءة الصورة، جرّب صورة أخرى', 'err'); }
+      finally { box.classList.remove('busy'); cam.value = ''; gal.value = ''; }
+    };
+    cam.onchange = () => handle(cam.files[0]);
+    gal.onchange = () => handle(gal.files[0]);
+  }
+  setPreview(kind, url) {
+    const box = $(`[data-photo="${kind}"] [data-prev]`, this.root);
+    box.innerHTML = `<img src="${url}" alt="">`;
+  }
+
+  /* ---- جمع وتحقق ---- */
+  collect() {
+    const d = {};
+    FIELD_KEYS.forEach(k => { const el = this.f(k); d[k] = el ? toEn(el.value).replace(/\s+/g, ' ').trim() : ''; });
+    if (this.photos.profile) d.profilePhoto = this.photos.profile;
+    if (this.photos.id) d.idPhoto = this.photos.id;
+    return d;
+  }
+  honeypot() { return $('[data-hp]', this.root).value; }
+
+  validate() {
+    const d = this.collect(), e = {};
+    const need = (k, m) => { if (!d[k]) e[k] = m || 'هذا الحقل مطلوب'; };
+    const words = d.fullName.split(' ').filter(Boolean);
+    if (words.length < 4) e.fullName = 'اكتب الاسم رباعيًا (4 كلمات على الأقل)';
+    else if (/[0-9]/.test(d.fullName) || !/^[\u0600-\u06FFA-Za-z .'-]+$/.test(d.fullName)) e.fullName = 'الاسم يجب أن يحتوي على حروف فقط';
+    need('gender', 'اختر النوع');
+    if (!/^\d{14}$/.test(d.nationalId)) e.nationalId = 'الرقم القومي يجب أن يكون 14 رقمًا';
+    if (!d.birthDate) e.birthDate = 'أدخل تاريخ الميلاد';
+    else {
+      const dt = new Date(d.birthDate);
+      if (isNaN(dt) || dt > new Date() || dt.getFullYear() < 1940) e.birthDate = 'تاريخ الميلاد غير صحيح';
+    }
+    const ph = /^01\d{9}$/;
+    if (!ph.test(d.whatsapp)) e.whatsapp = 'يجب أن يكون 11 رقمًا ويبدأ بـ 01';
+    if (!ph.test(d.phone)) e.phone = 'يجب أن يكون 11 رقمًا ويبدأ بـ 01';
+    if (d.otherPhone && !ph.test(d.otherPhone)) e.otherPhone = 'يجب أن يكون 11 رقمًا ويبدأ بـ 01 أو اتركه فارغًا';
+
+    if (!this.photos.profile && !this.existing.profile) e.profilePhoto = 'الصورة الشخصية مطلوبة';
+    if (!this.photos.id && !this.existing.id) e.idPhoto = 'صورة البطاقة مطلوبة';
+
+    need('confessor', 'اختر أب الاعتراف');
+    if (d.confessor === 'أخرى' && d.confessorOther.length < 3) e.confessorOther = 'اكتب اسم أب الاعتراف';
+
+    need('occupation', 'اختر المهنة');
+    if (d.occupation === 'طالب') {
+      need('studyStage', 'اختر المرحلة'); need('studyYear', 'اختر السنة الدراسية');
+      if (d.institution.length < 2) e.institution = 'اكتب جهة الدراسة';
+      const st = this.stage();
+      if (st && st.faculty && d.faculty.length < 2) e.faculty = 'اكتب الكلية أو القسم';
+    } else if (d.occupation === 'موظف') {
+      need('jobSector', 'اختر القطاع');
+      if (d.jobTitle.length < 2) e.jobTitle = 'اكتب المسمى الوظيفي';
+      if (d.workplace.length < 2) e.workplace = 'اكتب جهة العمل';
+    } else if (d.occupation === 'أخرى') {
+      need('otherStatus', 'اختر الحالة');
+      if (d.otherStatus === 'أخرى' && d.otherStatusText.length < 2) e.otherStatusText = 'اكتب التفاصيل';
+    }
+
+    need('housingType', 'اختر نوع السكن');
+    if (d.housingType === 'كومباوند' && d.compoundName.length < 2) e.compoundName = 'اكتب اسم الكومباوند';
+    need('district', 'اختر الحي أو المجاورة');
+    if (d.district === 'أخرى' && d.districtOther.length < 2) e.districtOther = 'اكتب اسم الحي أو المنطقة';
+    if (!/^\d{1,5}$/.test(d.building)) e.building = 'رقم العمارة أرقام فقط';
+    if (!/^\d{1,5}$/.test(d.apartment)) e.apartment = 'رقم الشقة أرقام فقط';
+    return e;
+  }
+
+  showErrors(errs) {
+    this.clearAllErr();
+    let first = null;
+    Object.keys(errs).forEach(k => {
+      const w = this.w(k); if (!w) return;
+      w.classList.add('bad'); $('.err', w).textContent = errs[k];
+      if (!first || w.compareDocumentPosition(first) & Node.DOCUMENT_POSITION_FOLLOWING) first = w;
+    });
+    if (first) first.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+  clearErr(k) { const w = this.w(k); if (w) { w.classList.remove('bad'); const e = $('.err', w); if (e) e.textContent = ''; } }
+  clearAllErr() { $$('.field.bad', this.root).forEach(w => { w.classList.remove('bad'); $('.err', w).textContent = ''; }); }
+}
+
+/* ============================ التبويبات ============================ */
+let CFG = null, regForm = null;
+$$('nav.tabs button').forEach(b => b.onclick = () => {
+  $$('nav.tabs button').forEach(x => x.classList.toggle('active', x === b));
+  ['register', 'status', 'admin'].forEach(t => $('#tab-' + t).hidden = t !== b.dataset.tab);
+  if (b.dataset.tab === 'admin') adminEnter();
 });
 
-/* =========================================================
-   QR Code (إصدار 1 - تصحيح M - يكفي حتى 14 حرفًا) - مدمج بدون مكتبات خارجية
-   ========================================================= */
-const QR = (function () {
-  const SIZE = 21, DATA_CW = 16, EC_CW = 10;
-  const MASKS = [
-    (x, y) => (x + y) % 2 === 0,
-    (x, y) => y % 2 === 0,
-    (x, y) => x % 3 === 0,
-    (x, y) => (x + y) % 3 === 0,
-    (x, y) => (Math.floor(x / 3) + Math.floor(y / 2)) % 2 === 0,
-    (x, y) => (x * y) % 2 + (x * y) % 3 === 0,
-    (x, y) => ((x * y) % 2 + (x * y) % 3) % 2 === 0,
-    (x, y) => ((x + y) % 2 + (x * y) % 3) % 2 === 0
-  ];
-  function mul(x, y) { let z = 0; for (let i = 7; i >= 0; i--) { z = (z << 1) ^ ((z >>> 7) * 0x11D); z ^= ((y >>> i) & 1) * x; } return z; }
-  function divisor(deg) {
-    const r = new Array(deg).fill(0); r[deg - 1] = 1; let root = 1;
-    for (let i = 0; i < deg; i++) {
-      for (let j = 0; j < r.length; j++) { r[j] = mul(r[j], root); if (j + 1 < r.length) r[j] ^= r[j + 1]; }
-      root = mul(root, 2);
-    }
-    return r;
-  }
-  function remainder(data, div) {
-    const r = new Array(div.length).fill(0);
-    for (const b of data) { const f = b ^ r.shift(); r.push(0); div.forEach((c, i) => { r[i] ^= mul(c, f); }); }
-    return r;
-  }
-  function build(cw, mask) {
-    const m = [], fn = [];
-    for (let i = 0; i < SIZE; i++) { m.push(new Array(SIZE).fill(false)); fn.push(new Array(SIZE).fill(false)); }
-    const set = (x, y, d) => { m[y][x] = d; fn[y][x] = true; };
-    for (let i = 0; i < SIZE; i++) { set(6, i, i % 2 === 0); set(i, 6, i % 2 === 0); }
-    [[3, 3], [SIZE - 4, 3], [3, SIZE - 4]].forEach(c => {
-      for (let dy = -4; dy <= 4; dy++) for (let dx = -4; dx <= 4; dx++) {
-        const d = Math.max(Math.abs(dx), Math.abs(dy)), x = c[0] + dx, y = c[1] + dy;
-        if (x >= 0 && x < SIZE && y >= 0 && y < SIZE) set(x, y, d !== 2 && d !== 4);
-      }
-    });
-    const fd = mask; let rem = fd;                           // مستوى التصحيح M = 00
-    for (let i = 0; i < 10; i++) rem = (rem << 1) ^ ((rem >>> 9) * 0x537);
-    const bits = ((fd << 10) | rem) ^ 0x5412, gb = i => ((bits >>> i) & 1) !== 0;
-    for (let i = 0; i <= 5; i++) set(8, i, gb(i));
-    set(8, 7, gb(6)); set(8, 8, gb(7)); set(7, 8, gb(8));
-    for (let i = 9; i < 15; i++) set(14 - i, 8, gb(i));
-    for (let i = 0; i < 8; i++) set(SIZE - 1 - i, 8, gb(i));
-    for (let i = 8; i < 15; i++) set(8, SIZE - 15 + i, gb(i));
-    set(8, SIZE - 8, true);
-    let k = 0; const total = cw.length * 8;
-    for (let right = SIZE - 1; right >= 1; right -= 2) {
-      if (right === 6) right = 5;
-      for (let vert = 0; vert < SIZE; vert++) for (let j = 0; j < 2; j++) {
-        const x = right - j, up = ((right + 1) & 2) === 0, y = up ? SIZE - 1 - vert : vert;
-        if (!fn[y][x] && k < total) { m[y][x] = ((cw[k >>> 3] >>> (7 - (k & 7))) & 1) !== 0; k++; }
-      }
-    }
-    for (let y = 0; y < SIZE; y++) for (let x = 0; x < SIZE; x++) if (!fn[y][x] && MASKS[mask](x, y)) m[y][x] = !m[y][x];
-    return m;
-  }
-  function penalty(m) {
-    let p = 0; const lines = [];
-    for (let y = 0; y < SIZE; y++) lines.push(m[y].map(b => b ? '1' : '0').join(''));
-    for (let x = 0; x < SIZE; x++) lines.push(m.map(r => r[x] ? '1' : '0').join(''));
-    lines.forEach(s => {
-      (s.match(/0+|1+/g) || []).forEach(r => { if (r.length >= 5) p += 3 + r.length - 5; });
-      ['10111010000', '00001011101'].forEach(pat => { let k = -1; while ((k = s.indexOf(pat, k + 1)) >= 0) p += 40; });
-    });
-    for (let y = 0; y < SIZE - 1; y++) for (let x = 0; x < SIZE - 1; x++) {
-      const c = m[y][x]; if (c === m[y][x + 1] && c === m[y + 1][x] && c === m[y + 1][x + 1]) p += 3;
-    }
-    let dark = 0; m.forEach(r => r.forEach(b => { if (b) dark++; }));
-    p += Math.max(0, Math.ceil(Math.abs(dark * 20 - SIZE * SIZE * 10) / (SIZE * SIZE)) - 1) * 10;
-    return p;
-  }
-  function make(text) {
-    const bytes = [];
-    for (let i = 0; i < text.length; i++) { const c = text.charCodeAt(i); if (c > 127) throw new Error('QR: ASCII only'); bytes.push(c); }
-    if (bytes.length > 14) throw new Error('QR: data too long');
-    const bits = [], put = (v, n) => { for (let i = n - 1; i >= 0; i--) bits.push((v >>> i) & 1); };
-    put(4, 4); put(bytes.length, 8); bytes.forEach(b => put(b, 8));
-    const cap = DATA_CW * 8; put(0, Math.min(4, cap - bits.length));
-    while (bits.length % 8) bits.push(0);
-    for (let pad = 0xEC; bits.length < cap; pad ^= 0xEC ^ 0x11) put(pad, 8);
-    const data = []; for (let i = 0; i < bits.length; i += 8) data.push(parseInt(bits.slice(i, i + 8).join(''), 2));
-    const cw = data.concat(remainder(data, divisor(EC_CW)));
-    let best = null, bp = Infinity;
-    for (let mk = 0; mk < 8; mk++) { const mm = build(cw, mk), p = penalty(mm); if (p < bp) { bp = p; best = mm; } }
-    return { size: SIZE, dark: (r, c) => best[r][c] };
-  }
-  return { make };
-})();
-
-/* =========================================================
-   كارت الـ ID (مقاس CR80: 85.6×54 مم بدقة 300 dpi = 1011×638 بكسل)
-   ========================================================= */
-const CARD_W = 1011, CARD_H = 638;
-const CARD_TITLE = 'اجتماع شباب «اتبعني»';
-const CARD_SUB = 'كاتدرائية مارمينا والبابا كيرلس - العاشر من رمضان';
-const CARD_FONT = "'Cairo', Tahoma, Arial, sans-serif";
-
-function rrect(g, x, y, w, h, r) {
-  g.beginPath(); g.moveTo(x + r, y);
-  g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r);
-  g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath();
-}
-function crossShape(g, cx, cy, s) {
-  g.fillStyle = '#c8a24a';
-  rrect(g, cx - s * 0.14, cy - s * 0.5, s * 0.28, s, s * 0.05); g.fill();
-  rrect(g, cx - s * 0.38, cy - s * 0.22, s * 0.76, s * 0.26, s * 0.05); g.fill();
-}
-function nameLines(g, name, maxW) {
-  for (let s = 42; s >= 28; s -= 2) {
-    g.font = `700 ${s}px ${CARD_FONT}`;
-    if (g.measureText(name).width <= maxW) return { size: s, lines: [name] };
-  }
-  const size = 28; g.font = `700 ${size}px ${CARD_FONT}`;
-  const lines = []; let cur = '';
-  name.split(' ').forEach(w => {
-    const t = cur ? cur + ' ' + w : w;
-    if (!cur || g.measureText(t).width <= maxW) cur = t; else { lines.push(cur); cur = w; }
-  });
-  if (cur) lines.push(cur);
-  return { size, lines: lines.slice(0, 3) };
-}
-
-// d = { name, code, photo (Image أو null) }
-function drawCard(g, d) {
-  const W = CARD_W, H = CARD_H, NAVY = '#1f3a5f', GOLD = '#c8a24a';
-  g.save();
-  g.clearRect(0, 0, W, H);
-  rrect(g, 0, 0, W, H, 34); g.clip();
-  g.fillStyle = '#fffdf6'; g.fillRect(0, 0, W, H);
-
-  // الهيدر
-  const gr = g.createLinearGradient(0, 0, W, 0); gr.addColorStop(0, NAVY); gr.addColorStop(1, '#2c5282');
-  g.fillStyle = gr; g.fillRect(0, 0, W, 130);
-  g.fillStyle = GOLD; g.fillRect(0, 130, W, 6);
-  crossShape(g, 64, 62, 54); crossShape(g, W - 64, 62, 54);
-  g.direction = 'rtl'; g.textBaseline = 'middle'; g.textAlign = 'center';
-  g.fillStyle = '#ffffff'; g.font = `700 46px ${CARD_FONT}`; g.fillText(CARD_TITLE, W / 2, 56);
-  g.fillStyle = '#f1e2b0'; g.font = `400 24px ${CARD_FONT}`; g.fillText(CARD_SUB, W / 2, 102);
-
-  // الصورة الشخصية (يمين)
-  const PS = 300, px = W - 40 - PS, py = 205;
-  g.fillStyle = GOLD; rrect(g, px - 7, py - 7, PS + 14, PS + 14, 28); g.fill();
-  g.save(); rrect(g, px, py, PS, PS, 22); g.clip();
-  if (d.photo) {
-    const iw = d.photo.naturalWidth || d.photo.width, ih = d.photo.naturalHeight || d.photo.height, s = Math.min(iw, ih);
-    g.drawImage(d.photo, (iw - s) / 2, (ih - s) / 2, s, s, px, py, PS, PS);
-  } else {
-    g.fillStyle = '#e7ecf4'; g.fillRect(px, py, PS, PS);
-    g.fillStyle = '#b8c3d4';
-    g.beginPath(); g.arc(px + PS / 2, py + PS * 0.38, PS * 0.17, 0, Math.PI * 2); g.fill();
-    g.beginPath(); g.ellipse(px + PS / 2, py + PS * 0.98, PS * 0.36, PS * 0.32, 0, 0, Math.PI * 2); g.fill();
-  }
-  g.restore();
-
-  // QR (يسار)
-  const QS = 250, qx = 40, qy = 205, qr = QR.make(d.code), n = qr.size;
-  const pad = 14, mod = Math.floor((QS - pad * 2) / n), side = mod * n, off = Math.floor((QS - side) / 2);
-  g.fillStyle = '#ffffff'; rrect(g, qx, qy, QS, QS, 16); g.fill();
-  g.strokeStyle = '#d9dfea'; g.lineWidth = 2; g.stroke();
-  g.fillStyle = '#000000';
-  for (let r = 0; r < n; r++) for (let c = 0; c < n; c++) if (qr.dark(r, c)) g.fillRect(qx + off + c * mod, qy + off + r * mod, mod, mod);
-  g.fillStyle = '#6b7785'; g.font = `400 22px ${CARD_FONT}`; g.textAlign = 'center';
-  g.fillText('امسح الكود عند الدخول', qx + QS / 2, qy + QS + 34);
-
-  // الاسم والكود (المنتصف)
-  const cx = Math.round((qx + QS + px) / 2), zw = px - (qx + QS) - 40;
-  g.fillStyle = '#6b7785'; g.font = `400 22px ${CARD_FONT}`; g.fillText('الاسم', cx, 232);
-  const nl = nameLines(g, d.name, zw), lh = nl.size * (nl.lines.length > 1 ? 1.3 : 1.4);
-  g.fillStyle = NAVY; g.font = `700 ${nl.size}px ${CARD_FONT}`;
-  nl.lines.forEach((t, i) => g.fillText(t, cx, 300 + (i - (nl.lines.length - 1) / 2) * lh));
-  g.fillStyle = GOLD; g.fillRect(cx - 70, 366, 140, 4);
-
-  g.fillStyle = '#6b7785'; g.font = `400 22px ${CARD_FONT}`; g.fillText('الكود', cx, 400);
-  g.direction = 'ltr'; g.textAlign = 'left';
-  let cs = 56, ws, tw; const gap = 10;
-  for (; cs >= 36; cs -= 2) {                       // صغّر الخط لو الكود أعرض من المساحة
-    g.font = `700 ${cs}px ${CARD_FONT}`;
-    ws = d.code.split('').map(ch => g.measureText(ch).width);
-    tw = ws.reduce((a, b) => a + b, 0) + gap * (ws.length - 1);
-    if (tw + 44 <= zw) break;
-  }
-  const bw = Math.min(zw, tw + 44);
-  g.fillStyle = '#f5f8fd'; rrect(g, cx - bw / 2, 418, bw, 84, 16); g.fill();
-  g.setLineDash([10, 7]); g.strokeStyle = GOLD; g.lineWidth = 3; g.stroke(); g.setLineDash([]);
-  g.fillStyle = NAVY; let tx = cx - tw / 2;
-  d.code.split('').forEach((ch, i) => { g.fillText(ch, tx, 461); tx += ws[i] + gap; });
-
-  // الفوتر
-  g.direction = 'rtl'; g.textAlign = 'center';
-  g.fillStyle = NAVY; g.fillRect(0, 582, W, 56);
-  g.fillStyle = '#ffffff'; g.font = `400 22px ${CARD_FONT}`;
-  g.fillText('كارت شخصي - يُرجى إبراز الكارت عند الدخول', W / 2, 611);
-
-  // إطار ذهبي رفيع
-  rrect(g, 3, 3, W - 6, H - 6, 32); g.strokeStyle = GOLD; g.lineWidth = 6; g.stroke();
-  g.restore();
-}
-
-async function renderCard(d) {
+/* ============================ التسجيل ============================ */
+async function loadConfig() {
+  $('#regLoading').hidden = false; $('#regError').hidden = true;
   try {
-    if (document.fonts && document.fonts.load) {
-      await Promise.all([
-        document.fonts.load('700 46px Cairo', d.name + CARD_TITLE + '0123456789'),
-        document.fonts.load('400 24px Cairo', CARD_SUB + 'الاسم الكود امسح عند الدخول كارت شخصي يُرجى إبراز')
-      ]);
+    CFG = await api('getConfig', {}, 30000);
+    $('#regLoading').hidden = true;
+    if (CFG.version !== window.EXPECTED_VERSION) {
+      const b = $('#regError'); b.hidden = false;
+      b.textContent = 'الخادم قديم: الصق Code.gs الجديد ثم Deploy ← Manage deployments ← Edit ← New version';
     }
-  } catch (e) { /* نكمل بخط بديل */ }
-  const cv = document.createElement('canvas'); cv.width = CARD_W; cv.height = CARD_H;
-  drawCard(cv.getContext('2d'), d);
-  return cv;
-}
-
-// أسباب عدم ظهور الصورة على الكارت (الرمز بييجي من الخادم)
-const CARD_WHY = {
-  no_path: 'خانة الصورة الشخصية فاضية في سجلك. تواصل مع المنظّمين.',
-  not_found: 'ملف صورتك غير موجود في المكان المسجّل له. تواصل مع المنظّمين.',
-  read_error: 'تعذّرت قراءة ملف الصورة من الخادم. جرّب إعادة المحاولة، ولو تكررت تواصل مع المنظّمين.',
-  decode: 'صيغة الصورة غير مدعومة في المتصفح. تواصل مع المنظّمين لاستبدالها.',
-  old_server: 'الخادم (Apps Script) لسه شغّال بنسخة قديمة من الكود. في Apps Script: Deploy ← Manage deployments ← ✏️ ← Version: New version ← Deploy (بدون إنشاء Deployment جديد). ولو أنشأت Deployment جديد انسخ رابطه الجديد في config.js.',
-  unknown: 'سبب غير معروف. جرّب إعادة المحاولة.'
-};
-const loadImage = src => new Promise(res => { const i = new Image(); i.onload = () => res(i); i.onerror = () => res(null); i.src = src; });
-
-function downloadCanvas(cv, filename) {
-  const save = href => { const a = document.createElement('a'); a.href = href; a.download = filename; document.body.appendChild(a); a.click(); a.remove(); };
-  if (cv.toBlob) cv.toBlob(b => {
-    if (!b) return save(cv.toDataURL('image/png'));
-    const u = URL.createObjectURL(b); save(u); setTimeout(() => URL.revokeObjectURL(u), 5000);
-  }, 'image/png');
-  else save(cv.toDataURL('image/png'));
-}
-
-async function buildCard(nid, name, code) {
-  const host = $('#cardBox'); if (!host) return;
-  host.innerHTML = '<p class="lead" style="text-align:center"><span class="spin"></span> جاري تجهيز الكارت...</p>';
-  const r = await api('cardPhoto', { nid }, 60000);
-  if (!host.isConnected) return;
-  if (!r.ok) {
-    host.innerHTML = `<div class="formerr">${esc(r.error)}</div><button class="btn" id="cardRetry">إعادة المحاولة</button>`;
-    $('#cardRetry').onclick = () => buildCard(nid, name, code);
-    return;
-  }
-  try {
-    const photo = r.photo ? await loadImage(r.photo) : null;
-    let warn = '';
-    if (!photo) {
-      const why = r.photo ? 'decode' : (r.why !== undefined ? (r.why || 'unknown') : 'old_server');   // r.why غير موجود = الخادم بالكود القديم
-      warn = (CARD_WHY[why] || CARD_WHY.unknown) + ' (رمز: ' + why + ')';
-    }
-    const cv = await renderCard({ name: r.name || name, code: r.code || code, photo });
-    if (!host.isConnected) return;
-    host.innerHTML = `<div class="card-title">كارت الـ ID الخاص بك</div>
-      ${warn ? `<div class="notice warn">⚠ صورتك لم تظهر على الكارت: ${esc(warn)}</div>` : ''}
-      <img class="idcard" alt="ID Card" src="${cv.toDataURL('image/png')}">
-      <div class="row" style="justify-content:center">
-        <button class="btn gold" id="cardDl">⬇ تحميل الكارت (PNG)</button>
-        ${warn ? '<button class="btn" id="cardRetry">↻ إعادة المحاولة</button>' : ''}
-      </div>
-      <small class="hint" style="text-align:center">لو التحميل لم يبدأ على الموبايل، اضغط مطولًا على الكارت واختر «حفظ الصورة».</small>`;
-    $('#cardDl').onclick = () => downloadCanvas(cv, 'ID-Card-' + (r.code || code) + '.png');
-    if (warn) $('#cardRetry').onclick = () => buildCard(nid, name, code);
+    if (!CFG.open) { $('#regClosed').hidden = false; return; }
+    buildRegForm();
   } catch (e) {
-    host.innerHTML = '<div class="formerr">تعذر تجهيز الكارت.</div><button class="btn" id="cardRetry">إعادة المحاولة</button>';
-    $('#cardRetry').onclick = () => buildCard(nid, name, code);
+    $('#regLoading').hidden = true;
+    const b = $('#regError'); b.hidden = false;
+    b.innerHTML = esc(e.message) + ' <button class="btn sm ghost" id="btnRetryCfg" type="button">إعادة المحاولة</button>';
+    $('#btnRetryCfg').onclick = loadConfig;
   }
 }
-
-/* =========================================================
-   النموذج المشترك
-   ========================================================= */
-const fld = (h, k) => h.querySelector(`[data-f="${k}"]`);
-const val = (h, k) => fld(h, k).value;
-const grp = (h, k, on) => { const g = h.querySelector(`[data-group="${k}"]`); if (g) g.hidden = !on; };
-// العنصر إمّا نص (القيمة = النص) أو زوج [القيمة, النص الظاهر]
-function fillOptions(sel, arr) {
-  sel.innerHTML = '<option value="">اختر</option>' + arr.map(x => Array.isArray(x)
-    ? `<option value="${esc(x[0])}">${esc(x[1])}</option>` : `<option>${esc(x)}</option>`).join('');
+function buildRegForm() {
+  $('#regFormWrap').hidden = false; $('#regSuccess').hidden = true;
+  regForm = new RegForm($('#regFormBox'), CFG, { mode: 'register' });
 }
-const todayISO = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; };
-// تاريخ yyyy-mm-dd حقيقي (مش 2020-02-31)
-function validISO(s) {
-  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s); if (!m) return false;
-  const y = +m[1], mo = +m[2], d = +m[3], dt = new Date(y, mo - 1, d);
-  return dt.getFullYear() === y && dt.getMonth() === mo - 1 && dt.getDate() === d;
-}
+$('#btnNewReg').onclick = () => { buildRegForm(); window.scrollTo({ top: 0, behavior: 'smooth' }); };
 
-function mountForm(host, opts) {
-  opts = opts || {};
-  host.innerHTML = '';
-  host.appendChild($('#tplForm').content.cloneNode(true));
-  host._photos = {}; host._opts = opts;
-  $$('[data-list]', host).forEach(s => {
-    const l = LISTS[s.dataset.list];
-    fillOptions(s, Array.isArray(l) ? l : Object.keys(l));
-  });
-  fld(host, 'birthDate').max = todayISO();
-  if (!opts.photos) { host.querySelector('[data-group="photos"]').remove(); }
-  else {
-    host.querySelector('[data-photonote]').textContent = opts.photoNote || 'الصور تُضغط تلقائيًا قبل الرفع لتكون سريعة حتى مع الإنترنت الضعيف.';
-    if (opts.optionalPhotos) $$('[data-photostar]', host).forEach(x => x.remove());
-    ['profile', 'idCard'].forEach(k => bindPhoto(host, k));
+$('#regFormWrap').addEventListener('submit', async ev => {
+  ev.preventDefault();
+  const errBox = $('#regSubmitErr'); errBox.hidden = true;
+  const errs = regForm.validate();
+  if (Object.keys(errs).length) { regForm.showErrors(errs); toast('راجع الحقول المظللة بالأحمر', 'err'); return; }
+  const btn = $('#btnSubmit'); btn.disabled = true; btn.textContent = 'جاري رفع الصور والبيانات...';
+  $('#submitHint').textContent = 'من فضلك لا تغلق الصفحة حتى يتم الإرسال';
+  try {
+    await api('register', { data: regForm.collect(), hp: regForm.honeypot() }, 120000);
+    $('#regFormWrap').hidden = true; $('#regSuccess').hidden = false;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  } catch (e) {
+    errBox.hidden = false;
+    errBox.textContent = e.message + (/مهلة|الاتصال/.test(e.message) ? ' — قبل ما تعيد الإرسال استعلم عن حالتك من تبويب "استعلام" للتأكد إن الطلب لم يصل.' : '');
+    errBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  } finally {
+    btn.disabled = false; btn.textContent = 'إرسال الطلب'; $('#submitHint').textContent = '';
   }
-  host.oninput = host.onchange = e => onFormChange(host, e);
-  refreshForm(host);
-}
+});
 
-function onFormChange(host, e) {
-  const f = e.target.closest('[data-f]');
-  if (f) { const w = f.closest('.field'); if (w) w.classList.remove('err'); }
-  if (f && f.dataset.f === 'nid') nidHint(host);
-  refreshForm(host);
-}
+/* ============================ الاستعلام ============================ */
+['stNid', 'stWa'].forEach(id => {
+  const el = $('#' + id);
+  el.addEventListener('input', () => { const v = toEn(el.value).replace(/\D/g, ''); if (v !== el.value) el.value = v; });
+});
+const badgeCls = s => s === 'مقبول' ? 'a' : s === 'مرفوض' ? 'r' : 'p';
+$('#statusForm').addEventListener('submit', async ev => {
+  ev.preventDefault();
+  const out = $('#stResult'), btn = $('#btnStatus');
+  const nid = $('#stNid').value, wa = $('#stWa').value;
+  if (!/^\d{14}$/.test(nid) || !/^01\d{9}$/.test(wa)) { out.innerHTML = '<div class="banner err">أدخل الرقم القومي (14 رقم) ورقم الواتساب (11 رقم) بشكل صحيح</div>'; return; }
+  btn.disabled = true; out.innerHTML = '<span class="spin"></span>';
+  try {
+    const r = await api('checkStatus', { nationalId: nid, whatsapp: wa }, 30000);
+    let h = `<div class="banner info"><b>${esc(r.name)}</b><br>الحالة: <span class="badge ${badgeCls(r.status)}">${esc(r.status)}</span></div>`;
+    if (r.status === 'مقبول') h += `<div class="center" style="padding:10px"><div>تم قبولك، الكود الخاص بك:</div><div class="code-box">${esc(r.code)}</div></div>`;
+    if (r.status === 'مرفوض') h += `<div class="banner err">${r.reason ? 'سبب الرفض: ' + esc(r.reason) + '<br>' : ''}تقدر تعدّل بياناتك وتقدّم مرة أخرى من تبويب "التسجيل" بنفس الرقم القومي.</div>`;
+    if (r.status === 'قيد المراجعة') h += '<div class="hint">طلبك قيد المراجعة من الإدارة.</div>';
+    out.innerHTML = h;
+  } catch (e) { out.innerHTML = `<div class="banner err">${esc(e.message)}</div>`; }
+  finally { btn.disabled = false; }
+});
 
-function nidHint(host) {
-  const h = host.querySelector('[data-hint="nid"]');
-  const v = digits(val(host, 'nid'));
-  h.className = 'hint'; h.textContent = '';
-  if (v.length !== 14) return;
-  const r = parseNid(v);
-  if (r.error) { h.className = 'hint bad'; h.textContent = r.error; }
-  else { h.className = 'hint good'; h.textContent = '✔ الرقم القومي صالح'; }
-}
+/* ============================ الأدمن ============================ */
+const AD = { token: sessionStorage.getItem('adTok') || '', user: sessionStorage.getItem('adUser') || '', role: sessionStorage.getItem('adRole') || 'admin',
+  records: [], open: true, status: '', q: '', limit: 100 };
+const isSuper = () => AD.role === 'super';
 
-function refreshForm(host) {
-  const occ = val(host, 'occupation');
-  grp(host, 'student', occ === 'طالب'); grp(host, 'employee', occ === 'موظف'); grp(host, 'other', occ === 'أخرى');
-  grp(host, 'otherText', occ === 'أخرى' && val(host, 'otherStatus') === 'أخرى');
-  const st = val(host, 'studyStage'), ys = fld(host, 'studyYear');
-  if (ys.dataset.stage !== st) { ys.dataset.stage = st; fillOptions(ys, LISTS.stages[st] || []); }
-  host.querySelector('[data-facreq]').hidden = (st === 'فني أو دبلوم');
-  host.querySelector('[data-wpreq]').hidden = (val(host, 'workSector') === 'أعمال حرة');
-  grp(host, 'compound', val(host, 'housingType') === 'كومباوند');
-  grp(host, 'districtOther', val(host, 'district') === 'أخرى');
+function adminEnter() {
+  if (AD.token) { showDash(); loadList(); } else { $('#adLogin').hidden = false; $('#adDash').hidden = true; }
 }
-
-function fillForm(host, d) {
-  d = d || {};
-  for (let pass = 0; pass < 2; pass++) {
-    FORM_KEYS.forEach(k => { const f = fld(host, k); if (f && d[k] != null) f.value = d[k]; });
-    refreshForm(host);
-  }
-  nidHint(host);
+function showDash() {
+  $('#adLogin').hidden = true; $('#adDash').hidden = false;
+  $('#adName').textContent = AD.user;
+  $('#adRole').hidden = !isSuper();
+  $('#btnAdmins').hidden = !isSuper();
 }
-
-function readForm(host) {
-  const d = {};
-  FORM_KEYS.forEach(k => { const f = fld(host, k); d[k] = f ? f.value.trim() : ''; });
-  d.nid = digits(d.nid); d.whatsapp = digits(d.whatsapp); d.phone = digits(d.phone); d.phone2 = digits(d.phone2);
-  d.building = toEn(d.building); d.apartment = toEn(d.apartment); d.addressDetails = toEn(d.addressDetails);
-  return d;
+function adminLogout(silent) {
+  if (!silent && AD.token) api('logout', { token: AD.token }).catch(() => {});
+  AD.token = ''; AD.user = ''; AD.role = 'admin'; AD.records = [];
+  ['adTok', 'adUser', 'adRole'].forEach(k => sessionStorage.removeItem(k));
+  $$('.overlay').forEach(o => o.remove()); document.body.style.overflow = '';
+  $('#adLogin').hidden = false; $('#adDash').hidden = true; $('#adPass').value = '';
 }
-
-function parseNid(n) {
-  if (!/^\d{14}$/.test(n)) return { error: 'الرقم القومي يجب أن يكون 14 رقمًا.' };
-  const c = n[0]; if (c !== '2' && c !== '3') return { error: 'الرقم القومي غير صحيح.' };
-  const y = (c === '2' ? 1900 : 2000) + +n.substr(1, 2), m = +n.substr(3, 2), d = +n.substr(5, 2);
-  const dt = new Date(y, m - 1, d);
-  if (dt.getFullYear() !== y || dt.getMonth() !== m - 1 || dt.getDate() !== d || dt > new Date()) return { error: 'الرقم القومي غير صحيح (تاريخ الميلاد).' };
-  if (!GOV.includes(n.substr(7, 2))) return { error: 'الرقم القومي غير صحيح (كود المحافظة).' };
-  return { gender: (+n[12]) % 2 === 1 ? 'ذكر' : 'أنثى', birth: `${y}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}` };
+function saveSession(token, user, role) {
+  AD.token = token; AD.user = user; AD.role = role === 'super' ? 'super' : 'admin';
+  sessionStorage.setItem('adTok', AD.token); sessionStorage.setItem('adUser', AD.user); sessionStorage.setItem('adRole', AD.role);
 }
-
-// يرجع أول خطأ {f, m} أو null
-function validateClient(d, host, needPhotos) {
-  const E = (f, m) => ({ f, m });
-  const name = d.fullName.replace(/\s+/g, ' ').trim(), words = name.split(' ').filter(Boolean);
-  if (words.length < 4 || words.some(w => w.length < 2)) return E('fullName', 'الاسم يجب أن يكون رباعيًا (4 كلمات على الأقل).');
-  if (!RE_NAME.test(name)) return E('fullName', 'الاسم يجب أن يحتوي على حروف فقط (بدون أرقام أو رموز).');
-  const n = parseNid(d.nid); if (n.error) return E('nid', n.error);
-  if (!d.gender) return E('gender', 'اختر النوع.');
-  if (d.gender !== n.gender) return E('gender', 'برجاء مراجعة بياناتك: النوع المختار لا يتطابق مع الرقم القومي. راجع النوع والرقم القومي ثم أعد المحاولة.');
-  // تاريخ الميلاد الفعلي: مسموح يختلف عن الرقم القومي، لكن لازم تاريخ حقيقي ومش في المستقبل
-  if (!d.birthDate) return E('birthDate', 'اكتب تاريخ الميلاد.');
-  if (!validISO(d.birthDate)) return E('birthDate', 'تاريخ الميلاد غير صحيح.');
-  if (d.birthDate < '1900-01-01' || d.birthDate > todayISO()) return E('birthDate', 'تاريخ الميلاد غير منطقي، راجع التاريخ.');
-  if (!d.maritalStatus) return E('maritalStatus', 'اختر الحالة الاجتماعية.');
-  const ph = /^01[0125]\d{8}$/;
-  if (!ph.test(d.whatsapp)) return E('whatsapp', 'رقم الواتساب يجب أن يكون 11 رقمًا ويبدأ بـ 01.');
-  if (!ph.test(d.phone)) return E('phone', 'رقم الهاتف يجب أن يكون 11 رقمًا ويبدأ بـ 01.');
-  if (d.phone2 && !ph.test(d.phone2)) return E('phone2', 'رقم الهاتف الآخر يجب أن يكون 11 رقمًا ويبدأ بـ 01.');
-  if (!d.father) return E('father', 'اكتب اسم أب الاعتراف.');
-  if (!RE_NAME.test(d.father.replace(/\s+/g, ' '))) return E('father', 'أب الاعتراف: حروف فقط (بدون أرقام أو رموز).');
-  if (!d.occupation) return E('occupation', 'اختر المهنة.');
-  if (d.occupation === 'طالب') {
-    if (!d.studyStage) return E('studyStage', 'اختر المرحلة الدراسية.');
-    if (!d.studyYear) return E('studyYear', 'اختر السنة الدراسية.');
-    if (!d.studyPlace) return E('studyPlace', 'اكتب جهة الدراسة.');
-    if (!d.faculty && d.studyStage !== 'فني أو دبلوم') return E('faculty', 'اكتب الكلية / القسم.');
-  } else if (d.occupation === 'موظف') {
-    if (!d.workSector) return E('workSector', 'اختر قطاع العمل.');
-    if (!d.jobTitle) return E('jobTitle', 'اكتب المسمى الوظيفي.');
-    if (!d.workPlace && d.workSector !== 'أعمال حرة') return E('workPlace', 'اكتب جهة العمل.');
-  } else {
-    if (!d.otherStatus) return E('otherStatus', 'اختر الحالة.');
-    if (d.otherStatus === 'أخرى' && !d.otherText) return E('otherText', 'اكتب التفاصيل.');
-  }
-  if (!d.housingType) return E('housingType', 'اختر نوع السكن.');
-  if (d.housingType === 'كومباوند' && !d.compound) return E('compound', 'اكتب اسم الكومباوند.');
-  if (!d.district) return E('district', 'اختر الحي / المجاورة.');
-  if (d.district === 'أخرى' && !d.districtOther) return E('districtOther', 'اكتب اسم الحي / المجاورة.');
-  if (!d.building) return E('building', 'اكتب رقم العمارة.');
-  if (!/^[0-9]{1,6}$/.test(d.building)) return E('building', 'رقم العمارة: أرقام فقط.');
-  if (!d.apartment) return E('apartment', 'اكتب رقم الشقة.');
-  if (!/^[0-9]{1,6}$/.test(d.apartment)) return E('apartment', 'رقم الشقة: أرقام فقط.');
-  if (needPhotos) {
-    if (!host._photos.profile) return { photo: 'profile', m: 'الصورة الشخصية مطلوبة.' };
-    if (!host._photos.idCard) return { photo: 'idCard', m: 'صورة البطاقة مطلوبة.' };
-  }
-  return null;
-}
-
-function markError(host, err, errBoxSel) {
-  $$('.err', host).forEach(x => x.classList.remove('err'));
-  showErr(errBoxSel, err.m);
-  let el;
-  if (err.photo) el = host.querySelector(`[data-photo="${err.photo}"]`);
-  else { const f = fld(host, err.f); el = f && (f.closest('.field') || f); }
-  if (el) { el.classList.add('err'); el.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
-}
-
-/* ---------------- الصور ---------------- */
-async function loadBitmap(file) {
-  if (window.createImageBitmap) { try { return await createImageBitmap(file, { imageOrientation: 'from-image' }); } catch (e) {} }
-  return await new Promise((res, rej) => {
-    const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = URL.createObjectURL(file);
-  });
-}
-const bw = b => b.naturalWidth || b.width, bh = b => b.naturalHeight || b.height;
-
-function resizeToJpeg(bmp, maxSide, q) {
-  const k = Math.min(1, maxSide / Math.max(bw(bmp), bh(bmp)));
-  const c = document.createElement('canvas'); c.width = Math.round(bw(bmp) * k); c.height = Math.round(bh(bmp) * k);
-  const x = c.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, c.width, c.height); x.drawImage(bmp, 0, 0, c.width, c.height);
-  return c.toDataURL('image/jpeg', q);
-}
-
-function bindPhoto(host, kind) {
-  const box = host.querySelector(`[data-photo="${kind}"]`), prev = box.querySelector('.prev');
-  box.querySelector('[data-cam]').onclick = () => box.querySelector('[data-in-cam]').click();
-  box.querySelector('[data-gal]').onclick = () => box.querySelector('[data-in-gal]').click();
-  $$('input[type=file]', box).forEach(inp => inp.addEventListener('change', async () => {
-    const file = inp.files[0]; inp.value = ''; if (!file) return;
-    try {
-      const bmp = await loadBitmap(file);
-      const url = kind === 'profile' ? await openCropper(bmp) : resizeToJpeg(bmp, 1280, 0.78);
-      if (!url) return;
-      host._photos[kind] = url; prev.innerHTML = `<img src="${url}" alt="">`; box.classList.remove('err');
-    } catch (e) { toast('تعذر قراءة الصورة. جرّب صورة أخرى.', 'err'); }
-  }));
-}
-
-function openCropper(bmp) {
-  return new Promise(resolve => {
-    const modal = $('#cropModal'), cv = $('#cropCanvas'), ctx = cv.getContext('2d'), zoom = $('#cropZoom');
-    const S = 320; cv.width = cv.height = S;
-    const iw = bw(bmp), ih = bh(bmp), base = S / Math.min(iw, ih);
-    let z = 1, ox, oy; const sc = () => base * z;
-    const clamp = () => { ox = Math.min(0, Math.max(S - iw * sc(), ox)); oy = Math.min(0, Math.max(S - ih * sc(), oy)); };
-    const draw = () => { ctx.fillStyle = '#000'; ctx.fillRect(0, 0, S, S); ctx.drawImage(bmp, ox, oy, iw * sc(), ih * sc()); };
-    ox = (S - iw * sc()) / 2; oy = (S - ih * sc()) / 2; zoom.value = 1; clamp(); draw();
-    let drag = null;
-    cv.onpointerdown = e => { cv.setPointerCapture(e.pointerId); drag = { x: e.clientX, y: e.clientY }; cv.style.cursor = 'grabbing'; };
-    cv.onpointermove = e => {
-      if (!drag) return; const r = S / cv.clientWidth;
-      ox += (e.clientX - drag.x) * r; oy += (e.clientY - drag.y) * r; drag = { x: e.clientX, y: e.clientY }; clamp(); draw();
-    };
-    cv.onpointerup = cv.onpointercancel = () => { drag = null; cv.style.cursor = 'grab'; };
-    zoom.oninput = () => {
-      const cx = (S / 2 - ox) / sc(), cy = (S / 2 - oy) / sc();
-      z = +zoom.value; ox = S / 2 - cx * sc(); oy = S / 2 - cy * sc(); clamp(); draw();
-    };
-    const done = v => { modal.hidden = true; resolve(v); };
-    $('#cropCancel').onclick = () => done(null);
-    $('#cropOk').onclick = () => {
-      const o = document.createElement('canvas'); o.width = o.height = 800; const k = 800 / S, x = o.getContext('2d');
-      x.fillStyle = '#fff'; x.fillRect(0, 0, 800, 800); x.drawImage(bmp, ox * k, oy * k, iw * sc() * k, ih * sc() * k);
-      done(o.toDataURL('image/jpeg', 0.82));
-    };
-    modal.hidden = false;
+function adminCall(action, payload, timeout) {
+  return api(action, Object.assign({ token: AD.token }, payload || {}), timeout).catch(e => {
+    if (e.code === 'SESSION_EXPIRED') { adminLogout(true); toast('انتهت الجلسة، سجّل الدخول مرة أخرى', 'err'); throw new Error('انتهت الجلسة'); }
+    throw e;
   });
 }
 
-/* =========================================================
-   التسجيل
-   ========================================================= */
-const regHost = $('#regForm');
-mountForm(regHost, { photos: true });
-let regBusy = false, regOpen = true;
-
-function setOpenUI(open) {
-  regOpen = open;
-  $('#closedBox').hidden = open; $('#regBtn').disabled = !open;
-}
-api('info').then(r => { if (r.ok) setOpenUI(r.open); });
-
-$('#regBtn').onclick = async () => {
-  if (regBusy) return;
-  if (!regOpen) return toast('التسجيل مغلق حاليًا.', 'err');
-  showErr('#regErr', '');
-  const d = readForm(regHost), err = validateClient(d, regHost, true);
-  if (err) return markError(regHost, err, '#regErr');
-  regBusy = true; const btn = $('#regBtn'); btn.disabled = true; btn.innerHTML = '<span class="spin"></span> جاري الإرسال... لا تغلق الصفحة';
-  const r = await api('register', { data: d, profile: regHost._photos.profile, idCard: regHost._photos.idCard }, 120000);
-  regBusy = false; btn.disabled = !regOpen; btn.textContent = 'إرسال الطلب';
-  if (r.ok) {
-    $('#regWrap').hidden = true; $('#doneBox').hidden = false; window.scrollTo({ top: 0, behavior: 'smooth' });
-  } else showErr('#regErr', r.error + ((r.error || '').includes('الاتصال') || (r.error || '').includes('مهلة') ? ' (قد يكون طلبك وصل، تحقق من تبويب الاستعلام قبل إعادة الإرسال).' : ''));
-};
-$('#newReg').onclick = () => { mountForm(regHost, { photos: true }); $('#doneBox').hidden = true; $('#regWrap').hidden = false; };
-
-/* =========================================================
-   الاستعلام (بالرقم القومي فقط) + تعديل المرفوض
-   زر Enter (كمبيوتر) أو Go (موبايل) يشغّل الاستعلام عن طريق <form>
-   ========================================================= */
-const resubHost = $('#resubForm');
-let SQ = null, resubBusy = false;
-
-$('#stForm').onsubmit = e => e.preventDefault();      // منع إعادة تحميل الصفحة (الاستعلام يتم عبر زر الإرسال)
-$('#stBtn').onclick = async () => {
-  showErr('#stErr', ''); $('#stResult').innerHTML = '';
-  const nid = digits($('#stNid').value);
-  if (!nid) return showErr('#stErr', 'أدخل الرقم القومي.');
-  if (nid.length !== 14) return showErr('#stErr', 'الرقم القومي يجب أن يكون 14 رقمًا.');
-  const pn = parseNid(nid); if (pn.error) return showErr('#stErr', pn.error);
-  const q = { nid };
-  const b = $('#stBtn'); b.disabled = true; b.innerHTML = '<span class="spin"></span>';
-  const r = await api('status', q);
-  b.disabled = false; b.textContent = 'استعلام';
-  if (!r.ok) return showErr('#stErr', r.error);
-  SQ = { q, r };
-  const box = $('#stResult');
-  if (r.status === 'مقبول') {
-    box.innerHTML = `<div class="notice good"><b>${esc(r.name)}</b><br>تم قبول طلبك ✔ وهذا كودك الخاص، احتفظ به:</div><div class="code">${esc(r.code)}</div><div id="cardBox"></div>`;
-    buildCard(nid, r.name, r.code);
-  } else if (r.status === 'مرفوض') {
-    box.innerHTML = `<div class="notice bad"><b>${esc(r.name)}</b><br>تم رفض الطلب.<br><b>السبب:</b> ${esc(r.reason)}</div><button class="btn pri" id="goEdit">تعديل البيانات وإعادة الإرسال</button>`;
-    $('#goEdit').onclick = startResubmit;
-  } else {
-    box.innerHTML = `<div class="notice warn"><b>${esc(r.name)}</b><br>طلبك <b>قيد المراجعة</b>. سيتم إبلاغك بعد القبول.</div>`;
-  }
-};
-
-function startResubmit() {
-  mountForm(resubHost, { photos: true, optionalPhotos: true, photoNote: 'اترك الصور كما هي للإبقاء على الصور الحالية، أو اختر صورة جديدة لاستبدالها.' });
-  fillForm(resubHost, SQ.r.data);
-  $('#stReason').innerHTML = '<b>سبب الرفض:</b> ' + esc(SQ.r.reason);
-  $('#stQuery').hidden = true; $('#stEdit').hidden = false; showErr('#resubErr', '');
-}
-$('#resubCancel').onclick = () => { $('#stEdit').hidden = true; $('#stQuery').hidden = false; };
-$('#resubBtn').onclick = async () => {
-  if (resubBusy) return; showErr('#resubErr', '');
-  const d = readForm(resubHost), err = validateClient(d, resubHost, false);
-  if (err) return markError(resubHost, err, '#resubErr');
-  resubBusy = true; const b = $('#resubBtn'); b.disabled = true; b.innerHTML = '<span class="spin"></span> جاري الإرسال...';
-  const r = await api('resubmit', { nid: SQ.q.nid, data: d, profile: resubHost._photos.profile || null, idCard: resubHost._photos.idCard || null }, 120000);
-  resubBusy = false; b.disabled = false; b.textContent = 'إعادة الإرسال';
-  if (!r.ok) return showErr('#resubErr', r.error);
-  toast('تم إعادة إرسال طلبك للمراجعة ✔', 'ok');
-  $('#stEdit').hidden = true; $('#stQuery').hidden = false; $('#stResult').innerHTML = '<div class="notice good">تم إعادة إرسال طلبك، وهو الآن <b>قيد المراجعة</b>.</div>';
-  $('#stNid').value = '';
-};
-
-/* =========================================================
-   الأدمن
-   ========================================================= */
-const A = { token: sessionStorage.getItem('adm_tok') || '', user: sessionStorage.getItem('adm_user') || '', rows: [], view: [], open: true, cur: null, img: {} };
-
-async function adm(action, payload, t) {
-  const r = await api(action, { token: A.token, ...(payload || {}) }, t);
-  if (r.auth) { logout('انتهت الجلسة، سجّل الدخول مرة أخرى.'); }
-  return r;
-}
-
-function logout(msg) {
-  A.token = ''; A.user = ''; sessionStorage.removeItem('adm_tok'); sessionStorage.removeItem('adm_user');
-  $('#admDash').hidden = true; $('#admLogin').hidden = false; $('#detailModal').hidden = true; A.rows = []; A.img = {};
-  if (msg) showErr('#admErr', msg);
-}
-
-// Enter من لوحة مفاتيح الكمبيوتر أو الموبايل (Go) يشغّل الدخول عن طريق <form>
-$('#admForm').onsubmit = e => e.preventDefault();
-$('#admBtn').onclick = async () => {
-  showErr('#admErr', '');
-  const u = $('#admUser').value.trim(), p = $('#admPass').value;
-  if (!u || !p) {
-    showErr('#admErr', !u ? 'أدخل اسم المستخدم.' : 'أدخل كلمة المرور.');
-    (!u ? $('#admUser') : $('#admPass')).focus();      // Enter في خانة اليوزر ينقلك لكلمة المرور
-    return;
-  }
-  const b = $('#admBtn'); b.disabled = true; b.innerHTML = '<span class="spin"></span>';
-  const r = await api('login', { username: u, password: p });
-  b.disabled = false; b.textContent = 'دخول';
-  if (!r.ok) return showErr('#admErr', r.error);
-  A.token = r.token; A.user = r.username; sessionStorage.setItem('adm_tok', A.token); sessionStorage.setItem('adm_user', A.user);
-  $('#admPass').value = ''; enterDash();
-};
-$('#admLogout').onclick = () => logout();
-$('#admRefresh').onclick = () => loadList();
-
-function enterDash() {
-  $('#admLogin').hidden = true; $('#admDash').hidden = false; $('#admName').textContent = A.user; loadList();
-}
+$('#loginForm').addEventListener('submit', async ev => {
+  ev.preventDefault();
+  const b = $('#btnLogin'), er = $('#loginErr'); er.hidden = true; b.disabled = true; b.textContent = 'جاري الدخول...';
+  try {
+    const r = await api('login', { username: $('#adUser').value, password: $('#adPass').value }, 30000);
+    saveSession(r.token, r.username, r.role);
+    $('#adPass').value = ''; showDash(); loadList();
+  } catch (e) { er.hidden = false; er.textContent = e.message; }
+  finally { b.disabled = false; b.textContent = 'دخول'; }
+});
+$('#btnLogout').onclick = () => adminLogout(false);
+$('#btnRefresh').onclick = () => loadList();
 
 async function loadList() {
-  $('#admBody').innerHTML = '<tr><td colspan="8" style="text-align:center;padding:20px"><span class="spin"></span> جاري التحميل...</td></tr>';
-  const r = await adm('adminList');
-  if (!r.ok) { $('#admBody').innerHTML = ''; return toast(r.error, 'err'); }
-  A.rows = r.rows; setToggle(r.open); renderList();
+  $('#adBody').innerHTML = '<tr><td colspan="8" style="text-align:center"><span class="spin"></span></td></tr>';
+  try {
+    if (!CFG) CFG = await api('getConfig', {}, 30000);
+    const r = await adminCall('list', {}, 60000);
+    AD.records = r.records; AD.open = r.open;
+    if (r.role && r.role !== AD.role) { saveSession(AD.token, AD.user, r.role); showDash(); }
+    renderAdmin();
+  } catch (e) { $('#adBody').innerHTML = `<tr><td colspan="8" style="color:var(--bad);text-align:center">${esc(e.message)}</td></tr>`; }
 }
 
-function setToggle(open) {
-  A.open = open; const b = $('#admToggle');
-  b.textContent = open ? '🟢 التسجيل مفتوح (اضغط للإغلاق)' : '🔴 التسجيل مغلق (اضغط للفتح)';
+function fmtDate(s) { return s ? s.slice(0, 16) : ''; }
+
+function renderAdmin() {
+  const R = AD.records;
+  const cnt = s => R.filter(x => x.status === s).length;
+  const sts = [['', 'الكل', R.length], ['قيد المراجعة', 'قيد المراجعة', cnt('قيد المراجعة')], ['مقبول', 'مقبول', cnt('مقبول')], ['مرفوض', 'مرفوض', cnt('مرفوض')]];
+  $('#adStats').innerHTML = sts.map(s => `<div class="stat${AD.status === s[0] ? ' on' : ''}" data-st="${esc(s[0])}"><b>${s[2]}</b><span>${esc(s[1])}</span></div>`).join('');
+  $$('#adStats .stat').forEach(el => el.onclick = () => { AD.status = el.dataset.st; AD.limit = 100; renderAdmin(); });
+  $('#adFilter').innerHTML = sts.map(s => `<option value="${esc(s[0])}"${AD.status === s[0] ? ' selected' : ''}>${esc(s[0] ? s[1] : 'كل الحالات')}</option>`).join('');
+  $('#btnToggleReg').textContent = AD.open ? '🔒 غلق التسجيل' : '🔓 فتح التسجيل';
+
+  const rows = filtered();
+  const shown = rows.slice(0, AD.limit);
+  $('#adBody').innerHTML = shown.length ? shown.map((r, i) => `
+    <tr data-id="${esc(r.id)}"><td>${i + 1}</td><td class="nm">${esc(r.fullName)}</td><td class="ltr-cell">${esc(r.nationalId)}</td>
+    <td class="ltr-cell">${esc(r.whatsapp)}</td><td>${esc(r.district === 'أخرى' ? r.districtOther : r.district)}</td>
+    <td><span class="badge ${badgeCls(r.status)}">${esc(r.status)}</span></td><td class="ltr-cell"><b>${esc(r.code)}</b></td><td>${esc(fmtDate(r.createdAt))}</td></tr>`).join('')
+    : '<tr><td colspan="8" style="text-align:center;color:var(--muted)">لا توجد نتائج</td></tr>';
+  $$('#adBody tr[data-id]').forEach(tr => tr.onclick = () => openDetail(tr.dataset.id));
+  $('#btnMore').hidden = rows.length <= AD.limit;
+  $('#adCount').textContent = `عرض ${shown.length} من ${rows.length}`;
 }
-$('#admToggle').onclick = async () => {
-  const r = await adm('adminSetOpen', { open: !A.open });
-  if (r.ok) { setToggle(r.open); toast(r.open ? 'تم فتح التسجيل' : 'تم غلق التسجيل', 'ok'); } else toast(r.error, 'err');
+
+function filtered() {
+  const q = toEn(AD.q).toLowerCase().trim();
+  return AD.records.filter(r => (!AD.status || r.status === AD.status) &&
+    (!q || [r.fullName, r.nationalId, r.whatsapp, r.phone, r.otherPhone, r.code].some(v => String(v || '').toLowerCase().includes(q))))
+    .slice().reverse(); // الأحدث أولًا
+}
+$('#adSearch').addEventListener('input', e => { AD.q = e.target.value; AD.limit = 100; renderAdmin(); });
+$('#adFilter').addEventListener('change', e => { AD.status = e.target.value; AD.limit = 100; renderAdmin(); });
+$('#btnMore').onclick = () => { AD.limit += 100; renderAdmin(); };
+
+$('#btnToggleReg').onclick = async () => {
+  const to = !AD.open;
+  const ok = await ask({ title: to ? 'فتح التسجيل' : 'غلق التسجيل', message: to ? 'هيتم فتح باب التسجيل للجميع.' : 'مش هيقدر حد يسجل لحد ما تفتحه تاني.', okText: 'تأكيد' });
+  if (!ok) return;
+  try { const r = await adminCall('setRegistration', { open: to }); AD.open = r.open; renderAdmin(); toast(r.open ? 'تم فتح التسجيل' : 'تم غلق التسجيل', 'ok'); }
+  catch (e) { toast(e.message, 'err'); }
 };
 
-const badge = s => `<span class="badge ${s === 'مقبول' ? 'o' : s === 'مرفوض' ? 'n' : 'p'}">${esc(s)}</span>`;
-
-function renderList() {
-  const q = $('#admSearch').value.toLowerCase().trim(), f = $('#admFilter').value;
-  A.view = A.rows.filter(r => (!f || r.status === f) &&
-    (!q || [r.fullName, r.nid, r.code, r.whatsapp, r.phone, r.phone2].join(' ').toLowerCase().includes(q)));
-  const c = s => A.rows.filter(r => r.status === s).length;
-  $('#sTotal').textContent = A.rows.length; $('#sPend').textContent = c('قيد المراجعة'); $('#sOk').textContent = c('مقبول'); $('#sNo').textContent = c('مرفوض');
-  $('#admBody').innerHTML = A.view.map((r, i) => `<tr class="r" data-nid="${esc(r.nid)}">
-    <td>${i + 1}</td><td class="ltr"><b>${esc(r.code) || '-'}</b></td><td>${esc(r.fullName)}</td><td class="ltr">${esc(r.nid)}</td>
-    <td class="ltr">${esc(r.whatsapp)}</td><td>${badge(r.status)}</td><td class="ltr">${esc((r.createdAt || '').slice(0, 10))}</td>
-    <td>${r.status !== 'مقبول' ? `<button class="btn sm ok" data-a="acc">قبول</button> ` : ''}${r.status !== 'مرفوض' ? `<button class="btn sm bad" data-a="rej">رفض</button> ` : ''}<button class="btn sm" data-a="del">🗑</button></td></tr>`).join('') ||
-    '<tr><td colspan="8" style="text-align:center;padding:20px;color:var(--mut)">لا توجد نتائج</td></tr>';
-  $('#admCount').textContent = `المعروض: ${A.view.length} من ${A.rows.length}`;
-}
-$('#admSearch').oninput = renderList; $('#admFilter').onchange = renderList;
-
-$('#admBody').onclick = e => {
-  const tr = e.target.closest('tr.r'); if (!tr) return;
-  const nid = tr.dataset.nid, a = e.target.closest('[data-a]');
-  if (!a) return openDetail(nid);
-  if (a.dataset.a === 'acc') doAccept(nid); else if (a.dataset.a === 'rej') doReject(nid); else doDelete(nid);
+/* ---- تصدير Excel ---- */
+$('#btnExport').onclick = () => {
+  if (typeof XLSX === 'undefined') { toast('مكتبة Excel لم تُحمّل، تأكد من الإنترنت', 'err'); return; }
+  const rows = filtered().reverse();
+  if (!rows.length) { toast('لا توجد بيانات للتصدير', 'err'); return; }
+  const cols = CFG.columns.filter(c => c[0] !== 'id');
+  const data = rows.map(r => { const o = {}; cols.forEach(c => o[c[1]] = String(r[c[0]] == null ? '' : r[c[0]])); return o; });
+  const ws = XLSX.utils.json_to_sheet(data, { header: cols.map(c => c[1]) });
+  ws['!cols'] = cols.map(c => ({ wch: Math.max(12, c[1].length + 4) }));
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'التسجيلات');
+  wb.Workbook = { Views: [{ RTL: true }] };
+  const d = new Date(), p = n => ('0' + n).slice(-2);
+  XLSX.writeFile(wb, `registrations_${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}.xlsx`);
 };
 
-function upsertRow(row, oldNid) {
-  const i = A.rows.findIndex(r => r.nid === (oldNid || row.nid));
-  if (i >= 0) A.rows[i] = row; else A.rows.unshift(row);
-  renderList();
-}
-const byNid = n => A.rows.find(r => r.nid === n);
+/* ============================ حسابي: تغيير كلمة المرور (لكل الأدمنز) ============================ */
+const PW_MIN = () => (CFG && CFG.passwordMin) || 8;
 
-/* نافذة تأكيد/إدخال */
-function ask({ title, msg, input, okText }) {
-  return new Promise(res => {
-    $('#askTitle').textContent = title; $('#askMsg').textContent = msg || '';
-    const ta = $('#askInput'); ta.hidden = !input; ta.value = '';
-    $('#askOk').textContent = okText || 'تأكيد'; $('#askModal').hidden = false; if (input) ta.focus();
-    const close = v => { $('#askModal').hidden = true; res(v); };
-    $('#askOk').onclick = () => { if (input && !ta.value.trim()) return toast('اكتب السبب أولًا', 'err'); close(input ? ta.value.trim() : true); };
-    $('#askCancel').onclick = () => close(null);
+function pwFieldHTML(id, label, autocomplete) {
+  return `<div class="field"><label class="l">${label}</label><input type="password" id="${id}" class="ltr" autocomplete="${autocomplete}" autocapitalize="none"></div>`;
+}
+function bindShowToggle(root, ids) {
+  const cb = $('[data-show]', root);
+  cb.onchange = () => ids.forEach(id => { const el = $('#' + id, root); if (el) el.type = cb.checked ? 'text' : 'password'; });
+}
+
+$('#btnMyAccount').onclick = () => {
+  const m = openModal('حسابي', `
+    <div class="banner info">اسم المستخدم: <b class="ltr" style="display:inline-block">${esc(AD.user)}</b> · الصلاحية: <b>${isSuper() ? 'سوبر أدمن' : 'أدمن'}</b></div>
+    <h4 style="margin:0 0 8px;color:var(--navy)">تغيير كلمة المرور</h4>
+    ${pwFieldHTML('pwOld', 'كلمة المرور الحالية', 'current-password')}
+    ${pwFieldHTML('pwNew', 'كلمة المرور الجديدة (' + PW_MIN() + ' أحرف على الأقل)', 'new-password')}
+    ${pwFieldHTML('pwNew2', 'تأكيد كلمة المرور الجديدة', 'new-password')}
+    <label class="chk"><input type="checkbox" data-show> إظهار كلمات المرور</label>
+    <div id="pwErr" class="banner err" hidden style="margin-top:10px"></div>`,
+    '<button class="btn primary" data-save>💾 حفظ كلمة المرور</button><button class="btn ghost" data-cancel>إلغاء</button>', true);
+  bindShowToggle(m.el, ['pwOld', 'pwNew', 'pwNew2']);
+  $('[data-cancel]', m.el).onclick = m.close;
+  $('[data-save]', m.el).onclick = async ev => {
+    const er = $('#pwErr', m.el); er.hidden = true;
+    const o = $('#pwOld', m.el).value, n = $('#pwNew', m.el).value, n2 = $('#pwNew2', m.el).value;
+    const bad = msg => { er.textContent = msg; er.hidden = false; };
+    if (!o) return bad('اكتب كلمة المرور الحالية');
+    if (n.length < PW_MIN()) return bad('كلمة المرور الجديدة يجب ألا تقل عن ' + PW_MIN() + ' أحرف');
+    if (n.toLowerCase() === AD.user.toLowerCase()) return bad('كلمة المرور يجب ألا تكون مثل اسم المستخدم');
+    if (n === o) return bad('كلمة المرور الجديدة يجب أن تختلف عن الحالية');
+    if (n !== n2) return bad('تأكيد كلمة المرور غير مطابق');
+    const btn = ev.currentTarget; btn.disabled = true; btn.textContent = 'جاري الحفظ...';
+    try {
+      const r = await adminCall('changePassword', { oldPassword: o, newPassword: n }, 60000);
+      saveSession(r.token, AD.user, AD.role); // توكن جديد (القديم بطل)
+      m.close(); toast('تم تغيير كلمة المرور', 'ok');
+    } catch (e) { bad(e.message); }
+    finally { btn.disabled = false; btn.textContent = '💾 حفظ كلمة المرور'; }
+  };
+};
+
+/* ============================ إدارة الأدمنز (سوبر أدمن فقط) ============================ */
+function randomPassword(len = 10) {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789';
+  const a = new Uint32Array(len); crypto.getRandomValues(a);
+  return Array.from(a, n => chars[n % chars.length]).join('');
+}
+
+$('#btnAdmins').onclick = async () => {
+  const m = openModal('إدارة الأدمنز', `
+    <div class="tbl-wrap"><table style="min-width:560px">
+      <thead><tr><th>اسم المستخدم</th><th>الصلاحية</th><th>أضافه</th><th>التاريخ</th><th></th></tr></thead>
+      <tbody id="admBody"><tr class="static"><td colspan="5" style="text-align:center"><span class="spin"></span></td></tr></tbody>
+    </table></div>
+    <h4 style="margin:18px 0 8px;color:var(--navy)">إضافة أدمن جديد</h4>
+    <div class="grid">
+      <div class="field"><label class="l">اسم المستخدم (إنجليزي)</label><input type="text" id="nuUser" class="ltr" autocomplete="off" autocapitalize="none" autocorrect="off" placeholder="مثال: mina.s"></div>
+      <div class="field"><label class="l">كلمة المرور (${PW_MIN()} أحرف على الأقل)</label>
+        <div class="pwrow"><input type="password" id="nuPass" class="ltr" autocomplete="new-password"><button type="button" class="btn ghost sm" id="nuGen">🎲 توليد</button></div>
+        <label class="chk"><input type="checkbox" data-show> إظهار</label></div>
+    </div>
+    <div class="hint">كل أدمن يقدر يغيّر كلمة مروره بنفسه من زر "حسابي". كلمة المرور بتتخزن مشفّرة ومش بتتعرض تاني، فاكتبها وبلّغها للشخص.</div>
+    <div id="admErr" class="banner err" hidden style="margin-top:10px"></div>`,
+    '<button class="btn ok" data-add>➕ إضافة الأدمن</button><button class="btn ghost" data-close>إغلاق</button>');
+  bindShowToggle(m.el, ['nuPass']);
+  $('[data-close]', m.el).onclick = m.close;
+  const errBox = $('#admErr', m.el);
+  const showErr = msg => { errBox.textContent = msg; errBox.hidden = !msg; };
+
+  const render = list => {
+    $('#admBody', m.el).innerHTML = list.map(a => `
+      <tr class="static"><td class="ltr-cell"><b>${esc(a.username)}</b></td>
+      <td><span class="badge ${a.role === 'super' ? 's' : 'p'}">${a.role === 'super' ? 'سوبر أدمن' : 'أدمن'}</span></td>
+      <td class="ltr-cell">${esc(a.createdBy || '—')}</td><td>${esc(fmtDate(a.createdAt))}</td>
+      <td>${a.role === 'super' ? '—' : `<button class="btn sm ghost" data-reset="${esc(a.username)}">🔑 كلمة المرور</button> <button class="btn sm danger" data-del="${esc(a.username)}">🗑 حذف</button>`}</td></tr>`).join('')
+      || '<tr class="static"><td colspan="5" style="text-align:center;color:var(--muted)">لا يوجد</td></tr>';
+    $$('[data-reset]', m.el).forEach(b => b.onclick = () => resetPw(b.dataset.reset));
+    $$('[data-del]', m.el).forEach(b => b.onclick = () => delAdmin(b.dataset.del));
+  };
+
+  const resetPw = async u => {
+    const pw = await ask({ title: 'كلمة مرور جديدة لـ ' + u, message: 'اكتب كلمة المرور الجديدة (ظاهرة عشان تبلّغها له). أي جلسة مفتوحة له هتتقفل.', input: 'text', placeholder: PW_MIN() + ' أحرف على الأقل', okText: 'حفظ' });
+    if (pw === null) return;
+    if (pw.length < PW_MIN()) { toast('كلمة المرور يجب ألا تقل عن ' + PW_MIN() + ' أحرف', 'err'); return; }
+    try { const r = await adminCall('resetAdminPassword', { username: u, password: pw }, 60000); render(r.admins); toast('تم تغيير كلمة مرور ' + u, 'ok'); }
+    catch (e) { toast(e.message, 'err'); }
+  };
+  const delAdmin = async u => {
+    const ok = await ask({ title: 'حذف أدمن', message: `حذف حساب "${u}"؟ هيتسجل خروجه فورًا ومش هيقدر يدخل تاني.`, okText: 'حذف', danger: true });
+    if (!ok) return;
+    try { const r = await adminCall('deleteAdmin', { username: u }, 60000); render(r.admins); toast('تم حذف ' + u, 'ok'); }
+    catch (e) { toast(e.message, 'err'); }
+  };
+
+  $('#nuGen', m.el).onclick = () => {
+    $('#nuPass', m.el).value = randomPassword();
+    const cb = $('[data-show]', m.el); cb.checked = true; cb.onchange();
+  };
+  $('[data-add]', m.el).onclick = async ev => {
+    showErr('');
+    const u = $('#nuUser', m.el).value.trim().toLowerCase(), p = $('#nuPass', m.el).value;
+    if (!/^[a-z0-9_.-]{3,30}$/.test(u)) return showErr('اسم المستخدم: من 3 إلى 30 حرفًا إنجليزيًا صغيرًا أو أرقامًا أو _ . -');
+    if (p.length < PW_MIN()) return showErr('كلمة المرور يجب ألا تقل عن ' + PW_MIN() + ' أحرف');
+    if (p.toLowerCase() === u) return showErr('كلمة المرور يجب ألا تكون مثل اسم المستخدم');
+    const btn = ev.currentTarget; btn.disabled = true; btn.textContent = 'جاري الإضافة...';
+    try {
+      const r = await adminCall('createAdmin', { username: u, password: p }, 60000);
+      render(r.admins);
+      $('#nuUser', m.el).value = ''; $('#nuPass', m.el).value = '';
+      toast('تمت إضافة ' + u + ' — بلّغه باليوزر والباسورد', 'ok');
+    } catch (e) { showErr(e.message); }
+    finally { btn.disabled = false; btn.textContent = '➕ إضافة الأدمن'; }
+  };
+
+  try { const r = await adminCall('listAdmins', {}, 60000); render(r.admins); }
+  catch (e) { $('#admBody', m.el).innerHTML = `<tr class="static"><td colspan="5" style="color:var(--bad);text-align:center">${esc(e.message)}</td></tr>`; }
+};
+
+/* ---- تفاصيل شخص ---- */
+const DETAIL_KEYS = ['status', 'code', 'fullName', 'gender', 'nationalId', 'birthDate', 'whatsapp', 'phone', 'otherPhone', 'confessor', 'confessorOther',
+  'occupation', 'studyStage', 'studyYear', 'institution', 'faculty', 'jobSector', 'jobTitle', 'workplace', 'otherStatus', 'otherStatusText',
+  'housingType', 'compoundName', 'district', 'districtOther', 'building', 'apartment', 'addressDetails', 'rejectReason', 'createdAt', 'decidedBy', 'decidedAt', 'updatedAt'];
+
+function openDetail(id) {
+  const r = AD.records.find(x => x.id === id); if (!r) return;
+  const label = Object.fromEntries(CFG.columns);
+  const kv = DETAIL_KEYS.filter(k => r[k]).map(k => {
+    const v = k === 'status' ? `<span class="badge ${badgeCls(r.status)}">${esc(r.status)}</span>` : esc(r[k]);
+    const cls = ['nationalId', 'whatsapp', 'phone', 'otherPhone', 'code', 'birthDate'].includes(k) ? ' class="ltr-cell" style="text-align:right"' : '';
+    return `<div class="k">${esc(label[k] || k)}</div><div class="v"><span${cls}>${v}</span></div>`;
+  }).join('');
+  const body = `
+    <div class="imgs">
+      <figure><div class="im" data-im="profile"><span class="spin"></span></div><figcaption>الصورة الشخصية</figcaption></figure>
+      <figure><div class="im card" data-im="id"><span class="spin"></span></div><figcaption>صورة البطاقة</figcaption></figure>
+    </div><div class="kv">${kv}</div>`;
+  const foot = `
+    ${r.status !== 'مقبول' ? '<button class="btn ok" data-act="approve">✔ قبول</button>' : ''}
+    ${r.status !== 'مرفوض' ? '<button class="btn warn" data-act="reject">✖ رفض</button>' : ''}
+    <button class="btn ghost" data-act="edit">✎ تعديل</button>
+    ${r.status === 'مقبول' && r.code ? '<button class="btn wa" data-act="wa">رسالة واتساب</button>' : ''}
+    <button class="btn danger" data-act="del" style="margin-inline-start:auto">🗑 حذف</button>`;
+  const m = openModal(r.fullName, body, foot);
+  const imgs = {};
+
+  adminCall('getImages', { id }, 60000).then(res => {
+    imgs.profile = res.profile; imgs.id = res.idPhoto;
+    [['profile', res.profile], ['id', res.idPhoto]].forEach(([k, src]) => {
+      const box = $(`[data-im="${k}"]`, m.el); if (!box) return;
+      if (src) { box.innerHTML = `<img src="${src}" alt="">`; box.onclick = () => lightbox(src); } else box.textContent = 'لا توجد صورة';
+    });
+  }).catch(() => { $$('[data-im]', m.el).forEach(b => b.textContent = 'تعذر تحميل الصورة'); });
+
+  const act = async (name, fn) => {
+    const b = $(`[data-act="${name}"]`, m.el); if (b) b.disabled = true;
+    try { await fn(); } catch (e) { toast(e.message, 'err'); } finally { if (b) b.disabled = false; }
+  };
+  const bind = (name, fn) => { const b = $(`[data-act="${name}"]`, m.el); if (b) b.onclick = () => act(name, fn); };
+
+  bind('approve', async () => {
+    const ok = await ask({ title: 'قبول التسجيل', message: `قبول "${r.fullName}"؟ ${r.code ? 'سيحتفظ بنفس كوده السابق.' : 'سيتم توليد كود خاص به تلقائيًا.'}`, okText: 'قبول' });
+    if (!ok) return;
+    const res = await adminCall('setStatus', { id, status: 'مقبول' });
+    replaceRec(res.record); m.close(); toast('تم القبول — الكود: ' + res.record.code, 'ok'); openDetail(id);
   });
+  bind('reject', async () => {
+    const reason = await ask({ title: 'رفض التسجيل', message: r.code ? 'ملحوظة: الشخص ده له كود محفوظ وهيرجع له لو اتقبل تاني.' : 'اكتب سبب الرفض (اختياري، هيظهر للشخص عند الاستعلام).', input: true, placeholder: 'سبب الرفض', okText: 'رفض', danger: true });
+    if (reason === null) return;
+    const res = await adminCall('setStatus', { id, status: 'مرفوض', reason });
+    replaceRec(res.record); m.close(); toast('تم الرفض', 'ok');
+  });
+  bind('del', async () => {
+    const ok = await ask({ title: 'حذف نهائي', message: `سيتم حذف "${r.fullName}" وصوره نهائيًا ويُفتح رقمه القومي للتسجيل من جديد. لا يمكن التراجع.`, okText: 'حذف نهائي', danger: true });
+    if (!ok) return;
+    await adminCall('remove', { id });
+    AD.records = AD.records.filter(x => x.id !== id); renderAdmin(); m.close(); toast('تم الحذف', 'ok');
+  });
+  bind('wa', async () => {
+    const first = r.fullName.split(' ')[0];
+    const msg = window.WA_TEMPLATE.replace('{name}', first).replace('{code}', r.code);
+    window.open('https://wa.me/2' + r.whatsapp + '?text=' + encodeURIComponent(msg), '_blank', 'noopener');
+  });
+  bind('edit', async () => { m.close(); openEdit(id, imgs); });
 }
 
-async function doAccept(nid) {
-  const r0 = byNid(nid); if (!r0) return;
-  if (!await ask({ title: 'قبول التسجيل', msg: `قبول «${r0.fullName}» وإنشاء كود خاص به؟`, okText: 'قبول' })) return;
-  const r = await adm('adminAccept', { nid });
-  if (r.ok) { upsertRow(r.row); toast('تم القبول. الكود: ' + r.row.code, 'ok'); refreshDetail(); } else toast(r.error, 'err');
-}
-async function doReject(nid) {
-  const r0 = byNid(nid); if (!r0) return;
-  const reason = await ask({ title: 'رفض التسجيل', msg: `سبب رفض «${r0.fullName}» (سيظهر للشخص):`, input: true, okText: 'رفض' });
-  if (!reason) return;
-  const r = await adm('adminReject', { nid, reason });
-  if (r.ok) { upsertRow(r.row); toast('تم الرفض', 'ok'); refreshDetail(); } else toast(r.error, 'err');
-}
-async function doDelete(nid) {
-  const r0 = byNid(nid); if (!r0) return;
-  if (!await ask({ title: 'حذف نهائي', msg: `سيتم حذف «${r0.fullName}» وصوره نهائيًا، ويصبح الرقم القومي متاحًا للتسجيل من جديد. متأكد؟`, okText: 'حذف' })) return;
-  const r = await adm('adminDelete', { nid });
-  if (r.ok) { A.rows = A.rows.filter(x => x.nid !== nid); renderList(); toast('تم الحذف', 'ok'); if (A.cur === nid) $('#detailModal').hidden = true; } else toast(r.error, 'err');
+function replaceRec(rec) {
+  const i = AD.records.findIndex(x => x.id === rec.id);
+  if (i >= 0) AD.records[i] = rec; renderAdmin();
 }
 
-/* نافذة التفاصيل */
-const dHost = $('#dForm');
-function openDetail(nid) {
-  const r = byNid(nid); if (!r) return;
-  A.cur = nid; $('#detailModal').hidden = false; showErr('#dErr', '');
-  mountForm(dHost, { photos: false }); fillForm(dHost, r);
-  refreshDetail();
-  loadImg(nid, 'profile', '#dImgP'); loadImg(nid, 'idCard', '#dImgI');
+/* ---- تعديل بيانات شخص ---- */
+function openEdit(id, imgs) {
+  const r = AD.records.find(x => x.id === id); if (!r) return;
+  const m = openModal('تعديل: ' + r.fullName, '<div id="editBox"></div><div id="editErr" class="banner err" hidden></div>',
+    '<button class="btn primary" data-save>💾 حفظ التعديلات</button><button class="btn ghost" data-cancel>إلغاء</button>');
+  const form = new RegForm($('#editBox', m.el), CFG, { mode: 'edit', initial: r, hasProfile: r.hasProfile, hasId: r.hasIdPhoto });
+  const showImgs = i => { if (i.profile) form.setPreview('profile', i.profile); if (i.id) form.setPreview('id', i.id); };
+  if (imgs.profile || imgs.id) showImgs(imgs);
+  else if (r.hasProfile || r.hasIdPhoto) adminCall('getImages', { id }, 60000).then(res => showImgs({ profile: res.profile, id: res.idPhoto })).catch(() => {});
+  $('[data-cancel]', m.el).onclick = () => { m.close(); openDetail(id); };
+  $('[data-save]', m.el).onclick = async ev => {
+    const eb = $('#editErr', m.el); eb.hidden = true;
+    const errs = form.validate();
+    if (Object.keys(errs).length) { form.showErrors(errs); toast('راجع الحقول المظللة بالأحمر', 'err'); return; }
+    const btn = ev.currentTarget; btn.disabled = true; btn.textContent = 'جاري الحفظ...';
+    try {
+      const res = await adminCall('update', { id, data: form.collect() }, 120000);
+      replaceRec(res.record); m.close(); toast('تم حفظ التعديلات', 'ok'); openDetail(id);
+    } catch (e) { eb.hidden = false; eb.textContent = e.message; eb.scrollIntoView({ block: 'center' }); }
+    finally { btn.disabled = false; btn.textContent = '💾 حفظ التعديلات'; }
+  };
 }
-function refreshDetail() {
-  const r = byNid(A.cur); if (!r || $('#detailModal').hidden) return;
-  $('#dName').textContent = r.fullName;
-  $('#dHead').innerHTML = badge(r.status) + (r.code ? ` <span class="ltr"><b>الكود: ${esc(r.code)}</b></span>` : '') +
-    (r.status === 'مرفوض' && r.rejectReason ? ` <span style="color:var(--bad)">السبب: ${esc(r.rejectReason)}</span>` : '');
-  const wa = 'https://wa.me/2' + digits(r.whatsapp) + '?text=' + encodeURIComponent(
-    `أهلًا ${r.fullName.split(' ')[0]}،\nتم قبول تسجيلك في اجتماع شباب «اتبعني» - كاتدرائية مارمينا والبابا كيرلس بالعاشر من رمضان ✝️\nكودك الخاص: ${r.code}\nاحتفظ به، وستحتاجه عند الحضور.`);
-  $('#dActions').innerHTML = `<button class="btn pri" id="dSave">💾 حفظ التعديلات</button>` +
-    (r.status !== 'مقبول' ? `<button class="btn ok" id="dAcc">قبول</button>` : '') +
-    (r.status !== 'مرفوض' ? `<button class="btn bad" id="dRej">رفض</button>` : '') +
-    `<button class="btn" id="dDel">🗑 حذف</button>` +
-    (r.status === 'مقبول' ? `<a class="btn gold" style="text-decoration:none" target="_blank" rel="noopener" href="${wa}">إرسال الكود واتساب</a>` : '');
-  $('#dSave').onclick = saveDetail; $('#dDel').onclick = () => doDelete(A.cur);
-  if ($('#dAcc')) $('#dAcc').onclick = () => doAccept(A.cur);
-  if ($('#dRej')) $('#dRej').onclick = () => doReject(A.cur);
-}
-async function saveDetail() {
-  showErr('#dErr', '');
-  const d = readForm(dHost), err = validateClient(d, dHost, false);
-  if (err) return markError(dHost, err, '#dErr');
-  const b = $('#dSave'); b.disabled = true; b.innerHTML = '<span class="spin"></span>';
-  const r = await adm('adminUpdate', { nid: A.cur, data: d });
-  b.disabled = false; b.textContent = '💾 حفظ التعديلات';
-  if (!r.ok) return showErr('#dErr', r.error);
-  const old = A.cur; A.cur = r.row.nid; upsertRow(r.row, old); refreshDetail(); toast('تم حفظ التعديلات', 'ok');
-}
-async function loadImg(nid, which, sel) {
-  const box = $(sel), key = nid + which;
-  box.innerHTML = '<span class="spin"></span>';
-  let src = A.img[key];
-  if (!src) {
-    const r = await adm('adminImage', { nid, which });
-    if (!r.ok) { if (A.cur === nid) box.textContent = r.error || 'لا توجد صورة'; return; }
-    src = A.img[key] = r.image;
-  }
-  if (A.cur !== nid) return;
-  box.innerHTML = `<img src="${src}" alt="">`;
-  box.querySelector('img').onclick = () => { $('#lbImg').src = src; $('#lightbox').hidden = false; };
-}
-$('#dClose').onclick = () => { $('#detailModal').hidden = true; A.cur = null; };
-$('#lightbox').onclick = () => $('#lightbox').hidden = true;
 
-/* تصدير Excel (حسب الفلتر الحالي) */
-$('#admExport').onclick = () => {
-  if (!A.view.length) return toast('لا توجد بيانات للتصدير', 'err');
-  const aoa = [EXPORT_COLS.map(c => c[1])].concat(A.view.map(r => EXPORT_COLS.map(c => String(r[c[0]] ?? ''))));
-  const stamp = new Date().toISOString().slice(0, 10);
-  if (window.XLSX) {
-    const ws = XLSX.utils.aoa_to_sheet(aoa);
-    ws['!cols'] = EXPORT_COLS.map(c => ({ wch: Math.max(12, c[1].length + 4) }));
-    const wb = XLSX.utils.book_new(); wb.Workbook = { Views: [{ RTL: true }] };
-    XLSX.utils.book_append_sheet(wb, ws, 'التسجيلات'); XLSX.writeFile(wb, `registrations_${stamp}.xlsx`);
-  } else {
-    const csv = '\uFEFF' + aoa.map(r => r.map(v => '"' + v.replace(/"/g, '""') + '"').join(',')).join('\n');
-    const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
-    a.download = `registrations_${stamp}.csv`; a.click();
-  }
-};
-
-if (A.token) enterDash();
+/* ============================ تشغيل ============================ */
+loadConfig();
 </script>
 </body>
 </html>
