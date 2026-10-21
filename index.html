@@ -4,119 +4,389 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
-<title>اجتماع شباب اتبعني - التسجيل</title>
+<meta name="theme-color" content="#2b1a0c">
+<title>اجتماع شباب «اتبعني» - كاتدرائية الشهيد العظيم مارمينا والبابا كيرلس السادس - العاشر من رمضان</title>
+<link rel="icon" id="favicon" href="data:,">
+<link rel="preload" as="image" href="logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
-<script src="config.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+<!-- شاشة البداية (Splash): بتتحمّل الأول قبل أي ستايل تاني. ألوانها من الشعار: بني غامق / كريمي / ذهبي -->
+<style id="splashCss">
+body.lock{overflow:hidden}
+#splash{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;text-align:center;color:#fff;
+  background:radial-gradient(circle at 50% 30%,#6b4426 0%,#3c2412 58%,#1f1208 100%);font-family:'Cairo',Tahoma,Arial,sans-serif;transition:opacity .7s ease,visibility .7s}
+#splash.hide{opacity:0;visibility:hidden}
+#splash::before{content:"";position:absolute;inset:0;opacity:.6;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='72'%3E%3Cpath d='M36 14v44M22 30h28' stroke='%23e6c37a' stroke-opacity='.08' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E")}
+.sp-in{position:relative;padding:24px;max-width:440px}
+.sp-logo{width:172px;height:172px;margin:0 auto 20px;border-radius:50%;background:#f4ecdc;border:4px solid #c38622;display:flex;align-items:center;justify-content:center;overflow:hidden;
+  box-shadow:0 14px 48px rgba(0,0,0,.5),0 0 0 10px rgba(195,134,34,.22);animation:spPop .9s cubic-bezier(.2,.9,.3,1.2) both,spGlow 2.6s ease-in-out .9s infinite}
+.sp-title{font-size:25px;font-weight:800;line-height:1.5;margin:0 0 4px}
+.sp-sub{font-size:14px;line-height:1.8;color:#ecd08f;margin:0 auto;max-width:360px;text-wrap:balance}
+.sp-bar{width:150px;height:4px;border-radius:99px;background:rgba(255,255,255,.16);margin:22px auto 0;overflow:hidden}
+.sp-bar i{display:block;height:100%;width:45%;border-radius:99px;background:linear-gradient(90deg,#c38622,#f0d697);animation:spBar 1.3s ease-in-out infinite}
+@keyframes spPop{0%{transform:scale(.55);opacity:0}100%{transform:scale(1);opacity:1}}
+@keyframes spGlow{0%,100%{box-shadow:0 14px 48px rgba(0,0,0,.5),0 0 0 10px rgba(195,134,34,.22)}50%{box-shadow:0 14px 48px rgba(0,0,0,.5),0 0 0 22px rgba(195,134,34,.05)}}
+@keyframes spBar{0%{transform:translateX(150%)}100%{transform:translateX(-250%)}}
+/* الشعار: دايرة بتتملي بالصورة كاملة، ولو الصورة مش متاحة بيظهر الصليب بدالها */
+.logo-box img{display:block;width:100%;height:100%;object-fit:cover}
+.logo-box img:not([src]){visibility:hidden}
+.logo-fb{display:none;color:#c38622;line-height:1;font-size:56px}
+.nologo .logo-box img{display:none}
+.nologo .logo-fb{display:block}
+@media (prefers-reduced-motion:reduce){.sp-logo,.sp-bar i{animation:none}#splash{transition:none}}
+</style>
+
+<!-- ?v=رقم النسخة: بيجبر المتصفح يحمّل الملفات الجديدة بعد كل تحديث (بدل النسخة القديمة المخزّنة). لازم يطابق EXPECTED_VERSION تحت -->
+<script src="config.js?v=2026-10-26-poster-v9"></script>
+<!-- محمّل الشعار: بيجرّب المصادر بالترتيب لحد ما واحد يشتغل: LOGO_URL (من config.js) ← logo.png (جنب index.html) ← Drive -->
+<script>
+(function () {
+  var cfg = window.APP_CONFIG || {}, ID = cfg.LOGO_DRIVE_ID || '1uRKg8J3YMz16hdAVGBGCWUV3c-S0CF3g';
+  var L = window.LOGO = { ready: false, failed: false, settled: false, src: '', list: [] };
+  if (cfg.LOGO_URL) L.list.push(cfg.LOGO_URL);
+  L.list.push('logo.png');
+  L.list.push('https://drive.google.com/thumbnail?id=' + ID + '&sz=w800');
+  L.apply = function () {
+    var im = document.querySelectorAll('img[data-logo]');
+    for (var i = 0; i < im.length; i++) if (L.src && im[i].getAttribute('src') !== L.src) im[i].setAttribute('src', L.src);
+    var ic = document.getElementById('favicon'); if (ic && L.ready) ic.setAttribute('href', L.src);
+    document.documentElement.classList.toggle('nologo', L.failed);
+  };
+  function settle() { L.settled = true; L.apply(); try { window.dispatchEvent(new Event('logosettled')); } catch (e) {} }
+  var i = 0;
+  (function next() {
+    if (i >= L.list.length) { L.failed = true; settle(); return; }
+    var url = L.list[i++], img = new Image();
+    img.onload = function () { if (img.naturalWidth > 1) { L.ready = true; L.src = url; settle(); } else next(); };
+    img.onerror = next;
+    img.src = url;
+  })();
+  document.addEventListener('DOMContentLoaded', L.apply);
+})();
+</script>
+<script src="portal.js?v=2026-10-26-poster-v9"></script>
+<script src="conferences.js?v=2026-10-26-poster-v9"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" defer></script>
 <style>
-:root{--navy:#1f3a5f;--navy2:#2c5282;--gold:#c8a24a;--bg:#f2f5fa;--card:#fff;--txt:#1d2733;--mut:#6b7785;--line:#dfe5ee;--ok:#1f8a4c;--warn:#c27c0e;--bad:#c0392b}
+/* ===== لوحة الألوان (مأخوذة من الشعار): بني #3c2412 · كريمي #f4ecdc · ذهبي #c38622 ===== */
+:root{
+  --brown:#3c2412;--brown2:#6b4426;--gold:#c38622;--gold-d:#96601a;--gold2:#e6c37a;
+  --navy:var(--brown);--navy2:var(--brown2);                         /* أسماء قديمة بتستخدمها portal.js و conferences.js */
+  --bg:#f6f0e4;--card:#fffdf8;--tint:#f6efe1;--tint2:#efe4cf;--txt:#2a1e14;--mut:#766553;--line:#e6dcc8;
+  --ok:#1f7a45;--warn:#a86a10;--bad:#b03427;--radius:18px;--shadow:0 6px 24px rgba(60,36,18,.10)}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 html,body{margin:0}
-body{font-family:'Cairo',Tahoma,Arial,sans-serif;background:var(--bg);color:var(--txt);line-height:1.7;font-size:15px;overflow-x:hidden}
-header{background:linear-gradient(135deg,var(--navy),var(--navy2));color:#fff;text-align:center;padding:22px 14px 18px}
-header h1{margin:0;font-size:22px}
-header p{margin:4px 0 0;opacity:.9;font-size:14px}
-header .cross{color:var(--gold);font-size:26px;line-height:1}
-nav{display:flex;gap:6px;max-width:980px;margin:-14px auto 0;padding:0 10px;position:relative}
-nav button{flex:1;border:0;background:#fff;color:var(--navy);padding:11px 6px;border-radius:12px 12px 0 0;font:inherit;font-weight:700;cursor:pointer;box-shadow:0 -2px 8px rgba(0,0,0,.05)}
-nav button.on{background:var(--gold);color:#fff}
-main{max-width:980px;margin:0 auto;padding:0 10px 40px}
-#sysBanner{max-width:980px;margin:10px auto 0;padding:0 10px}
-.panel{background:var(--card);border-radius:0 0 14px 14px;box-shadow:0 4px 18px rgba(31,58,95,.08);padding:18px}
-.sec{border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:14px;background:#fcfdff;min-width:0}
-.sec h3{margin:0 0 10px;color:var(--navy);font-size:16px;border-right:4px solid var(--gold);padding-right:8px}
+body{font-family:'Cairo',Tahoma,Arial,sans-serif;background:var(--bg);color:var(--txt);line-height:1.75;font-size:15px;overflow-x:hidden}
+a{color:var(--gold-d)}
+
+/* ===== الهيدر (Hero) ===== */
+header.hero{position:relative;overflow:hidden;text-align:center;color:#fff;padding:26px 16px 58px;border-radius:0 0 34px 34px;
+  background:radial-gradient(circle at 50% -8%,rgba(236,185,80,.40),transparent 52%),linear-gradient(165deg,#2b1a0c 0%,#47301a 52%,#6b4426 100%)}
+header.hero::before{content:"";position:absolute;inset:0;pointer-events:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='72'%3E%3Cpath d='M36 14v44M22 30h28' stroke='%23e6c37a' stroke-opacity='.075' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E")}
+header.hero>*{position:relative}
+.hero-logo{width:116px;height:116px;margin:0 auto 12px;border-radius:50%;background:var(--card);border:4px solid var(--gold);display:flex;align-items:center;justify-content:center;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,.45),0 0 0 8px rgba(230,195,122,.20)}
+.hero h1{margin:0;font-size:26px;font-weight:800;line-height:1.4}
+.hero .church{margin:6px auto 0;max-width:560px;font-size:14.5px;line-height:1.8;color:var(--gold2);font-weight:600;text-wrap:balance}
+.hero .orn{display:flex;align-items:center;justify-content:center;gap:10px;margin:10px 0 0;color:var(--gold2)}
+.hero .orn i{display:block;width:54px;height:2px;border-radius:2px;background:linear-gradient(90deg,transparent,var(--gold2))}
+.hero .orn i:last-child{transform:scaleX(-1)}
+
+/* ===== التابات الرئيسية (من غير slider) ===== */
+.navwrap{position:sticky;top:0;z-index:40;max-width:1000px;margin:-32px auto 0;padding:0 12px 6px}
+nav#mainNav{display:flex;gap:4px;padding:5px;background:rgba(255,253,248,.97);border-radius:18px;border:1px solid rgba(195,134,34,.5);box-shadow:0 10px 28px rgba(60,36,18,.24);backdrop-filter:blur(8px)}
+nav#mainNav button{flex:1;border:0;background:transparent;color:var(--brown);padding:11px 4px;border-radius:14px;font:inherit;font-weight:700;cursor:pointer;font-size:14.5px;white-space:nowrap;transition:background .2s,transform .15s}
+nav#mainNav button:hover{background:var(--tint)}
+nav#mainNav button.on{background:linear-gradient(135deg,var(--brown),var(--brown2));color:#fff;box-shadow:0 4px 12px rgba(60,36,18,.35)}
+main{max-width:1000px;margin:0 auto;padding:6px 12px 30px}
+#sysBanner{max-width:1000px;margin:10px auto 0;padding:0 12px}
+
+.panel{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px;margin-top:10px;border:1px solid rgba(230,220,200,.8)}
+.narrow{max-width:400px;margin:6px auto}
+.mini-logo{width:84px;height:84px;margin:0 auto 8px;border-radius:50%;background:var(--card);border:3px solid var(--gold);display:flex;align-items:center;justify-content:center;overflow:hidden;box-shadow:0 4px 16px rgba(60,36,18,.25)}
+.mini-logo .logo-fb{font-size:38px}
+.nano-logo{width:40px;height:40px;flex:none;border-radius:50%;background:var(--card);border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;overflow:hidden}
+.nano-logo .logo-fb{font-size:18px}
+.sec{border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:14px;background:linear-gradient(180deg,#fff,#fdfaf3);min-width:0}
+.sec h3{margin:0 0 12px;color:var(--brown);font-size:16.5px;border-right:5px solid var(--gold);padding-right:10px}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 @media(max-width:640px){.grid2{grid-template-columns:1fr}}
 .field{margin-bottom:10px}
-.field label{display:block;font-weight:600;margin-bottom:3px;font-size:14px}
+.field label{display:block;font-weight:600;margin-bottom:4px;font-size:14px;color:#4a3524}
 .field label b{color:var(--bad)}
-input,select,textarea{width:100%;font:inherit;padding:10px 11px;border:1.5px solid var(--line);border-radius:10px;background:#fff;color:var(--txt)}
-input[type=date]{min-height:46px}
-input:focus,select:focus,textarea:focus{outline:none;border-color:var(--navy2);box-shadow:0 0 0 3px rgba(44,82,130,.15)}
+input,select,textarea{width:100%;font:inherit;padding:11px 12px;border:1.5px solid #e0d4bb;border-radius:12px;background:#fff;color:var(--txt);transition:border-color .15s,box-shadow .15s}
+input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=file]),select{min-height:46px}
+input[type=checkbox],input[type=radio]{width:auto}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--gold-d);box-shadow:0 0 0 4px rgba(195,134,34,.20)}
 input[dir=ltr]{text-align:right}
-.field.err input,.field.err select,.field.err textarea,.photo.err{border-color:var(--bad);background:#fff6f5}
+.field.err input,.field.err select,.field.err textarea,.photo.err{border-color:var(--bad);background:#fff6f4}
 small.hint{display:block;color:var(--mut);font-size:12.5px;min-height:18px}
 small.hint.bad{color:var(--bad)} small.hint.good{color:var(--ok)}
-.btn{border:0;border-radius:10px;padding:10px 16px;font:inherit;font-weight:700;cursor:pointer;background:#e9eef6;color:var(--navy)}
+.btn{border:0;border-radius:12px;padding:10px 16px;font:inherit;font-weight:700;cursor:pointer;background:var(--tint2);color:var(--brown);transition:transform .15s,box-shadow .15s,filter .15s}
+.btn:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 4px 12px rgba(60,36,18,.18)}
+.btn:active:not(:disabled){transform:translateY(0)}
 .btn:disabled{opacity:.55;cursor:not-allowed}
-.btn.pri{background:var(--navy);color:#fff}.btn.gold{background:var(--gold);color:#fff}
-.btn.ok{background:var(--ok);color:#fff}.btn.bad{background:var(--bad);color:#fff}.btn.sm{padding:5px 10px;font-size:13px}
+.btn.pri{background:linear-gradient(135deg,var(--brown),var(--brown2));color:#fff}
+.btn.gold{background:linear-gradient(135deg,#7d4f10,#96601a);color:#fff}
+.btn.ok{background:linear-gradient(135deg,#17653a,var(--ok));color:#fff}.btn.bad{background:linear-gradient(135deg,#962a20,var(--bad));color:#fff}.btn.wa{background:#25d366;color:#053}
+.btn.sm{padding:5px 11px;font-size:13px;border-radius:10px}
 .btn.wide{width:100%;padding:13px;font-size:16px}
-.formerr{background:#fdecea;color:var(--bad);border:1px solid #f5c6c1;border-radius:10px;padding:9px 12px;margin:8px 0;font-weight:600}
-.notice{border-radius:10px;padding:10px 13px;margin-bottom:12px}
-.notice.warn{background:#fff6e0;border:1px solid #f0d9a0;color:#7a5a05}
-.notice.good{background:#e8f6ee;border:1px solid #b7e1c6;color:#16653a}
-.notice.bad{background:#fdecea;border:1px solid #f5c6c1;color:#8f2a20}
-.photo{border:1.5px dashed var(--line);border-radius:12px;padding:10px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
-.photo .prev{width:130px;height:130px;border-radius:10px;background:#eef2f8;display:flex;align-items:center;justify-content:center;color:var(--mut);font-size:12.5px;overflow:hidden;flex:none;text-align:center}
+.formerr{background:#fdecea;color:var(--bad);border:1px solid #f1c3bd;border-radius:12px;padding:9px 12px;margin:8px 0;font-weight:600}
+.notice{border-radius:12px;padding:10px 13px;margin-bottom:12px}
+.notice.warn{background:#fff4dc;border:1px solid #ecd29a;color:#7a5208}
+.notice.good{background:#e8f4ec;border:1px solid #b5d8c2;color:#16653a}
+.notice.bad{background:#fdecea;border:1px solid #f1c3bd;color:#8f2a20}
+.notice.info{background:var(--tint);border:1px solid #e3d2ae;color:var(--brown2)}
+.photo{border:1.5px dashed #d6c7a6;border-radius:14px;padding:10px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;background:#fdfaf3}
+.photo .prev{width:130px;height:130px;border-radius:12px;background:var(--tint2);display:flex;align-items:center;justify-content:center;color:var(--mut);font-size:12.5px;overflow:hidden;flex:none;text-align:center}
 .photo.idc .prev{width:190px;height:130px}
 .photo .prev img{width:100%;height:100%;object-fit:cover;display:block}
 .photo .btns{display:flex;flex-direction:column;gap:6px}
 .photo-title{font-weight:700;margin:6px 0 4px}
 .badge{display:inline-block;padding:2px 10px;border-radius:20px;font-size:12.5px;font-weight:700}
-.badge.p{background:#fff1d6;color:var(--warn)}.badge.o{background:#dff3e7;color:var(--ok)}.badge.n{background:#fbe1de;color:var(--bad)}.badge.s{background:#ede9fe;color:#5b21b6}
-.code{font-size:34px;font-weight:700;letter-spacing:6px;color:var(--navy);direction:ltr;text-align:center;background:#f5f8fd;border:2px dashed var(--gold);border-radius:12px;padding:8px;margin:10px 0}
-.card-title{text-align:center;font-weight:700;color:var(--navy);margin:16px 0 4px}
-img.idcard{display:block;width:100%;max-width:560px;margin:8px auto 12px;border-radius:14px;box-shadow:0 6px 22px rgba(31,58,95,.28);-webkit-touch-callout:default}
+.badge.p{background:#fdeccb;color:#8a5a0c}.badge.o{background:#dff0e5;color:#1a6a3c}.badge.n{background:#fae0dc;color:#9a2d22}.badge.s{background:#ede9fe;color:#5b21b6}.badge.g{background:#ece6d8;color:#5a4a38}.badge.b{background:#dbeafe;color:#1e40af}
+.code{font-size:34px;font-weight:700;letter-spacing:6px;color:var(--brown);direction:ltr;text-align:center;background:linear-gradient(180deg,#fffcf3,#f7eed8);border:2px dashed var(--gold);border-radius:14px;padding:8px;margin:10px 0}
+.card-title{text-align:center;font-weight:700;color:var(--brown);margin:16px 0 4px}
+img.idcard{display:block;width:100%;max-width:560px;margin:8px auto 12px;border-radius:16px;box-shadow:0 8px 26px rgba(60,36,18,.35);-webkit-touch-callout:default}
 .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:10px 0}
 @media(max-width:640px){.stats{grid-template-columns:repeat(2,1fr)}}
-.stat{background:#f5f8fd;border:1px solid var(--line);border-radius:12px;text-align:center;padding:8px}
-.stat b{display:block;font-size:22px;color:var(--navy)}.stat span{font-size:13px;color:var(--mut)}
-.tbl-wrap{overflow:auto;border:1px solid var(--line);border-radius:12px;max-height:68vh}
+.stat{background:linear-gradient(180deg,#fff,var(--tint));border:1px solid var(--line);border-radius:14px;text-align:center;padding:9px}
+.stat b{display:block;font-size:23px;color:var(--brown)}.stat span{font-size:13px;color:var(--mut)}
+.tbl-wrap{overflow:auto;border:1px solid var(--line);border-radius:14px;max-height:68vh}
 table{width:100%;border-collapse:collapse;font-size:13.5px;min-width:720px}
-th{position:sticky;top:0;background:var(--navy);color:#fff;padding:8px;text-align:right;white-space:nowrap}
+th{position:sticky;top:0;background:var(--brown);color:#fff;padding:9px 8px;text-align:right;white-space:nowrap}
 td{padding:7px 8px;border-top:1px solid var(--line);white-space:nowrap}
-tr.r:hover td{background:#f5f8fd;cursor:pointer}
+tr.r:hover td{background:var(--tint);cursor:pointer}
+table.tblA,table.tblB{min-width:0}
+table.tblA td,table.tblA th,table.tblB td,table.tblB th{white-space:normal;vertical-align:middle}
+tr.grow td{background:#fffaf0}
+tr.grow.pend td{background:#fff1d6}
+.acts{display:flex;gap:6px;flex-wrap:wrap}
 .ltr{direction:ltr;unicode-bidi:plaintext}
-table.tblA{min-width:0}
-table.tblA td,table.tblA th{white-space:normal;vertical-align:middle}
-table.tblA .acts{display:flex;gap:6px;flex-wrap:wrap}
 .chk{display:flex;gap:6px;align-items:center;font-size:13.5px;color:var(--mut);margin:2px 0 6px;cursor:pointer}
-.chk input{width:auto}
-.modal{position:fixed;inset:0;background:rgba(15,25,40,.55);z-index:50;display:flex;align-items:flex-start;justify-content:center;overflow:auto;padding:14px}
-.modal .box{background:#fff;border-radius:14px;max-width:760px;width:100%;padding:16px;margin:auto}
+.chk.big{font-size:15px;color:var(--txt);padding:9px 12px;border:1.5px solid #e0d4bb;border-radius:12px;background:#fff;margin:6px 0}
+.modal{position:fixed;inset:0;background:rgba(30,18,8,.58);z-index:50;display:flex;align-items:flex-start;justify-content:center;overflow:auto;padding:14px;backdrop-filter:blur(2px)}
+#cropModal{z-index:75}
+.modal .box{background:#fff;border-radius:18px;max-width:760px;width:100%;padding:18px;margin:auto;box-shadow:0 24px 70px rgba(0,0,0,.4)}
 .modal .box.sm{max-width:420px}
-.modal h3.mt{margin:0 0 8px;color:var(--navy)}
+.modal h3.mt{margin:0 0 8px;color:var(--brown)}
 .adm-photos{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}
 .adm-photos figure{margin:0;text-align:center;flex:1;min-width:150px}
-.adm-photos .im{height:190px;border-radius:10px;background:#eef2f8;display:flex;align-items:center;justify-content:center;color:var(--mut);overflow:hidden;padding:8px;text-align:center;font-size:13px;word-break:break-word}
+.adm-photos .im{position:relative;height:190px;border-radius:12px;background:var(--tint2);display:flex;align-items:center;justify-content:center;color:var(--mut);overflow:hidden;padding:8px;text-align:center;font-size:13px;word-break:break-word}
+.adm-photos .im.pend{outline:3px solid var(--gold)}
+.adm-photos .im.pend::after{content:'جديدة - بتتحفظ مع «حفظ التعديلات»';position:absolute;bottom:0;left:0;right:0;background:rgba(150,96,26,.96);color:#fff;font-size:12px;padding:2px}
 .adm-photos img{width:100%;height:100%;object-fit:contain;cursor:zoom-in;background:#000}
 .adm-photos figcaption{font-size:13px;margin-top:3px;color:var(--mut)}
-#toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:#222;color:#fff;padding:10px 18px;border-radius:24px;z-index:99;max-width:92%;text-align:center;box-shadow:0 4px 14px rgba(0,0,0,.3)}
+#toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:#2e1d10;color:#fff;padding:10px 18px;border-radius:24px;z-index:99;max-width:92%;text-align:center;box-shadow:0 6px 18px rgba(0,0,0,.35)}
 #toast.err{background:var(--bad)}#toast.ok{background:var(--ok)}
-canvas#cropCanvas{width:100%;max-width:320px;aspect-ratio:1;touch-action:none;border-radius:10px;background:#000;display:block;margin:0 auto;cursor:grab}
-.spin{display:inline-block;width:16px;height:16px;border:3px solid #ccd;border-top-color:var(--navy);border-radius:50%;animation:sp 1s linear infinite;vertical-align:middle}
+canvas#cropCanvas{width:100%;max-width:320px;aspect-ratio:1;touch-action:none;border-radius:12px;background:#000;display:block;margin:0 auto;cursor:grab}
+.spin{display:inline-block;width:16px;height:16px;border:3px solid #dccfb4;border-top-color:var(--gold-d);border-radius:50%;animation:sp 1s linear infinite;vertical-align:middle}
 @keyframes sp{to{transform:rotate(360deg)}}
 .lead{color:var(--mut);margin:0 0 12px}
+.empty{text-align:center;color:var(--mut);padding:26px 10px}
+/* ===== أول صفحة: دخول الأعضاء + زرار التسجيل ===== */
+.reg-cta{margin:18px 0 4px;padding:14px;border:1.5px dashed var(--gold);border-radius:16px;background:linear-gradient(180deg,#fffaf0,var(--tint));text-align:center}
+.reg-cta b{display:block;color:var(--brown);font-size:16px}
+.reg-cta span{display:block;color:var(--mut);font-size:13.5px;margin:2px 0 10px}
+.have-acct{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;background:var(--tint);border:1px solid var(--line);border-radius:12px;padding:8px 12px;margin-bottom:14px;font-size:14px}
+/* ===== بيانات التعليم (لغير الطالب) ===== */
+.edu-box{border:1.5px dashed #d6c7a6;border-radius:14px;padding:12px;margin-top:6px;background:#fdfaf3}
+.edu-box h4{margin:0 0 8px;color:var(--brown);font-size:15px}
+/* ===== تبويبات فرعية: من غير slider، لو مفيش مكان بتنزل سطر تاني ===== */
+.subtabs{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0}
+.subtabs button{flex:1 1 auto;border:1.5px solid #e0d4bb;background:#fff;color:var(--brown);border-radius:999px;padding:7px 12px;font:inherit;font-weight:700;cursor:pointer;font-size:14px;white-space:nowrap;transition:all .15s}
+.subtabs button:hover{border-color:var(--gold-d)}
+.subtabs button.on{background:linear-gradient(135deg,var(--brown),var(--brown2));border-color:var(--brown);color:#fff}
+.who{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;background:linear-gradient(180deg,#fffaf0,var(--tint));border:1px solid var(--line);border-radius:14px;padding:8px 12px}
+.who .wl{display:flex;align-items:center;gap:10px;min-width:0}
+/* ===== أخبار ===== */
+.post{border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:12px;background:#fff;box-shadow:0 2px 8px rgba(60,36,18,.05)}
+.post.pin{border-color:var(--gold);background:linear-gradient(180deg,#fffaf0,#fff)}
+.post h4{margin:0 0 2px;color:var(--brown);font-size:17px}
+.post .meta{font-size:12.5px;color:var(--mut);margin-bottom:6px}
+.post .body{white-space:pre-wrap;word-break:break-word}
+.pimgs{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:10px}
+.pimgs.one{grid-template-columns:1fr}
+.pimg{background:var(--tint2);border-radius:12px;min-height:120px;display:flex;align-items:center;justify-content:center;overflow:hidden;cursor:zoom-in;color:var(--mut);font-size:12px}
+.pimg img{width:100%;display:block;object-fit:cover;max-height:420px}
+.pimgs.one .pimg img{max-height:520px;object-fit:contain;background:#faf6ec}
+/* ===== رحلات ومؤتمرات ===== */
+.trip{border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:12px;background:#fff;box-shadow:0 2px 8px rgba(60,36,18,.05);overflow:hidden}
+.trip.past{opacity:.75}
+.trip h4{margin:0 0 4px;color:var(--brown);font-size:17px}
+.trip .tmeta{display:flex;gap:6px 14px;flex-wrap:wrap;font-size:13.5px;color:#5a4a38;margin-bottom:6px}
+.tbar{height:8px;border-radius:99px;background:#ebe3d2;overflow:hidden;margin:6px 0}
+.tbar i{display:block;height:100%;background:linear-gradient(90deg,var(--gold-d),var(--gold))}
+.tstate{margin-top:10px;padding-top:10px;border-top:1px dashed var(--line)}
+input.tcode{text-transform:uppercase;letter-spacing:4px;text-align:center;font-weight:700;direction:ltr;max-width:160px}
+/* ===== بوستر الرحلة (اختياري) ===== */
+.tposter{margin:-14px -14px 12px;background:var(--tint2);cursor:zoom-in;min-height:90px;display:flex;align-items:center;justify-content:center;color:var(--mut);font-size:13px}
+.tposter img{display:block;width:100%;max-height:360px;object-fit:cover}
+.pedit{display:flex;gap:12px;align-items:center;flex-wrap:wrap;border:1.5px dashed #d6c7a6;border-radius:14px;padding:10px;background:#fdfaf3}
+.pedit .pv{width:170px;height:110px;border-radius:12px;background:var(--tint2);overflow:hidden;display:flex;align-items:center;justify-content:center;color:var(--mut);font-size:12.5px;text-align:center;flex:none}
+.pedit .pv img{width:100%;height:100%;object-fit:cover;display:block;cursor:zoom-in}
+.pedit .pb{display:flex;flex-direction:column;gap:6px}
+/* ===== أنماط الأتوبيس المحفوظة ===== */
+.tplbar{display:flex;gap:6px;flex-wrap:wrap;align-items:center;background:var(--tint);border:1px solid var(--line);border-radius:12px;padding:8px;margin:6px 0}
+.tplbar select{width:auto;flex:1 1 170px;min-width:150px;padding:6px 8px;min-height:38px}
+/* ===== الحجز لأكتر من شخص (ضيوف) ===== */
+.party{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0;justify-content:center}
+.pc{position:relative;display:inline-block}
+.pchip{border:2px solid #e0d4bb;background:#fff;border-radius:12px;padding:5px 12px;font:inherit;cursor:pointer;text-align:center;line-height:1.4;min-width:96px;color:var(--brown)}
+.pchip b{display:block;font-size:13.5px}
+.pchip small{display:block;color:var(--mut);font-size:11.5px}
+.pchip.on{border-color:var(--brown);background:var(--tint2);box-shadow:0 0 0 3px rgba(60,36,18,.12)}
+.pchip.lock{border-style:dashed;background:#f7f2e6;opacity:.8}
+.pchip.rej{border-style:dashed;border-color:#e3b2ab;background:#fdf1ef}
+.pc .gx{position:absolute;top:-7px;left:-7px;width:22px;height:22px;border-radius:50%;border:0;background:var(--bad);color:#fff;font-size:14px;line-height:1;cursor:pointer;padding:0}
+.gform{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin:8px 0}
+.gform input{max-width:210px}
+.gform select{max-width:110px}
+.grow-edit{display:grid;grid-template-columns:1.4fr 1fr auto;gap:6px;align-items:center;margin-bottom:8px}
+.grow-edit.g3{grid-template-columns:1.4fr 1fr 110px auto}
+@media(max-width:640px){.grow-edit{grid-template-columns:1fr auto}.grow-edit.g3{grid-template-columns:1fr 104px auto}.grow-edit>input:first-child{grid-column:1/-1}.grow-edit>[data-rm]{min-width:42px}}
+.gl{border:1px solid var(--line);border-radius:12px;padding:8px 10px;margin-bottom:8px;background:#fff;display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.gl.pend{background:#fff8e6;border-color:#ecd29a}.gl.rej{background:#fdf1ef;border-color:#f1c3bd}
+/* ===== الأتوبيس ===== */
+.busWrap{display:inline-block;max-width:100%;overflow-x:auto;padding:2px}
+.busFront{text-align:center;font-size:12px;color:var(--mut);margin-bottom:4px}
+.bus{direction:ltr;display:inline-grid;grid-template-columns:repeat(var(--cols),var(--cs));gap:6px;padding:14px 12px;border:3px solid #b9a98f;border-radius:28px 28px 14px 14px;background:#faf6ec;--cs:min(42px,calc((100vw - 110px) / var(--cols)))}
+.bus .c{width:var(--cs);height:var(--cs);border-radius:9px;font:inherit;font-size:12.5px;font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid transparent;padding:0;background:none;color:var(--txt);cursor:default}
+.bus .c.E{border:1.5px dashed transparent}
+.bus.edit .c.E{border-color:#d6c9ad}
+.bus .c.S{background:#e8f4ec;border-color:var(--ok);color:#16653a}
+.bus .c.S.free{cursor:pointer}
+.bus .c.taken{background:#e9e3d6!important;border-color:#cfc4ad!important;color:#9a8e78!important;cursor:not-allowed}
+.bus .c.mine2{background:#f1deb0!important;border-color:var(--gold-d)!important;color:#3c2412!important}
+.bus .c.mine{background:#c8a24a!important;border-color:var(--gold-d)!important;color:#3c2412!important}
+.bus .c.sel{outline:3px solid var(--brown);background:#f3e2b4!important}
+.bus .c.X{background:repeating-linear-gradient(45deg,#f4efe3,#f4efe3 4px,#e9e1cf 4px,#e9e1cf 8px);border-color:#cfc4ad;color:#9a8e78}
+.bus .c.D,.bus .c.R{font-size:10px;color:#5a4a38;font-weight:600;border-color:#d6c9ad;background:#f1e9d8}
+.bus.edit{touch-action:none;user-select:none}
+.bus.edit .c{cursor:pointer}
+.bus.adm .c.taken{cursor:pointer}
+.legend{display:flex;gap:12px;flex-wrap:wrap;font-size:12.5px;color:var(--mut);margin:8px 0}
+.legend i{display:inline-block;width:14px;height:14px;border-radius:4px;vertical-align:-2px;margin-left:4px;border:2px solid}
+.tools{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}
+.tools button{border:1.5px solid #e0d4bb;background:#fff;border-radius:10px;padding:5px 10px;font:inherit;font-size:13px;cursor:pointer}
+.tools button.on{border-color:var(--brown);background:var(--tint2);font-weight:700}
+/* ===== سجل التدقيق والمحذوفات (سوبر أدمن) ===== */
+.flt{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-bottom:10px}
+.flt input,.flt select{padding:8px 10px}
+.aud{border:1px solid var(--line);border-radius:14px;padding:10px 12px;margin-bottom:8px;background:#fff}
+.aud.danger{border-color:#f1c3bd;background:#fff8f6}
+.aud .top{display:flex;gap:6px 10px;flex-wrap:wrap;align-items:center;font-size:13px;color:var(--mut)}
+.aud h5{margin:4px 0;font-size:15px;color:var(--brown)}
+.aud .chg{margin-top:6px;font-size:13px;border-top:1px dashed var(--line);padding-top:6px}
+.aud .chg div{margin:2px 0;word-break:break-word}
+.aud .chg s{color:var(--bad)}
+.aud .chg ins{color:var(--ok);text-decoration:none;font-weight:600}
+.msgs div{margin:6px 0}
+/* ===== نوافذ ديناميكية ===== */
+.ov{position:fixed;inset:0;background:rgba(30,18,8,.58);z-index:65;display:flex;align-items:flex-start;justify-content:center;overflow:auto;padding:14px;backdrop-filter:blur(2px)}
+.mb{background:#fff;border-radius:18px;max-width:820px;width:100%;margin:auto;box-shadow:0 24px 70px rgba(0,0,0,.4)}
+.mb.nar{max-width:480px}
+.mb>header{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:1px solid var(--line);position:sticky;top:0;background:#fff;border-radius:18px 18px 0 0;z-index:2;text-align:right}
+.mb>header h3{margin:0;font-size:17px;color:var(--brown)}
+.mb .bd{padding:14px 16px}
+.mb .ft{padding:10px 16px;border-top:1px solid var(--line);display:flex;gap:8px;flex-wrap:wrap;position:sticky;bottom:0;background:#fff;border-radius:0 0 18px 18px}
+.xb{border:0;background:var(--tint2);border-radius:10px;width:34px;height:34px;font-size:20px;cursor:pointer;color:var(--brown)}
+.nimgs{display:flex;gap:8px;flex-wrap:wrap}
+.nimgs .ni{position:relative;width:96px;height:96px;border-radius:12px;overflow:hidden;background:var(--tint2);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--mut)}
+.nimgs .ni img{width:100%;height:100%;object-fit:cover}
+.nimgs .ni button{position:absolute;top:2px;left:2px;border:0;background:rgba(176,52,39,.94);color:#fff;border-radius:50%;width:22px;height:22px;cursor:pointer;font-size:14px;line-height:1}
+.nimgs .add{border:2px dashed #d6c7a6;background:#fff;cursor:pointer;font-size:26px;color:var(--brown)}
+/* ===== الفوتر ===== */
+.site-foot{max-width:1000px;margin:6px auto 0;padding:22px 16px 34px;text-align:center;color:var(--mut)}
+.site-foot .nano-logo{width:60px;height:60px;margin:0 auto 8px;border-width:3px}
+.site-foot .nano-logo .logo-fb{font-size:26px}
+.site-foot b{display:block;color:var(--brown);font-size:15px}
+.site-foot>span{display:block;font-size:13px;line-height:1.7;margin-top:2px;text-wrap:balance}
+@media(max-width:640px){
+  header.hero{padding:22px 12px 54px}.hero h1{font-size:22px}.hero .church{font-size:13.5px}.hero-logo{width:98px;height:98px}
+  nav#mainNav button{font-size:12.5px;padding:10px 2px}.panel{padding:16px}
+}
 </style>
 </head>
-<body>
+<body class="lock">
 
-<header>
-  <div class="cross">✝</div>
-  <h1>اجتماع شباب «اتبعني»</h1>
-  <p>كاتدرائية مارمينا والبابا كيرلس - العاشر من رمضان</p>
+<!-- ============ شاشة البداية: اللوجو بيتحمّل الأول ============ -->
+<div id="splash" role="status" aria-label="جاري التحميل">
+  <div class="sp-in">
+    <div class="sp-logo logo-box"><img data-logo alt="شعار الكنيسة"><span class="logo-fb">✝</span></div>
+    <div class="sp-title" data-brand="event">اجتماع شباب «اتبعني»</div>
+    <div class="sp-sub" data-brand="church">كاتدرائية الشهيد العظيم مارمينا والبابا كيرلس السادس - العاشر من رمضان</div>
+    <div class="sp-bar"><i></i></div>
+  </div>
+</div>
+
+<header class="hero">
+  <div class="hero-logo logo-box"><img data-logo alt="شعار الكنيسة"><span class="logo-fb">✝</span></div>
+  <h1 data-brand="event">اجتماع شباب «اتبعني»</h1>
+  <p class="church" data-brand="church">كاتدرائية الشهيد العظيم مارمينا والبابا كيرلس السادس - العاشر من رمضان</p>
+  <div class="orn"><i></i>✝<i></i></div>
 </header>
 
-<nav>
-  <button class="on" data-tab="register">التسجيل</button>
-  <button data-tab="status">استعلام عن حالة التسجيل</button>
-  <button data-tab="admin">الأدمن</button>
-</nav>
+<!-- أول تاب = دخول الأعضاء (هي الصفحة الأولى اللي بتفتح) -->
+<div class="navwrap">
+  <nav id="mainNav">
+    <button class="on" data-tab="member" id="navMember">دخول الأعضاء</button>
+    <button data-tab="register" id="navRegister">تسجيل جديد</button>
+    <button data-tab="status">استعلام</button>
+    <button data-tab="admin">الأدمن</button>
+  </nav>
+</div>
 
 <div id="sysBanner" hidden><div class="notice bad" id="sysMsg"></div></div>
 
 <main>
-<!-- ============ تبويب التسجيل ============ -->
-<section class="panel" id="tab-register">
+<!-- ============ الأعضاء (الصفحة الأولى) ============ -->
+<section class="panel" id="tab-member">
+  <div id="memLogin" class="narrow">
+    <div class="mini-logo logo-box"><img data-logo alt="شعار الكنيسة"><span class="logo-fb">✝</span></div>
+    <h3 style="color:var(--brown);text-align:center;margin-top:0">دخول الأعضاء</h3>
+    <p class="lead" style="text-align:center">اليوزر هو <b>كودك الخاص</b> (7 أرقام)، وكلمة المرور في أول مرة هي <b>رقم الواتساب</b> المسجّل.</p>
+    <form id="memForm" novalidate>
+      <div class="field"><label>الكود</label><input id="memCode" inputmode="numeric" enterkeyhint="next" maxlength="7" dir="ltr" autocomplete="username" placeholder="5XXXYYY"></div>
+      <div class="field"><label>كلمة المرور</label><input id="memPass" type="password" dir="ltr" autocomplete="current-password" enterkeyhint="go"></div>
+      <label class="chk"><input type="checkbox" id="memShow"> إظهار كلمة المرور</label>
+      <div class="formerr" id="memErr" hidden></div>
+      <button class="btn pri wide" id="memBtn" type="submit">دخول</button>
+    </form>
+    <small class="hint" style="margin-top:8px">نسيت كلمة المرور؟ اطلب من الإدارة ترجّعها لرقم الواتساب.</small>
+    <div class="reg-cta">
+      <b>لسه مش عضو؟</b>
+      <span>سجّل بياناتك الأول، وبعد ما الإدارة توافق عليك هيوصلك كودك وتقدر تدخل من هنا.</span>
+      <button class="btn gold wide" id="goRegister" type="button">📝 سجّل كعضو جديد</button>
+    </div>
+  </div>
+  <div id="memPortal" hidden>
+    <div class="who"><div class="wl"><div class="nano-logo logo-box"><img data-logo alt=""><span class="logo-fb">✝</span></div><div>أهلًا <b id="memName"></b> · الكود <b class="ltr" id="memCodeShow" style="display:inline-block"></b></div></div><button class="btn sm bad" id="memLogout">خروج</button></div>
+    <div class="notice warn" id="memPwWarn" style="margin-top:10px" hidden>كلمة مرورك الحالية هي رقم الواتساب. يفضّل تغييرها من <a href="#" id="memGoAcct">حسابي</a>.</div>
+    <!-- الترتيب: الأخبار، الرحلات، المؤتمرات، حسابي. الرحلات والمؤتمرات مخفية لحد ما الخادم يقول إن فيه حاجة منهم -->
+    <div class="subtabs" id="memTabs">
+      <button class="on" data-mt="news">📰 الأخبار</button>
+      <button data-mt="trips" id="mtTrips" hidden>🚌 الرحلات</button>
+      <button data-mt="conf" id="mtConf" hidden>🏨 المؤتمرات</button>
+      <button data-mt="acct">👤 حسابي</button>
+    </div>
+    <div id="memNews"></div>
+    <div id="memTrips" hidden></div>
+    <div id="memConf" hidden></div>
+    <div id="memAcct" hidden></div>
+  </div>
+</section>
+
+<!-- ============ التسجيل ============ -->
+<section class="panel" id="tab-register" hidden>
+  <div class="have-acct" id="haveAcct"><span>عندك كود وحساب بالفعل؟</span><button class="btn sm pri" id="goLogin" type="button">🔑 ادخل من هنا</button></div>
   <div id="closedBox" class="notice bad" hidden>التسجيل مغلق حاليًا.</div>
   <div id="doneBox" hidden>
     <div class="notice good"><b>تم استلام طلبك بنجاح ✔</b><br>سيتم مراجعة بياناتك، وبعد القبول سيصلك كودك الخاص.</div>
-    <p>للاطمئنان على طلبك استخدم تبويب <b>«استعلام عن حالة التسجيل»</b> بالرقم القومي.</p>
-    <button class="btn pri" id="newReg">تسجيل شخص آخر</button>
+    <p>للاطمئنان على طلبك استخدم تبويب <b>«استعلام»</b> بالرقم القومي.</p>
+    <div class="row"><button class="btn pri" id="newReg">تسجيل شخص آخر</button><button class="btn" id="doneLogin" type="button">🔑 العودة لتسجيل الدخول</button></div>
   </div>
   <div id="regWrap">
     <p class="lead">املأ البيانات التالية بدقة. الحقول التي بعلامة <b style="color:var(--bad)">*</b> إجبارية.</p>
@@ -126,7 +396,7 @@ canvas#cropCanvas{width:100%;max-width:320px;aspect-ratio:1;touch-action:none;bo
   </div>
 </section>
 
-<!-- ============ تبويب الاستعلام ============ -->
+<!-- ============ الاستعلام ============ -->
 <section class="panel" id="tab-status" hidden>
   <div id="stQuery">
     <p class="lead">أدخل <b>الرقم القومي</b> (14 رقمًا، أرقام إنجليزية فقط) لمعرفة حالة طلبك.</p>
@@ -140,20 +410,18 @@ canvas#cropCanvas{width:100%;max-width:320px;aspect-ratio:1;touch-action:none;bo
   </div>
   <div id="stEdit" hidden>
     <div class="notice bad" id="stReason"></div>
-    <h3 style="color:var(--navy)">عدّل بياناتك ثم أعد الإرسال</h3>
+    <h3 style="color:var(--brown)">عدّل بياناتك ثم أعد الإرسال</h3>
     <div id="resubForm"></div>
     <div class="formerr" id="resubErr" hidden></div>
-    <div class="row">
-      <button class="btn pri" id="resubBtn">إعادة الإرسال</button>
-      <button class="btn" id="resubCancel">رجوع</button>
-    </div>
+    <div class="row"><button class="btn pri" id="resubBtn">إعادة الإرسال</button><button class="btn" id="resubCancel">رجوع</button></div>
   </div>
 </section>
 
-<!-- ============ تبويب الأدمن ============ -->
+<!-- ============ الأدمن ============ -->
 <section class="panel" id="tab-admin" hidden>
-  <div id="admLogin" style="max-width:360px;margin:auto">
-    <h3 style="color:var(--navy);text-align:center">دخول الأدمن</h3>
+  <div id="admLogin" class="narrow">
+    <div class="mini-logo logo-box"><img data-logo alt="شعار الكنيسة"><span class="logo-fb">✝</span></div>
+    <h3 style="color:var(--brown);text-align:center;margin-top:0">دخول الأدمن</h3>
     <form id="admForm" novalidate>
       <div class="field"><label>اسم المستخدم</label><input id="admUser" data-t="user" dir="ltr" autocomplete="username" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="next"></div>
       <div class="field"><label>كلمة المرور</label><input id="admPass" type="password" dir="ltr" autocomplete="current-password" enterkeyhint="go"></div>
@@ -164,7 +432,7 @@ canvas#cropCanvas{width:100%;max-width:320px;aspect-ratio:1;touch-action:none;bo
 
   <div id="admDash" hidden>
     <div class="row" style="justify-content:space-between">
-      <div>مرحبًا <b id="admName"></b> <span class="badge s" id="admRole" hidden>سوبر أدمن</span></div>
+      <div class="row" style="gap:10px"><div class="nano-logo logo-box"><img data-logo alt=""><span class="logo-fb">✝</span></div><div>مرحبًا <b id="admName"></b> <span class="badge s" id="admRole" hidden>سوبر أدمن</span></div></div>
       <div class="row">
         <button class="btn sm pri" id="admAdmins" hidden>👥 إدارة الأدمنز</button>
         <button class="btn sm" id="admAccount">🔑 حسابي</button>
@@ -172,49 +440,61 @@ canvas#cropCanvas{width:100%;max-width:320px;aspect-ratio:1;touch-action:none;bo
         <button class="btn sm bad" id="admLogout">خروج</button>
       </div>
     </div>
-    <div class="stats">
-      <div class="stat"><b id="sTotal">0</b><span>إجمالي المسجلين</span></div>
-      <div class="stat"><b id="sPend">0</b><span>قيد المراجعة</span></div>
-      <div class="stat"><b id="sOk">0</b><span>مقبول</span></div>
-      <div class="stat"><b id="sNo">0</b><span>مرفوض</span></div>
+    <div class="subtabs" id="admTabs">
+      <button class="on" data-at="regs">📋 التسجيلات</button>
+      <button data-at="news" id="admTabNews">📰 الأخبار</button>
+      <button data-at="trips" id="admTabTrips">🚌 الرحلات</button>
+      <button data-at="conf" id="admTabConf" hidden>🏨 المؤتمرات</button>
+      <button data-at="audit" id="admTabAudit" hidden>🔍 سجل التدقيق</button>
+      <button data-at="trash" id="admTabTrash" hidden>🗑 المحذوفات <span class="badge n" id="trashBadge" hidden>0</span></button>
     </div>
-    <div class="row" style="margin-bottom:10px">
-      <input id="admSearch" data-t="text" placeholder="بحث بالاسم / الرقم القومي / الكود / الهاتف" style="flex:1;min-width:200px">
-      <select id="admFilter" style="width:auto">
-        <option value="">كل الحالات</option><option>قيد المراجعة</option><option>مقبول</option><option>مرفوض</option>
-      </select>
-      <button class="btn gold" id="admExport">تصدير Excel</button>
-      <button class="btn" id="admToggle">...</button>
-    </div>
-    <div class="tbl-wrap">
-      <table>
+    <div class="notice warn" id="trashNotice" hidden>🗑 فيه <b id="trashN">0</b> عنصر محذوف يمكن استرجاعه. <a href="#" id="trashGo">افتح سلة المحذوفات</a></div>
+    <div id="admRegs">
+      <div class="stats">
+        <div class="stat"><b id="sTotal">0</b><span>إجمالي المسجلين</span></div>
+        <div class="stat"><b id="sPend">0</b><span>قيد المراجعة</span></div>
+        <div class="stat"><b id="sOk">0</b><span>مقبول</span></div>
+        <div class="stat"><b id="sNo">0</b><span>مرفوض</span></div>
+      </div>
+      <div class="row" style="margin-bottom:10px">
+        <input id="admSearch" data-t="text" placeholder="بحث بالاسم / الرقم القومي / الكود / الهاتف" style="flex:1;min-width:200px">
+        <select id="admFilter" style="width:auto"><option value="">كل الحالات</option><option>قيد المراجعة</option><option>مقبول</option><option>مرفوض</option></select>
+        <button class="btn gold" id="admExport">تصدير Excel</button>
+        <button class="btn" id="admToggle">...</button>
+      </div>
+      <div class="tbl-wrap"><table>
         <thead><tr><th>#</th><th>الكود</th><th>الاسم</th><th>الرقم القومي</th><th>واتساب</th><th>الحالة</th><th>التاريخ</th><th>إجراءات</th></tr></thead>
         <tbody id="admBody"></tbody>
-      </table>
+      </table></div>
+      <p class="lead" id="admCount" style="margin-top:6px"></p>
     </div>
-    <p class="lead" id="admCount" style="margin-top:6px"></p>
+    <div id="admNews" hidden></div>
+    <div id="admTrips" hidden></div>
+    <div id="admConf" hidden></div>
+    <div id="admAudit" hidden></div>
+    <div id="admTrash" hidden></div>
   </div>
 </section>
 </main>
 
-<!-- ============ قالب النموذج (يُستخدم في التسجيل وإعادة الإرسال وتعديل الأدمن) ============ -->
+<footer class="site-foot">
+  <div class="nano-logo logo-box"><img data-logo alt="شعار الكنيسة"><span class="logo-fb">✝</span></div>
+  <b data-brand="event">اجتماع شباب «اتبعني»</b>
+  <span data-brand="church">كاتدرائية الشهيد العظيم مارمينا والبابا كيرلس السادس - العاشر من رمضان</span>
+</footer>
+
+<!-- ============ قالب النموذج ============ -->
 <template id="tplForm">
   <div class="sec">
     <h3>البيانات الشخصية</h3>
-    <div class="field"><label>الاسم رباعي <b>*</b></label>
-      <input data-f="fullName" data-t="name" autocomplete="name" placeholder="الاسم الأول والثاني والثالث والرابع"></div>
+    <div class="field"><label>الاسم رباعي <b>*</b></label><input data-f="fullName" data-t="name" autocomplete="name" placeholder="الاسم الأول والثاني والثالث والرابع"></div>
     <div class="grid2">
-      <div class="field"><label>النوع <b>*</b></label>
-        <select data-f="gender"><option value="">اختر</option><option>ذكر</option><option>أنثى</option></select></div>
-      <div class="field"><label>الرقم القومي (14 رقم) <b>*</b></label>
-        <input data-f="nid" data-t="digits" inputmode="numeric" maxlength="14" dir="ltr" autocomplete="off"><small class="hint" data-hint="nid"></small></div>
+      <div class="field"><label>النوع <b>*</b></label><select data-f="gender"><option value="">اختر</option><option>ذكر</option><option>أنثى</option></select></div>
+      <div class="field"><label>الرقم القومي (14 رقم) <b>*</b></label><input data-f="nid" data-t="digits" inputmode="numeric" maxlength="14" dir="ltr" autocomplete="off"><small class="hint" data-hint="nid"></small></div>
     </div>
     <div class="grid2">
-      <div class="field"><label>تاريخ الميلاد <b>*</b></label>
-        <input type="date" data-f="birthDate" dir="ltr" min="1900-01-01" autocomplete="bday">
-        <small class="hint">اكتب تاريخ ميلادك الفعلي (حتى لو مختلف عن المكتوب في الرقم القومي).</small></div>
-      <div class="field"><label>الحالة الاجتماعية <b>*</b></label>
-        <select data-f="maritalStatus" data-list="marital"></select></div>
+      <div class="field"><label>تاريخ الميلاد <b>*</b></label><input type="date" data-f="birthDate" dir="ltr" min="1900-01-01" autocomplete="bday"><small class="hint">اكتب تاريخ ميلادك الفعلي (حتى لو مختلف عن المكتوب في الرقم القومي).</small></div>
+      <div class="field"><label>الحالة الاجتماعية <b>*</b></label><select data-f="maritalStatus" data-list="marital"></select></div>
     </div>
     <div class="grid2">
       <div class="field"><label>رقم الواتساب (11 رقم) <b>*</b></label><input data-f="whatsapp" data-t="digits" inputmode="numeric" maxlength="11" dir="ltr" placeholder="01XXXXXXXXX"></div>
@@ -225,12 +505,9 @@ canvas#cropCanvas{width:100%;max-width:320px;aspect-ratio:1;touch-action:none;bo
       <div class="field"><label>أب الاعتراف <b>*</b></label><input data-f="father" data-t="name"></div>
     </div>
   </div>
-
   <div class="sec">
     <h3>المهنة</h3>
-    <div class="field"><label>المهنة <b>*</b></label>
-      <select data-f="occupation"><option value="">اختر</option><option>طالب</option><option>موظف</option><option>أخرى</option></select></div>
-
+    <div class="field"><label>المهنة <b>*</b></label><select data-f="occupation"><option value="">اختر</option><option>طالب</option><option>موظف</option><option>أخرى</option></select></div>
     <div data-group="student" hidden>
       <div class="grid2">
         <div class="field"><label>المرحلة <b>*</b></label><select data-f="studyStage" data-list="stages"></select></div>
@@ -241,7 +518,6 @@ canvas#cropCanvas{width:100%;max-width:320px;aspect-ratio:1;touch-action:none;bo
         <div class="field"><label>الكلية / القسم <b data-facreq>*</b></label><input data-f="faculty" data-t="text"></div>
       </div>
     </div>
-
     <div data-group="employee" hidden>
       <div class="grid2">
         <div class="field"><label>القطاع <b>*</b></label><select data-f="workSector" data-list="sectors"></select></div>
@@ -249,13 +525,25 @@ canvas#cropCanvas{width:100%;max-width:320px;aspect-ratio:1;touch-action:none;bo
       </div>
       <div class="field"><label>جهة العمل <b data-wpreq>*</b></label><input data-f="workPlace" data-t="text"></div>
     </div>
-
     <div data-group="other" hidden>
       <div class="field"><label>الحالة <b>*</b></label><select data-f="otherStatus" data-list="otherStatus"></select></div>
       <div class="field" data-group="otherText" hidden><label>اكتب التفاصيل <b>*</b></label><input data-f="otherText" data-t="text"></div>
     </div>
+    <!-- لغير الطالب: بيانات آخر مرحلة دراسية -->
+    <div data-group="edu" hidden>
+      <div class="edu-box">
+        <h4>🎓 آخر مرحلة دراسية حصلت عليها</h4>
+        <div class="grid2">
+          <div class="field"><label>آخر مؤهل دراسي <b>*</b></label><select data-f="lastEduStage" data-list="lastStages"></select></div>
+          <div class="field"><label>سنة التخرج (أو آخر سنة دراسية) <b>*</b></label><input data-f="lastEduGradYear" data-t="digits" inputmode="numeric" maxlength="4" dir="ltr" placeholder="مثال: 2019" autocomplete="off"></div>
+        </div>
+        <div class="grid2">
+          <div class="field"><label>جهة الدراسة (المدرسة / الجامعة / المعهد) <b>*</b></label><input data-f="lastEduPlace" data-t="text"></div>
+          <div class="field"><label>الكلية / القسم <b data-edufacreq>*</b></label><input data-f="lastEduFaculty" data-t="text"></div>
+        </div>
+      </div>
+    </div>
   </div>
-
   <div class="sec">
     <h3>العنوان</h3>
     <div class="grid2">
@@ -272,35 +560,26 @@ canvas#cropCanvas{width:100%;max-width:320px;aspect-ratio:1;touch-action:none;bo
     </div>
     <div class="field"><label>تفاصيل أخرى للعنوان</label><textarea data-f="addressDetails" data-t="long" rows="2" placeholder="علامة مميزة، دور، ..."></textarea></div>
   </div>
-
   <div class="sec" data-group="photos">
     <h3>الصور</h3>
     <p class="lead" data-photonote style="margin:0 0 6px"></p>
     <div class="photo-title">الصورة الشخصية (تُقص مربعة) <b style="color:var(--bad)" data-photostar>*</b></div>
     <div class="photo" data-photo="profile">
       <div class="prev"><span>لا توجد صورة</span></div>
-      <div class="btns">
-        <button type="button" class="btn sm" data-cam>📷 التقاط صورة</button>
-        <button type="button" class="btn sm" data-gal>🖼️ من المعرض</button>
-      </div>
-      <input type="file" accept="image/*" capture="user" hidden data-in-cam>
-      <input type="file" accept="image/*" hidden data-in-gal>
+      <div class="btns"><button type="button" class="btn sm" data-cam>📷 التقاط صورة</button><button type="button" class="btn sm" data-gal>🖼️ من المعرض</button></div>
+      <input type="file" accept="image/*" capture="user" hidden data-in-cam><input type="file" accept="image/*" hidden data-in-gal>
     </div>
     <div class="photo-title" style="margin-top:12px">صورة بطاقة الرقم القومي (الوجه) <b style="color:var(--bad)" data-photostar>*</b></div>
     <div class="photo idc" data-photo="idCard">
       <div class="prev"><span>لا توجد صورة</span></div>
-      <div class="btns">
-        <button type="button" class="btn sm" data-cam>📷 التقاط صورة</button>
-        <button type="button" class="btn sm" data-gal>🖼️ من المعرض</button>
-      </div>
-      <input type="file" accept="image/*" capture="environment" hidden data-in-cam>
-      <input type="file" accept="image/*" hidden data-in-gal>
+      <div class="btns"><button type="button" class="btn sm" data-cam>📷 التقاط صورة</button><button type="button" class="btn sm" data-gal>🖼️ من المعرض</button></div>
+      <input type="file" accept="image/*" capture="environment" hidden data-in-cam><input type="file" accept="image/*" hidden data-in-gal>
     </div>
     <small class="hint">صورة البطاقة سرية ولا يراها إلا الأدمن.</small>
   </div>
 </template>
 
-<!-- ============ نوافذ ============ -->
+<!-- ============ نوافذ ثابتة ============ -->
 <div class="modal" id="cropModal" hidden>
   <div class="box sm">
     <h3 class="mt">اضبط الصورة الشخصية</h3>
@@ -313,22 +592,19 @@ canvas#cropCanvas{width:100%;max-width:320px;aspect-ratio:1;touch-action:none;bo
 
 <div class="modal" id="detailModal" hidden>
   <div class="box">
-    <div class="row" style="justify-content:space-between">
-      <h3 class="mt" id="dName"></h3>
-      <button class="btn sm" id="dClose">إغلاق ✕</button>
-    </div>
+    <div class="row" style="justify-content:space-between"><h3 class="mt" id="dName"></h3><button class="btn sm" id="dClose">إغلاق ✕</button></div>
     <div class="row" id="dHead" style="margin-bottom:8px"></div>
     <div class="adm-photos">
-      <figure><div class="im" id="dImgP"><span class="spin"></span></div><figcaption>الصورة الشخصية</figcaption></figure>
-      <figure><div class="im" id="dImgI"><span class="spin"></span></div><figcaption>صورة البطاقة (اضغط للتكبير)</figcaption></figure>
+      <figure><div class="im" id="dImgP"><span class="spin"></span></div><figcaption>الصورة الشخصية <button class="btn sm" id="dChgP" type="button">🖼️ تغيير</button></figcaption></figure>
+      <figure><div class="im" id="dImgI"><span class="spin"></span></div><figcaption>صورة البطاقة <button class="btn sm" id="dChgI" type="button">🖼️ تغيير</button></figcaption></figure>
     </div>
+    <input type="file" accept="image/*" hidden id="dFileP"><input type="file" accept="image/*" hidden id="dFileI">
     <div id="dForm"></div>
     <div class="formerr" id="dErr" hidden></div>
     <div class="row" id="dActions"></div>
   </div>
 </div>
 
-<!-- حسابي: تغيير كلمة مرور الأدمن الحالي -->
 <div class="modal" id="acctModal" hidden style="z-index:60">
   <div class="box sm">
     <h3 class="mt">🔑 حسابي</h3>
@@ -344,25 +620,17 @@ canvas#cropCanvas{width:100%;max-width:320px;aspect-ratio:1;touch-action:none;bo
   </div>
 </div>
 
-<!-- إدارة الأدمنز: للسوبر أدمن فقط -->
 <div class="modal" id="adminsModal" hidden style="z-index:60">
   <div class="box">
-    <div class="row" style="justify-content:space-between">
-      <h3 class="mt">👥 إدارة الأدمنز</h3>
-      <button class="btn sm" id="adminsClose">إغلاق ✕</button>
-    </div>
-    <div class="tbl-wrap" style="max-height:38vh">
-      <table class="tblA">
-        <thead><tr><th>الحساب</th><th>أضافه / التاريخ</th><th>إجراءات</th></tr></thead>
-        <tbody id="admsBody"></tbody>
-      </table>
-    </div>
-    <h4 style="margin:16px 0 8px;color:var(--navy)">إضافة أدمن جديد</h4>
+    <div class="row" style="justify-content:space-between"><h3 class="mt">👥 إدارة الأدمنز</h3><button class="btn sm" id="adminsClose">إغلاق ✕</button></div>
+    <div class="tbl-wrap" style="max-height:38vh"><table class="tblA">
+      <thead><tr><th>الحساب</th><th>أضافه / التاريخ</th><th>إجراءات</th></tr></thead><tbody id="admsBody"></tbody>
+    </table></div>
+    <h4 style="margin:16px 0 8px;color:var(--brown)">إضافة أدمن جديد</h4>
     <form id="newAdmForm" novalidate autocomplete="off">
       <div class="grid2">
         <div class="field"><label>اسم المستخدم (إنجليزي)</label><input id="naUser" data-t="user" dir="ltr" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="مثال: mina.s"></div>
-        <div class="field"><label>كلمة المرور (8 أحرف على الأقل)</label>
-          <div class="row" style="flex-wrap:nowrap"><input id="naPass" type="password" dir="ltr" autocomplete="new-password"><button class="btn sm" type="button" id="naGen">🎲 توليد</button></div></div>
+        <div class="field"><label>كلمة المرور (8 أحرف على الأقل)</label><div class="row" style="flex-wrap:nowrap"><input id="naPass" type="password" dir="ltr" autocomplete="new-password"><button class="btn sm" type="button" id="naGen">🎲 توليد</button></div></div>
       </div>
       <label class="chk"><input type="checkbox" id="naShow"> إظهار كلمة المرور</label>
       <div class="formerr" id="naErr" hidden></div>
@@ -377,7 +645,7 @@ canvas#cropCanvas{width:100%;max-width:320px;aspect-ratio:1;touch-action:none;bo
     <h3 class="mt" id="askTitle"></h3>
     <p id="askMsg"></p>
     <textarea id="askInput" data-t="long" rows="3" hidden placeholder="اكتب السبب..."></textarea>
-    <input id="askLine" type="text" dir="ltr" autocomplete="off" autocapitalize="off" spellcheck="false" hidden>
+    <input id="askLine" type="text" dir="auto" autocomplete="off" autocapitalize="off" spellcheck="false" hidden>
     <div class="row" style="margin-top:10px"><button class="btn pri" id="askOk">تأكيد</button><button class="btn" id="askCancel">إلغاء</button></div>
   </div>
 </div>
@@ -388,8 +656,45 @@ canvas#cropCanvas{width:100%;max-width:320px;aspect-ratio:1;touch-action:none;bo
 <script>
 // رابط الـ Web App يُقرأ من ملف config.js (لا تعدّل هنا)
 const API_URL = (window.APP_CONFIG && window.APP_CONFIG.API_URL) || '';
-// لازم يطابق APP_VERSION في Code.gs. لو مختلف يظهر تنبيه "الخادم قديم" فوق الصفحة.
-const EXPECTED_VERSION = '2026-10-20-super-v4';
+// لازم يطابق APP_VERSION في Code.gs، وPORTAL_VER في portal.js، وCONF_VER في conferences.js، ورقم ?v= في أول index.html.
+const EXPECTED_VERSION = '2026-10-26-poster-v9';
+
+/* =========================================================
+   الاسم المعتمد (مكان واحد): أي مكان في الموقع فيه اسم الكنيسة أو الاجتماع بيقرأ من هنا
+   ========================================================= */
+const EVENT_NAME = 'اجتماع شباب «اتبعني»';
+const CHURCH_NAME = 'كاتدرائية الشهيد العظيم مارمينا والبابا كيرلس السادس - العاشر من رمضان';
+(function brand() {
+  document.title = EVENT_NAME + ' - ' + CHURCH_NAME;
+  document.querySelectorAll('[data-brand="event"]').forEach(e => { e.textContent = EVENT_NAME; });
+  document.querySelectorAll('[data-brand="church"]').forEach(e => { e.textContent = CHURCH_NAME; });
+  const c = (window.APP_CONFIG && window.APP_CONFIG.COLORS) || {};          // اختياري: ألوان الموقع من config.js
+  const map = { brown: '--brown', brown2: '--brown2', gold: '--gold', goldDark: '--gold-d', gold2: '--gold2' };
+  Object.keys(map).forEach(k => { if (c[k]) document.documentElement.style.setProperty(map[k], c[k]); });
+  if (window.LOGO && window.LOGO.apply) window.LOGO.apply();
+})();
+
+/* =========================================================
+   شاشة البداية: الشعار بيتحمّل الأول، وبعدها الموقع بيظهر (بعد تحميل الصفحة وأول رد من الخادم)
+   ========================================================= */
+(function splash() {
+  const sp = document.getElementById('splash'); if (!sp) { document.body.classList.remove('lock'); return; }
+  const L = window.LOGO || { settled: true };
+  let done = false;
+  window.__siteReady = new Promise(res => { window.__siteReadyRes = res; });
+  const hide = () => {
+    if (done) return; done = true;
+    sp.classList.add('hide'); document.body.classList.remove('lock');
+    setTimeout(() => sp.remove(), 900);
+  };
+  const logoP = new Promise(res => { if (L.settled) res(); else window.addEventListener('logosettled', res, { once: true }); });
+  const loadP = new Promise(res => { if (document.readyState === 'complete') res(); else window.addEventListener('load', res, { once: true }); });
+  Promise.all([logoP, loadP]).then(() => {
+    // الشعار بيفضل ظاهر ~ثانية بعد ما يتحمّل (عشان يتشاف)، وبعدها بنستنى أول رد من الخادم (بحد أقصى 2.5 ثانية)
+    setTimeout(() => Promise.race([window.__siteReady, new Promise(r => setTimeout(r, 2500))]).then(hide), 950);
+  });
+  setTimeout(hide, 6500);                                                          // حد أقصى: الموقع بيفتح حتى لو حاجة اتعطلت
+})();
 
 const LISTS = {
   stages: {
@@ -398,31 +703,29 @@ const LISTS = {
     'معهد': ['الأولى', 'الثانية', 'الثالثة', 'الرابعة', 'الخامسة'],
     'دراسات عليا': ['دبلومة', 'تمهيدي ماجستير', 'ماجستير', 'تمهيدي دكتوراه', 'دكتوراه']
   },
+  lastStages: ['مؤهل متوسط / ثانوية', 'فني أو دبلوم', 'جامعي', 'معهد', 'دراسات عليا'],
   sectors: ['حكومي', 'خاص', 'أعمال حرة'],
   otherStatus: ['خريج بدون عمل', 'لا يعمل', 'أخرى'],
   housing: ['اسكان اجتماعي', 'ابني بيتك', 'كومباوند'],
-  // [القيمة المحفوظة, النص الظاهر]  - القيمة المحفوظة ثابتة، والنص الظاهر يناسب الذكر والأنثى
   marital: [['أعزب', 'أعزب / عزباء'], ['خطوبة', 'خطوبة'], ['متزوج', 'متزوج / متزوجة']],
   districts: ['الحي ال16', 'الحي ال15', 'الحي ال12', 'الحي ال11', 'مجاورة 59', 'مجاورة 60', 'حي الاندلس', 'أخرى']
 };
+const EDU_NO_FACULTY = ['مؤهل متوسط / ثانوية', 'فني أو دبلوم'];     // المؤهلات اللي الكلية / القسم فيها اختياري
 const GOV = ['01','02','03','04','11','12','13','14','15','16','17','18','19','21','22','23','24','25','26','27','28','29','31','32','33','34','35','88'];
-const FORM_KEYS = ['fullName','gender','nid','birthDate','maritalStatus','whatsapp','phone','phone2','father','occupation','studyStage','studyYear','studyPlace','faculty','workSector','jobTitle','workPlace','otherStatus','otherText','housingType','compound','district','districtOther','building','apartment','addressDetails'];
-const EXPORT_COLS = [['code','الكود'],['status','الحالة'],['fullName','الاسم'],['gender','النوع'],['nid','الرقم القومي'],['birthDate','تاريخ الميلاد'],['maritalStatus','الحالة الاجتماعية'],['whatsapp','واتساب'],['phone','الهاتف'],['phone2','هاتف آخر'],['father','أب الاعتراف'],['occupation','المهنة'],['studyStage','المرحلة'],['studyYear','السنة الدراسية'],['studyPlace','جهة الدراسة'],['faculty','الكلية / القسم'],['workSector','قطاع العمل'],['jobTitle','المسمى الوظيفي'],['workPlace','جهة العمل'],['otherStatus','حالة (أخرى)'],['otherText','تفاصيل (أخرى)'],['housingType','نوع السكن'],['compound','الكومباوند'],['district','الحي / المجاورة'],['districtOther','حي آخر'],['building','العمارة'],['apartment','الشقة'],['addressDetails','تفاصيل العنوان'],['rejectReason','سبب الرفض'],['createdAt','تاريخ التسجيل'],['reviewedBy','راجعه'],['reviewedAt','تاريخ المراجعة']];
+const FORM_KEYS = ['fullName','gender','nid','birthDate','maritalStatus','whatsapp','phone','phone2','father','occupation','studyStage','studyYear','studyPlace','faculty','workSector','jobTitle','workPlace','otherStatus','otherText','housingType','compound','district','districtOther','building','apartment','addressDetails','lastEduStage','lastEduGradYear','lastEduPlace','lastEduFaculty'];
+const EXPORT_COLS = [['code','الكود'],['status','الحالة'],['fullName','الاسم'],['gender','النوع'],['nid','الرقم القومي'],['birthDate','تاريخ الميلاد'],['maritalStatus','الحالة الاجتماعية'],['whatsapp','واتساب'],['phone','الهاتف'],['phone2','هاتف آخر'],['father','أب الاعتراف'],['occupation','المهنة'],['studyStage','المرحلة'],['studyYear','السنة الدراسية'],['studyPlace','جهة الدراسة'],['faculty','الكلية / القسم'],['workSector','قطاع العمل'],['jobTitle','المسمى الوظيفي'],['workPlace','جهة العمل'],['otherStatus','حالة (أخرى)'],['otherText','تفاصيل (أخرى)'],['lastEduStage','آخر مؤهل دراسي'],['lastEduGradYear','سنة التخرج'],['lastEduPlace','جهة الدراسة (آخر مؤهل)'],['lastEduFaculty','الكلية / القسم (آخر مؤهل)'],['housingType','نوع السكن'],['compound','الكومباوند'],['district','الحي / المجاورة'],['districtOther','حي آخر'],['building','العمارة'],['apartment','الشقة'],['addressDetails','تفاصيل العنوان'],['rejectReason','سبب الرفض'],['createdAt','تاريخ التسجيل'],['reviewedBy','راجعه'],['reviewedAt','تاريخ المراجعة']];
 const PW_MIN = 8;
 
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const digits = s => String(s ?? '').replace(/[^0-9]/g, '');   // أرقام إنجليزية 0-9 فقط
-// يحوّل الأرقام العربية (٠-٩) والفارسية (۰-۹) لأرقام إنجليزية
+const digits = s => String(s ?? '').replace(/[^0-9]/g, '');
 const toEn = s => String(s ?? '').replace(/[\u0660-\u0669]/g, c => c.charCodeAt(0) - 0x0660).replace(/[\u06F0-\u06F9]/g, c => c.charCodeAt(0) - 0x06F0);
 
-/* ---------- قواعد الإدخال حسب نوع كل حقل (data-t) ---------- */
-// الحروف المسموحة: عربي (بالتشكيل) + إنجليزي.
-// conv: true  => الأرقام العربية بتتحوّل لإنجليزي بدل ما تتمسح (رقم العمارة/الشقة وتفاصيل العنوان فقط).
+/* ---------- قواعد الإدخال لكل نوع حقل (data-t) ---------- */
 const LETTERS = 'a-zA-Z\u0621-\u063A\u0641-\u064A\u0670\u0671\u064B-\u0652';
 const RULES = {
-  digits: { re: /[^0-9]/g, msg: 'أرقام إنجليزية (0-9) فقط' },
+  digits: { re: /[^0-9]/g, conv: true, msg: 'أرقام فقط' },
   num:    { re: /[^0-9]/g, conv: true, msg: 'أرقام فقط' },
   name:   { re: new RegExp('[^' + LETTERS + ' ]', 'g'), msg: 'حروف فقط (بدون أرقام أو رموز)' },
   text:   { re: new RegExp('[^' + LETTERS + '0-9 .,\u060C\\-\'/&()]', 'g'), msg: 'حروف وأرقام إنجليزية فقط' },
@@ -440,10 +743,9 @@ function sanitizeInput(el) {
   el.value = nv;
   if (pos != null) {
     const pre = rule.conv ? toEn(v.slice(0, pos)) : v.slice(0, pos);
-    const np = pre.replace(rule.re, '').length;
-    try { el.setSelectionRange(np, np); } catch (e) {}
+    try { el.setSelectionRange(pre.replace(rule.re, '').length, pre.replace(rule.re, '').length); } catch (e) {}
   }
-  if (nv.length !== conv.length) {                     // اتمسح حرف (التحويل لوحده ما بيظهرش رسالة)
+  if (nv.length !== conv.length) {
     const now = Date.now();
     if (now - tipT > 1500) {
       tipT = now;
@@ -453,7 +755,6 @@ function sanitizeInput(el) {
     }
   }
 }
-// capture على document: يعمل قبل باقي المعالجات ويشمل الكتابة واللصق
 document.addEventListener('input', e => { const el = e.target; if (el && el.dataset && el.dataset.t && !e.isComposing) sanitizeInput(el); }, true);
 document.addEventListener('compositionend', e => { const el = e.target; if (el && el.dataset && el.dataset.t) sanitizeInput(el); }, true);
 
@@ -467,8 +768,7 @@ function showErr(id, msg) { const e = $(id); e.textContent = msg || ''; e.hidden
 /* ---------------- الاتصال بالخادم ---------------- */
 async function api(action, payload, timeoutMs) {
   if (!API_URL || API_URL.indexOf('PASTE_') === 0) return { ok: false, error: 'لم يتم ضبط رابط الخادم داخل ملف config.js.' };
-  const ctrl = new AbortController();
-  const t = setTimeout(() => ctrl.abort(), timeoutMs || 45000);
+  const ctrl = new AbortController(), t = setTimeout(() => ctrl.abort(), timeoutMs || 45000);
   try {
     // بدون headers مخصصة لتجنب preflight مع Apps Script
     const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action, ...(payload || {}) }), signal: ctrl.signal });
@@ -478,34 +778,34 @@ async function api(action, payload, timeoutMs) {
   } finally { clearTimeout(t); }
 }
 
-/* ---------------- التبويبات ---------------- */
-$$('nav button').forEach(b => b.onclick = () => {
-  $$('nav button').forEach(x => x.classList.toggle('on', x === b));
-  ['register', 'status', 'admin'].forEach(k => $('#tab-' + k).hidden = (k !== b.dataset.tab));
+/* ---------------- التابات الرئيسية (الأولى = دخول الأعضاء) ---------------- */
+const MAIN_TABS = ['member', 'register', 'status', 'admin'];
+$$('#mainNav button').forEach(b => b.onclick = () => {
+  $$('#mainNav button').forEach(x => x.classList.toggle('on', x === b));
+  MAIN_TABS.forEach(k => $('#tab-' + k).hidden = (k !== b.dataset.tab));
+  if (typeof portalOnTab === 'function') portalOnTab(b.dataset.tab);
+  window.scrollTo({ top: 0 });
 });
+function gotoTab(name) { const b = $(`#mainNav [data-tab="${name}"]`); if (b) b.click(); }
+// «لسه مش عضو؟ سجّل» ← صفحة التسجيل، و«عندي حساب» ← صفحة الدخول
+$('#goRegister').onclick = () => gotoTab('register');
+$('#goLogin').onclick = () => gotoTab('member');
+$('#doneLogin').onclick = () => gotoTab('member');
 
 /* =========================================================
-   QR Code (إصدار 1 - تصحيح M - يكفي حتى 14 حرفًا) - مدمج بدون مكتبات خارجية
+   QR Code (إصدار 1 - تصحيح M - يكفي حتى 14 حرفًا) - مدمج بدون مكتبات
    ========================================================= */
 const QR = (function () {
   const SIZE = 21, DATA_CW = 16, EC_CW = 10;
   const MASKS = [
-    (x, y) => (x + y) % 2 === 0,
-    (x, y) => y % 2 === 0,
-    (x, y) => x % 3 === 0,
-    (x, y) => (x + y) % 3 === 0,
-    (x, y) => (Math.floor(x / 3) + Math.floor(y / 2)) % 2 === 0,
-    (x, y) => (x * y) % 2 + (x * y) % 3 === 0,
-    (x, y) => ((x * y) % 2 + (x * y) % 3) % 2 === 0,
-    (x, y) => ((x + y) % 2 + (x * y) % 3) % 2 === 0
+    (x, y) => (x + y) % 2 === 0, (x, y) => y % 2 === 0, (x, y) => x % 3 === 0, (x, y) => (x + y) % 3 === 0,
+    (x, y) => (Math.floor(x / 3) + Math.floor(y / 2)) % 2 === 0, (x, y) => (x * y) % 2 + (x * y) % 3 === 0,
+    (x, y) => ((x * y) % 2 + (x * y) % 3) % 2 === 0, (x, y) => ((x + y) % 2 + (x * y) % 3) % 2 === 0
   ];
   function mul(x, y) { let z = 0; for (let i = 7; i >= 0; i--) { z = (z << 1) ^ ((z >>> 7) * 0x11D); z ^= ((y >>> i) & 1) * x; } return z; }
   function divisor(deg) {
     const r = new Array(deg).fill(0); r[deg - 1] = 1; let root = 1;
-    for (let i = 0; i < deg; i++) {
-      for (let j = 0; j < r.length; j++) { r[j] = mul(r[j], root); if (j + 1 < r.length) r[j] ^= r[j + 1]; }
-      root = mul(root, 2);
-    }
+    for (let i = 0; i < deg; i++) { for (let j = 0; j < r.length; j++) { r[j] = mul(r[j], root); if (j + 1 < r.length) r[j] ^= r[j + 1]; } root = mul(root, 2); }
     return r;
   }
   function remainder(data, div) {
@@ -524,7 +824,7 @@ const QR = (function () {
         if (x >= 0 && x < SIZE && y >= 0 && y < SIZE) set(x, y, d !== 2 && d !== 4);
       }
     });
-    const fd = mask; let rem = fd;                           // مستوى التصحيح M = 00
+    const fd = mask; let rem = fd;
     for (let i = 0; i < 10; i++) rem = (rem << 1) ^ ((rem >>> 9) * 0x537);
     const bits = ((fd << 10) | rem) ^ 0x5412, gb = i => ((bits >>> i) & 1) !== 0;
     for (let i = 0; i <= 5; i++) set(8, i, gb(i));
@@ -552,9 +852,7 @@ const QR = (function () {
       (s.match(/0+|1+/g) || []).forEach(r => { if (r.length >= 5) p += 3 + r.length - 5; });
       ['10111010000', '00001011101'].forEach(pat => { let k = -1; while ((k = s.indexOf(pat, k + 1)) >= 0) p += 40; });
     });
-    for (let y = 0; y < SIZE - 1; y++) for (let x = 0; x < SIZE - 1; x++) {
-      const c = m[y][x]; if (c === m[y][x + 1] && c === m[y + 1][x] && c === m[y + 1][x + 1]) p += 3;
-    }
+    for (let y = 0; y < SIZE - 1; y++) for (let x = 0; x < SIZE - 1; x++) { const c = m[y][x]; if (c === m[y][x + 1] && c === m[y + 1][x] && c === m[y + 1][x + 1]) p += 3; }
     let dark = 0; m.forEach(r => r.forEach(b => { if (b) dark++; }));
     p += Math.max(0, Math.ceil(Math.abs(dark * 20 - SIZE * SIZE * 10) / (SIZE * SIZE)) - 1) * 10;
     return p;
@@ -578,12 +876,14 @@ const QR = (function () {
 })();
 
 /* =========================================================
-   كارت الـ ID (مقاس CR80: 85.6×54 مم بدقة 300 dpi = 1011×638 بكسل)
+   كارت الـ ID (CR80: 85.6×54 مم بدقة 300 dpi = 1011×638 بكسل)
+   ألوانه من الشعار: بني #3c2412 · كريمي #f4ecdc · ذهبي #c38622
    ========================================================= */
 const CARD_W = 1011, CARD_H = 638;
-const CARD_TITLE = 'اجتماع شباب «اتبعني»';
-const CARD_SUB = 'كاتدرائية مارمينا والبابا كيرلس - العاشر من رمضان';
+const CARD_TITLE = EVENT_NAME;
+const CARD_SUB = CHURCH_NAME;
 const CARD_FONT = "'Cairo', Tahoma, Arial, sans-serif";
+const CC = { brown: '#3c2412', brown2: '#6b4426', gold: '#c38622', goldL: '#e6c37a', cream: '#fbf5e8', tint: '#f4ecdc', muted: '#766553' };
 
 function rrect(g, x, y, w, h, r) {
   g.beginPath(); g.moveTo(x + r, y);
@@ -591,116 +891,127 @@ function rrect(g, x, y, w, h, r) {
   g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath();
 }
 function crossShape(g, cx, cy, s) {
-  g.fillStyle = '#c8a24a';
+  g.fillStyle = CC.goldL;
   rrect(g, cx - s * 0.14, cy - s * 0.5, s * 0.28, s, s * 0.05); g.fill();
   rrect(g, cx - s * 0.38, cy - s * 0.22, s * 0.76, s * 0.26, s * 0.05); g.fill();
 }
 function nameLines(g, name, maxW) {
-  for (let s = 42; s >= 28; s -= 2) {
-    g.font = `700 ${s}px ${CARD_FONT}`;
-    if (g.measureText(name).width <= maxW) return { size: s, lines: [name] };
-  }
+  for (let s = 42; s >= 28; s -= 2) { g.font = `700 ${s}px ${CARD_FONT}`; if (g.measureText(name).width <= maxW) return { size: s, lines: [name] }; }
   const size = 28; g.font = `700 ${size}px ${CARD_FONT}`;
   const lines = []; let cur = '';
-  name.split(' ').forEach(w => {
-    const t = cur ? cur + ' ' + w : w;
-    if (!cur || g.measureText(t).width <= maxW) cur = t; else { lines.push(cur); cur = w; }
-  });
+  name.split(' ').forEach(w => { const t = cur ? cur + ' ' + w : w; if (!cur || g.measureText(t).width <= maxW) cur = t; else { lines.push(cur); cur = w; } });
   if (cur) lines.push(cur);
   return { size, lines: lines.slice(0, 3) };
 }
+function fitFont(g, text, weight, start, min, maxW) {
+  for (let s = start; s >= min; s -= 1) { g.font = `${weight} ${s}px ${CARD_FONT}`; if (g.measureText(text).width <= maxW) return s; }
+  return min;
+}
 
-// d = { name, code, photo (Image أو null) }
 function drawCard(g, d) {
-  const W = CARD_W, H = CARD_H, NAVY = '#1f3a5f', GOLD = '#c8a24a';
-  g.save();
-  g.clearRect(0, 0, W, H);
+  const W = CARD_W, H = CARD_H;
+  g.save(); g.clearRect(0, 0, W, H);
   rrect(g, 0, 0, W, H, 34); g.clip();
-  g.fillStyle = '#fffdf6'; g.fillRect(0, 0, W, H);
-
-  // الهيدر
-  const gr = g.createLinearGradient(0, 0, W, 0); gr.addColorStop(0, NAVY); gr.addColorStop(1, '#2c5282');
+  g.fillStyle = CC.cream; g.fillRect(0, 0, W, H);
+  const gr = g.createLinearGradient(0, 0, W, 0); gr.addColorStop(0, '#2b1a0c'); gr.addColorStop(0.55, '#47301a'); gr.addColorStop(1, CC.brown2);
   g.fillStyle = gr; g.fillRect(0, 0, W, 130);
-  g.fillStyle = GOLD; g.fillRect(0, 130, W, 6);
-  crossShape(g, 64, 62, 54); crossShape(g, W - 64, 62, 54);
-  g.direction = 'rtl'; g.textBaseline = 'middle'; g.textAlign = 'center';
-  g.fillStyle = '#ffffff'; g.font = `700 46px ${CARD_FONT}`; g.fillText(CARD_TITLE, W / 2, 56);
-  g.fillStyle = '#f1e2b0'; g.font = `400 24px ${CARD_FONT}`; g.fillText(CARD_SUB, W / 2, 102);
+  g.fillStyle = CC.gold; g.fillRect(0, 130, W, 6);
 
-  // الصورة الشخصية (يمين)
+  // الشعار (يمين): الصورة دايرة أصلًا فبنملّي بيها الدايرة كلها، وإطار ذهبي حواليها. لو مش متاح بيتحط صليب بداله
+  const LR = 52, lcx = W - 80, lcy = 64;
+  if (d.logo) {
+    g.save(); g.beginPath(); g.arc(lcx, lcy, LR + 5, 0, Math.PI * 2); g.fillStyle = CC.gold; g.fill(); g.restore();
+    g.save(); g.beginPath(); g.arc(lcx, lcy, LR, 0, Math.PI * 2); g.closePath(); g.clip();
+    g.fillStyle = CC.tint; g.fillRect(lcx - LR, lcy - LR, LR * 2, LR * 2);
+    g.drawImage(d.logo, lcx - LR, lcy - LR, LR * 2, LR * 2);
+    g.restore();
+  } else crossShape(g, W - 64, 62, 54);
+  crossShape(g, 64, 62, 54);
+
+  g.direction = 'rtl'; g.textBaseline = 'middle'; g.textAlign = 'center';
+  const tw0 = W - 2 * 160;                                                         // المساحة بين الصليب والشعار
+  g.fillStyle = '#ffffff'; g.font = `700 ${fitFont(g, CARD_TITLE, 700, 46, 30, tw0)}px ${CARD_FONT}`; g.fillText(CARD_TITLE, W / 2, 50);
+  g.fillStyle = CC.goldL; g.font = `600 ${fitFont(g, CARD_SUB, 600, 24, 15, tw0)}px ${CARD_FONT}`; g.fillText(CARD_SUB, W / 2, 102);
+
   const PS = 300, px = W - 40 - PS, py = 205;
-  g.fillStyle = GOLD; rrect(g, px - 7, py - 7, PS + 14, PS + 14, 28); g.fill();
+  g.fillStyle = CC.gold; rrect(g, px - 7, py - 7, PS + 14, PS + 14, 28); g.fill();
   g.save(); rrect(g, px, py, PS, PS, 22); g.clip();
   if (d.photo) {
     const iw = d.photo.naturalWidth || d.photo.width, ih = d.photo.naturalHeight || d.photo.height, s = Math.min(iw, ih);
     g.drawImage(d.photo, (iw - s) / 2, (ih - s) / 2, s, s, px, py, PS, PS);
   } else {
-    g.fillStyle = '#e7ecf4'; g.fillRect(px, py, PS, PS);
-    g.fillStyle = '#b8c3d4';
+    g.fillStyle = '#ece2cc'; g.fillRect(px, py, PS, PS); g.fillStyle = '#c9b996';
     g.beginPath(); g.arc(px + PS / 2, py + PS * 0.38, PS * 0.17, 0, Math.PI * 2); g.fill();
     g.beginPath(); g.ellipse(px + PS / 2, py + PS * 0.98, PS * 0.36, PS * 0.32, 0, 0, Math.PI * 2); g.fill();
   }
   g.restore();
 
-  // QR (يسار)
   const QS = 250, qx = 40, qy = 205, qr = QR.make(d.code), n = qr.size;
   const pad = 14, mod = Math.floor((QS - pad * 2) / n), side = mod * n, off = Math.floor((QS - side) / 2);
   g.fillStyle = '#ffffff'; rrect(g, qx, qy, QS, QS, 16); g.fill();
-  g.strokeStyle = '#d9dfea'; g.lineWidth = 2; g.stroke();
+  g.strokeStyle = '#e0d4bb'; g.lineWidth = 2; g.stroke();
   g.fillStyle = '#000000';
   for (let r = 0; r < n; r++) for (let c = 0; c < n; c++) if (qr.dark(r, c)) g.fillRect(qx + off + c * mod, qy + off + r * mod, mod, mod);
-  g.fillStyle = '#6b7785'; g.font = `400 22px ${CARD_FONT}`; g.textAlign = 'center';
+  g.fillStyle = CC.muted; g.font = `400 22px ${CARD_FONT}`; g.textAlign = 'center';
   g.fillText('امسح الكود عند الدخول', qx + QS / 2, qy + QS + 34);
 
-  // الاسم والكود (المنتصف)
   const cx = Math.round((qx + QS + px) / 2), zw = px - (qx + QS) - 40;
-  g.fillStyle = '#6b7785'; g.font = `400 22px ${CARD_FONT}`; g.fillText('الاسم', cx, 232);
+  g.fillStyle = CC.muted; g.font = `400 22px ${CARD_FONT}`; g.fillText('الاسم', cx, 232);
   const nl = nameLines(g, d.name, zw), lh = nl.size * (nl.lines.length > 1 ? 1.3 : 1.4);
-  g.fillStyle = NAVY; g.font = `700 ${nl.size}px ${CARD_FONT}`;
+  g.fillStyle = CC.brown; g.font = `700 ${nl.size}px ${CARD_FONT}`;
   nl.lines.forEach((t, i) => g.fillText(t, cx, 300 + (i - (nl.lines.length - 1) / 2) * lh));
-  g.fillStyle = GOLD; g.fillRect(cx - 70, 366, 140, 4);
-
-  g.fillStyle = '#6b7785'; g.font = `400 22px ${CARD_FONT}`; g.fillText('الكود', cx, 400);
+  g.fillStyle = CC.gold; g.fillRect(cx - 70, 366, 140, 4);
+  g.fillStyle = CC.muted; g.font = `400 22px ${CARD_FONT}`; g.fillText('الكود', cx, 400);
   g.direction = 'ltr'; g.textAlign = 'left';
   let cs = 56, ws, tw; const gap = 10;
-  for (; cs >= 36; cs -= 2) {                       // صغّر الخط لو الكود أعرض من المساحة
+  for (; cs >= 36; cs -= 2) {
     g.font = `700 ${cs}px ${CARD_FONT}`;
     ws = d.code.split('').map(ch => g.measureText(ch).width);
     tw = ws.reduce((a, b) => a + b, 0) + gap * (ws.length - 1);
     if (tw + 44 <= zw) break;
   }
   const bw = Math.min(zw, tw + 44);
-  g.fillStyle = '#f5f8fd'; rrect(g, cx - bw / 2, 418, bw, 84, 16); g.fill();
-  g.setLineDash([10, 7]); g.strokeStyle = GOLD; g.lineWidth = 3; g.stroke(); g.setLineDash([]);
-  g.fillStyle = NAVY; let tx = cx - tw / 2;
+  g.fillStyle = CC.tint; rrect(g, cx - bw / 2, 418, bw, 84, 16); g.fill();
+  g.setLineDash([10, 7]); g.strokeStyle = CC.gold; g.lineWidth = 3; g.stroke(); g.setLineDash([]);
+  g.fillStyle = CC.brown; let tx = cx - tw / 2;
   d.code.split('').forEach((ch, i) => { g.fillText(ch, tx, 461); tx += ws[i] + gap; });
 
-  // الفوتر
   g.direction = 'rtl'; g.textAlign = 'center';
-  g.fillStyle = NAVY; g.fillRect(0, 582, W, 56);
+  g.fillStyle = CC.brown; g.fillRect(0, 582, W, 56);
   g.fillStyle = '#ffffff'; g.font = `400 22px ${CARD_FONT}`;
   g.fillText('كارت شخصي - يُرجى إبراز الكارت عند الدخول', W / 2, 611);
-
-  // إطار ذهبي رفيع
-  rrect(g, 3, 3, W - 6, H - 6, 32); g.strokeStyle = GOLD; g.lineWidth = 6; g.stroke();
+  rrect(g, 3, 3, W - 6, H - 6, 32); g.strokeStyle = CC.gold; g.lineWidth = 6; g.stroke();
   g.restore();
+}
+
+// الشعار للـ canvas: لازم يتحمّل بـ CORS عشان الكارت يتحمّل PNG (لو الشعار على نفس الموقع logo.png ده شغّال دايمًا). لو فشل الكارت بيتعمل بالصليب.
+let _logoCanvas;
+function canvasLogo() {
+  if (_logoCanvas !== undefined) return Promise.resolve(_logoCanvas);
+  const L = window.LOGO;
+  if (!L || !L.ready || !L.src) return Promise.resolve(null);
+  return new Promise(res => {
+    const i = new Image(); i.crossOrigin = 'anonymous';
+    i.onload = () => { _logoCanvas = i; res(i); };
+    i.onerror = () => { _logoCanvas = null; res(null); };
+    i.src = L.src;
+  });
 }
 
 async function renderCard(d) {
   try {
-    if (document.fonts && document.fonts.load) {
-      await Promise.all([
-        document.fonts.load('700 46px Cairo', d.name + CARD_TITLE + '0123456789'),
-        document.fonts.load('400 24px Cairo', CARD_SUB + 'الاسم الكود امسح عند الدخول كارت شخصي يُرجى إبراز')
-      ]);
-    }
-  } catch (e) { /* نكمل بخط بديل */ }
+    if (document.fonts && document.fonts.load) await Promise.all([
+      document.fonts.load('700 46px Cairo', d.name + CARD_TITLE + '0123456789'),
+      document.fonts.load('600 24px Cairo', CARD_SUB + 'الاسم الكود امسح عند الدخول كارت شخصي يُرجى إبراز')
+    ]);
+  } catch (e) {}
+  if (window.LOGO && !window.LOGO.settled) await new Promise(r => window.addEventListener('logosettled', r, { once: true }));
+  d.logo = await canvasLogo();
   const cv = document.createElement('canvas'); cv.width = CARD_W; cv.height = CARD_H;
   drawCard(cv.getContext('2d'), d);
   return cv;
 }
 
-// أسباب عدم ظهور الصورة على الكارت (الرمز بييجي من الخادم)
 const CARD_WHY = {
   no_path: 'خانة الصورة الشخصية فاضية في سجلك. تواصل مع المنظّمين.',
   not_found: 'ملف صورتك غير موجود في المكان المسجّل له. تواصل مع المنظّمين.',
@@ -713,46 +1024,40 @@ const loadImage = src => new Promise(res => { const i = new Image(); i.onload = 
 
 function downloadCanvas(cv, filename) {
   const save = href => { const a = document.createElement('a'); a.href = href; a.download = filename; document.body.appendChild(a); a.click(); a.remove(); };
-  if (cv.toBlob) cv.toBlob(b => {
-    if (!b) return save(cv.toDataURL('image/png'));
-    const u = URL.createObjectURL(b); save(u); setTimeout(() => URL.revokeObjectURL(u), 5000);
-  }, 'image/png');
+  if (cv.toBlob) cv.toBlob(b => { if (!b) return save(cv.toDataURL('image/png')); const u = URL.createObjectURL(b); save(u); setTimeout(() => URL.revokeObjectURL(u), 5000); }, 'image/png');
   else save(cv.toDataURL('image/png'));
 }
 
+// يرسم الكارت داخل host من بيانات r = {name, code, photo, why}. retry = دالة إعادة المحاولة
+async function paintCard(host, r, retry) {
+  try {
+    const photo = r.photo ? await loadImage(r.photo) : null;
+    let warn = '';
+    if (!photo) {
+      const why = r.photo ? 'decode' : (r.why !== undefined ? (r.why || 'unknown') : 'old_server');
+      warn = (CARD_WHY[why] || CARD_WHY.unknown) + ' (رمز: ' + why + ')';
+    }
+    const cv = await renderCard({ name: r.name, code: r.code, photo });
+    if (!host.isConnected) return;
+    host.innerHTML = `<div class="card-title">كارت الـ ID الخاص بك</div>
+      ${warn ? `<div class="notice warn">⚠ صورتك لم تظهر على الكارت: ${esc(warn)}</div>` : ''}
+      <img class="idcard" alt="ID Card" src="${cv.toDataURL('image/png')}">
+      <div class="row" style="justify-content:center"><button class="btn gold" data-cdl>⬇ تحميل الكارت (PNG)</button>${warn ? '<button class="btn" data-cretry>↻ إعادة المحاولة</button>' : ''}</div>
+      <small class="hint" style="text-align:center">لو التحميل لم يبدأ على الموبايل، اضغط مطولًا على الكارت واختر «حفظ الصورة».</small>`;
+    $('[data-cdl]', host).onclick = () => downloadCanvas(cv, 'ID-Card-' + r.code + '.png');
+    if (warn) $('[data-cretry]', host).onclick = retry;
+  } catch (e) {
+    host.innerHTML = '<div class="formerr">تعذر تجهيز الكارت.</div><button class="btn" data-cretry>إعادة المحاولة</button>';
+    $('[data-cretry]', host).onclick = retry;
+  }
+}
 async function buildCard(nid, name, code) {
   const host = $('#cardBox'); if (!host) return;
   host.innerHTML = '<p class="lead" style="text-align:center"><span class="spin"></span> جاري تجهيز الكارت...</p>';
   const r = await api('cardPhoto', { nid }, 60000);
   if (!host.isConnected) return;
-  if (!r.ok) {
-    host.innerHTML = `<div class="formerr">${esc(r.error)}</div><button class="btn" id="cardRetry">إعادة المحاولة</button>`;
-    $('#cardRetry').onclick = () => buildCard(nid, name, code);
-    return;
-  }
-  try {
-    const photo = r.photo ? await loadImage(r.photo) : null;
-    let warn = '';
-    if (!photo) {
-      const why = r.photo ? 'decode' : (r.why !== undefined ? (r.why || 'unknown') : 'old_server');   // r.why غير موجود = الخادم بالكود القديم
-      warn = (CARD_WHY[why] || CARD_WHY.unknown) + ' (رمز: ' + why + ')';
-    }
-    const cv = await renderCard({ name: r.name || name, code: r.code || code, photo });
-    if (!host.isConnected) return;
-    host.innerHTML = `<div class="card-title">كارت الـ ID الخاص بك</div>
-      ${warn ? `<div class="notice warn">⚠ صورتك لم تظهر على الكارت: ${esc(warn)}</div>` : ''}
-      <img class="idcard" alt="ID Card" src="${cv.toDataURL('image/png')}">
-      <div class="row" style="justify-content:center">
-        <button class="btn gold" id="cardDl">⬇ تحميل الكارت (PNG)</button>
-        ${warn ? '<button class="btn" id="cardRetry">↻ إعادة المحاولة</button>' : ''}
-      </div>
-      <small class="hint" style="text-align:center">لو التحميل لم يبدأ على الموبايل، اضغط مطولًا على الكارت واختر «حفظ الصورة».</small>`;
-    $('#cardDl').onclick = () => downloadCanvas(cv, 'ID-Card-' + (r.code || code) + '.png');
-    if (warn) $('#cardRetry').onclick = () => buildCard(nid, name, code);
-  } catch (e) {
-    host.innerHTML = '<div class="formerr">تعذر تجهيز الكارت.</div><button class="btn" id="cardRetry">إعادة المحاولة</button>';
-    $('#cardRetry').onclick = () => buildCard(nid, name, code);
-  }
+  if (!r.ok) { host.innerHTML = `<div class="formerr">${esc(r.error)}</div><button class="btn" data-cretry>إعادة المحاولة</button>`; $('[data-cretry]', host).onclick = () => buildCard(nid, name, code); return; }
+  paintCard(host, { name: r.name || name, code: r.code || code, photo: r.photo, why: r.why }, () => buildCard(nid, name, code));
 }
 
 /* =========================================================
@@ -761,13 +1066,10 @@ async function buildCard(nid, name, code) {
 const fld = (h, k) => h.querySelector(`[data-f="${k}"]`);
 const val = (h, k) => fld(h, k).value;
 const grp = (h, k, on) => { const g = h.querySelector(`[data-group="${k}"]`); if (g) g.hidden = !on; };
-// العنصر إمّا نص (القيمة = النص) أو زوج [القيمة, النص الظاهر]
 function fillOptions(sel, arr) {
-  sel.innerHTML = '<option value="">اختر</option>' + arr.map(x => Array.isArray(x)
-    ? `<option value="${esc(x[0])}">${esc(x[1])}</option>` : `<option>${esc(x)}</option>`).join('');
+  sel.innerHTML = '<option value="">اختر</option>' + arr.map(x => Array.isArray(x) ? `<option value="${esc(x[0])}">${esc(x[1])}</option>` : `<option>${esc(x)}</option>`).join('');
 }
 const todayISO = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; };
-// تاريخ yyyy-mm-dd حقيقي (مش 2020-02-31)
 function validISO(s) {
   const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s); if (!m) return false;
   const y = +m[1], mo = +m[2], d = +m[3], dt = new Date(y, mo - 1, d);
@@ -779,12 +1081,9 @@ function mountForm(host, opts) {
   host.innerHTML = '';
   host.appendChild($('#tplForm').content.cloneNode(true));
   host._photos = {}; host._opts = opts;
-  $$('[data-list]', host).forEach(s => {
-    const l = LISTS[s.dataset.list];
-    fillOptions(s, Array.isArray(l) ? l : Object.keys(l));
-  });
+  $$('[data-list]', host).forEach(s => { const l = LISTS[s.dataset.list]; fillOptions(s, Array.isArray(l) ? l : Object.keys(l)); });
   fld(host, 'birthDate').max = todayISO();
-  if (!opts.photos) { host.querySelector('[data-group="photos"]').remove(); }
+  if (!opts.photos) host.querySelector('[data-group="photos"]').remove();
   else {
     host.querySelector('[data-photonote]').textContent = opts.photoNote || 'الصور تُضغط تلقائيًا قبل الرفع لتكون سريعة حتى مع الإنترنت الضعيف.';
     if (opts.optionalPhotos) $$('[data-photostar]', host).forEach(x => x.remove());
@@ -793,65 +1092,55 @@ function mountForm(host, opts) {
   host.oninput = host.onchange = e => onFormChange(host, e);
   refreshForm(host);
 }
-
 function onFormChange(host, e) {
   const f = e.target.closest('[data-f]');
   if (f) { const w = f.closest('.field'); if (w) w.classList.remove('err'); }
   if (f && f.dataset.f === 'nid') nidHint(host);
   refreshForm(host);
 }
-
 function nidHint(host) {
-  const h = host.querySelector('[data-hint="nid"]');
-  const v = digits(val(host, 'nid'));
+  const h = host.querySelector('[data-hint="nid"]'), v = digits(val(host, 'nid'));
   h.className = 'hint'; h.textContent = '';
   if (v.length !== 14) return;
   const r = parseNid(v);
-  if (r.error) { h.className = 'hint bad'; h.textContent = r.error; }
-  else { h.className = 'hint good'; h.textContent = '✔ الرقم القومي صالح'; }
+  if (r.error) { h.className = 'hint bad'; h.textContent = r.error; } else { h.className = 'hint good'; h.textContent = '✔ الرقم القومي صالح'; }
 }
-
 function refreshForm(host) {
   const occ = val(host, 'occupation');
   grp(host, 'student', occ === 'طالب'); grp(host, 'employee', occ === 'موظف'); grp(host, 'other', occ === 'أخرى');
   grp(host, 'otherText', occ === 'أخرى' && val(host, 'otherStatus') === 'أخرى');
+  grp(host, 'edu', occ === 'موظف' || occ === 'أخرى');                              // غير الطالب: بيانات آخر مرحلة دراسية
   const st = val(host, 'studyStage'), ys = fld(host, 'studyYear');
   if (ys.dataset.stage !== st) { ys.dataset.stage = st; fillOptions(ys, LISTS.stages[st] || []); }
   host.querySelector('[data-facreq]').hidden = (st === 'فني أو دبلوم');
   host.querySelector('[data-wpreq]').hidden = (val(host, 'workSector') === 'أعمال حرة');
+  host.querySelector('[data-edufacreq]').hidden = EDU_NO_FACULTY.includes(val(host, 'lastEduStage'));
   grp(host, 'compound', val(host, 'housingType') === 'كومباوند');
   grp(host, 'districtOther', val(host, 'district') === 'أخرى');
 }
-
 function fillForm(host, d) {
   d = d || {};
-  for (let pass = 0; pass < 2; pass++) {
-    FORM_KEYS.forEach(k => { const f = fld(host, k); if (f && d[k] != null) f.value = d[k]; });
-    refreshForm(host);
-  }
+  for (let pass = 0; pass < 2; pass++) { FORM_KEYS.forEach(k => { const f = fld(host, k); if (f && d[k] != null) f.value = d[k]; }); refreshForm(host); }
   nidHint(host);
 }
-
 function readForm(host) {
   const d = {};
   FORM_KEYS.forEach(k => { const f = fld(host, k); d[k] = f ? f.value.trim() : ''; });
-  d.nid = digits(d.nid); d.whatsapp = digits(d.whatsapp); d.phone = digits(d.phone); d.phone2 = digits(d.phone2);
+  d.nid = digits(d.nid); d.whatsapp = digits(d.whatsapp); d.phone = digits(d.phone); d.phone2 = digits(d.phone2); d.lastEduGradYear = digits(d.lastEduGradYear);
   d.building = toEn(d.building); d.apartment = toEn(d.apartment); d.addressDetails = toEn(d.addressDetails);
   return d;
 }
-
 function parseNid(n) {
   if (!/^\d{14}$/.test(n)) return { error: 'الرقم القومي يجب أن يكون 14 رقمًا.' };
   const c = n[0]; if (c !== '2' && c !== '3') return { error: 'الرقم القومي غير صحيح.' };
-  const y = (c === '2' ? 1900 : 2000) + +n.substr(1, 2), m = +n.substr(3, 2), d = +n.substr(5, 2);
-  const dt = new Date(y, m - 1, d);
+  const y = (c === '2' ? 1900 : 2000) + +n.substr(1, 2), m = +n.substr(3, 2), d = +n.substr(5, 2), dt = new Date(y, m - 1, d);
   if (dt.getFullYear() !== y || dt.getMonth() !== m - 1 || dt.getDate() !== d || dt > new Date()) return { error: 'الرقم القومي غير صحيح (تاريخ الميلاد).' };
   if (!GOV.includes(n.substr(7, 2))) return { error: 'الرقم القومي غير صحيح (كود المحافظة).' };
   return { gender: (+n[12]) % 2 === 1 ? 'ذكر' : 'أنثى', birth: `${y}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}` };
 }
 
-// يرجع أول خطأ {f, m} أو null
-function validateClient(d, host, needPhotos) {
+// opts.lenientEdu: سجل قديم (غير طالب) من غير بيانات تعليم: الأدمن يقدر يحفظ من غير ما يملاها (لكن لو بدأ يكتب فيها لازم تكتمل)
+function validateClient(d, host, needPhotos, opts) {
   const E = (f, m) => ({ f, m });
   const name = d.fullName.replace(/\s+/g, ' ').trim(), words = name.split(' ').filter(Boolean);
   if (words.length < 4 || words.some(w => w.length < 2)) return E('fullName', 'الاسم يجب أن يكون رباعيًا (4 كلمات على الأقل).');
@@ -859,7 +1148,6 @@ function validateClient(d, host, needPhotos) {
   const n = parseNid(d.nid); if (n.error) return E('nid', n.error);
   if (!d.gender) return E('gender', 'اختر النوع.');
   if (d.gender !== n.gender) return E('gender', 'برجاء مراجعة بياناتك: النوع المختار لا يتطابق مع الرقم القومي. راجع النوع والرقم القومي ثم أعد المحاولة.');
-  // تاريخ الميلاد الفعلي: مسموح يختلف عن الرقم القومي، لكن لازم تاريخ حقيقي ومش في المستقبل
   if (!d.birthDate) return E('birthDate', 'اكتب تاريخ الميلاد.');
   if (!validISO(d.birthDate)) return E('birthDate', 'تاريخ الميلاد غير صحيح.');
   if (d.birthDate < '1900-01-01' || d.birthDate > todayISO()) return E('birthDate', 'تاريخ الميلاد غير منطقي، راجع التاريخ.');
@@ -884,6 +1172,16 @@ function validateClient(d, host, needPhotos) {
     if (!d.otherStatus) return E('otherStatus', 'اختر الحالة.');
     if (d.otherStatus === 'أخرى' && !d.otherText) return E('otherText', 'اكتب التفاصيل.');
   }
+  // غير الطالب: آخر مرحلة دراسية (المؤهل + سنة التخرج + جهة الدراسة + الكلية)
+  if (d.occupation !== 'طالب' && !(opts && opts.lenientEdu && !d.lastEduStage && !d.lastEduGradYear && !d.lastEduPlace && !d.lastEduFaculty)) {
+    if (!LISTS.lastStages.includes(d.lastEduStage)) return E('lastEduStage', 'اختر آخر مؤهل دراسي حصلت عليه.');
+    if (!/^[0-9]{4}$/.test(d.lastEduGradYear)) return E('lastEduGradYear', 'اكتب سنة التخرج (4 أرقام، مثال: 2019).');
+    const y = +d.lastEduGradYear, cy = new Date().getFullYear(), by = +d.birthDate.slice(0, 4);
+    if (y < 1950 || y > cy) return E('lastEduGradYear', 'سنة التخرج غير منطقية.');
+    if (y < by + 14) return E('lastEduGradYear', 'سنة التخرج غير منطقية بالنسبة لتاريخ الميلاد.');
+    if (!d.lastEduPlace) return E('lastEduPlace', 'اكتب جهة الدراسة (آخر مؤهل).');
+    if (!d.lastEduFaculty && !EDU_NO_FACULTY.includes(d.lastEduStage)) return E('lastEduFaculty', 'اكتب الكلية / القسم (آخر مؤهل).');
+  }
   if (!d.housingType) return E('housingType', 'اختر نوع السكن.');
   if (d.housingType === 'كومباوند' && !d.compound) return E('compound', 'اكتب اسم الكومباوند.');
   if (!d.district) return E('district', 'اختر الحي / المجاورة.');
@@ -898,7 +1196,6 @@ function validateClient(d, host, needPhotos) {
   }
   return null;
 }
-
 function markError(host, err, errBoxSel) {
   $$('.err', host).forEach(x => x.classList.remove('err'));
   showErr(errBoxSel, err.m);
@@ -911,19 +1208,15 @@ function markError(host, err, errBoxSel) {
 /* ---------------- الصور ---------------- */
 async function loadBitmap(file) {
   if (window.createImageBitmap) { try { return await createImageBitmap(file, { imageOrientation: 'from-image' }); } catch (e) {} }
-  return await new Promise((res, rej) => {
-    const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = URL.createObjectURL(file);
-  });
+  return await new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = URL.createObjectURL(file); });
 }
 const bw = b => b.naturalWidth || b.width, bh = b => b.naturalHeight || b.height;
-
 function resizeToJpeg(bmp, maxSide, q) {
   const k = Math.min(1, maxSide / Math.max(bw(bmp), bh(bmp)));
   const c = document.createElement('canvas'); c.width = Math.round(bw(bmp) * k); c.height = Math.round(bh(bmp) * k);
   const x = c.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, c.width, c.height); x.drawImage(bmp, 0, 0, c.width, c.height);
   return c.toDataURL('image/jpeg', q);
 }
-
 function bindPhoto(host, kind) {
   const box = host.querySelector(`[data-photo="${kind}"]`), prev = box.querySelector('.prev');
   box.querySelector('[data-cam]').onclick = () => box.querySelector('[data-in-cam]').click();
@@ -938,7 +1231,6 @@ function bindPhoto(host, kind) {
     } catch (e) { toast('تعذر قراءة الصورة. جرّب صورة أخرى.', 'err'); }
   }));
 }
-
 function openCropper(bmp) {
   return new Promise(resolve => {
     const modal = $('#cropModal'), cv = $('#cropCanvas'), ctx = cv.getContext('2d'), zoom = $('#cropZoom');
@@ -950,15 +1242,9 @@ function openCropper(bmp) {
     ox = (S - iw * sc()) / 2; oy = (S - ih * sc()) / 2; zoom.value = 1; clamp(); draw();
     let drag = null;
     cv.onpointerdown = e => { cv.setPointerCapture(e.pointerId); drag = { x: e.clientX, y: e.clientY }; cv.style.cursor = 'grabbing'; };
-    cv.onpointermove = e => {
-      if (!drag) return; const r = S / cv.clientWidth;
-      ox += (e.clientX - drag.x) * r; oy += (e.clientY - drag.y) * r; drag = { x: e.clientX, y: e.clientY }; clamp(); draw();
-    };
+    cv.onpointermove = e => { if (!drag) return; const r = S / cv.clientWidth; ox += (e.clientX - drag.x) * r; oy += (e.clientY - drag.y) * r; drag = { x: e.clientX, y: e.clientY }; clamp(); draw(); };
     cv.onpointerup = cv.onpointercancel = () => { drag = null; cv.style.cursor = 'grab'; };
-    zoom.oninput = () => {
-      const cx = (S / 2 - ox) / sc(), cy = (S / 2 - oy) / sc();
-      z = +zoom.value; ox = S / 2 - cx * sc(); oy = S / 2 - cy * sc(); clamp(); draw();
-    };
+    zoom.oninput = () => { const cx = (S / 2 - ox) / sc(), cy = (S / 2 - oy) / sc(); z = +zoom.value; ox = S / 2 - cx * sc(); oy = S / 2 - cy * sc(); clamp(); draw(); };
     const done = v => { modal.hidden = true; resolve(v); };
     $('#cropCancel').onclick = () => done(null);
     $('#cropOk').onclick = () => {
@@ -971,24 +1257,36 @@ function openCropper(bmp) {
 }
 
 /* =========================================================
+   التنبيهات فوق الصفحة (متعددة: خادم قديم / ملفات JS قديمة)
+   ========================================================= */
+const sysMsgs = {};
+function sysBanner(msg, key) {
+  sysMsgs[key || 'srv'] = msg || '';
+  const list = Object.keys(sysMsgs).map(k => sysMsgs[k]).filter(Boolean);
+  $('#sysMsg').innerHTML = list.map(esc).join('<hr style="border:0;border-top:1px dashed #f1c3bd;margin:8px 0">');
+  $('#sysBanner').hidden = !list.length;
+}
+// لو portal.js أو conferences.js على الموقع نسخة قديمة (كاش/ما اترفعش) بنقول ده بوضوح بدل ما الأزرار تتصرف غلط
+(function fileCheck() {
+  const stale = [];
+  if (typeof PORTAL_VER === 'undefined' || PORTAL_VER !== EXPECTED_VERSION) stale.push('portal.js');
+  if (window.CONF_VER !== EXPECTED_VERSION) stale.push('conferences.js');
+  if (stale.length) sysBanner('ملف ' + stale.join(' و ') + ' على موقعك نسخة قديمة (إما مخزّنة في المتصفح أو لسه ما اترفعش الجديد على GitHub). ارفع النسخة الجديدة وبعدها اعمل تحديث إجباري Ctrl+F5 (على الموبايل: امسح بيانات الموقع). لحد ما ده يحصل ممكن الاشتراك والحجز يدّوا أخطاء.', 'files');
+})();
+
+/* =========================================================
    التسجيل
    ========================================================= */
 const regHost = $('#regForm');
 mountForm(regHost, { photos: true });
 let regBusy = false, regOpen = true;
+function setOpenUI(open) { regOpen = open; $('#closedBox').hidden = open; $('#regBtn').disabled = !open; }
 
-function setOpenUI(open) {
-  regOpen = open;
-  $('#closedBox').hidden = open; $('#regBtn').disabled = !open;
-}
-function sysBanner(msg) { $('#sysMsg').textContent = msg || ''; $('#sysBanner').hidden = !msg; }
-
-// أول اتصال: يتأكد إن الرابط مضبوط وإن نسخة الخادم هي نفس نسخة الصفحة
 api('info').then(r => {
   if (!r.ok) return sysBanner(r.error);
   setOpenUI(r.open);
   if (r.version !== EXPECTED_VERSION) sysBanner('الخادم (Apps Script) شغّال بنسخة قديمة من الكود. اعمل: Deploy ← Manage deployments ← ✏️ ← Version: New version ← Deploy. (لو عملت New deployment انسخ الرابط الجديد في config.js)');
-});
+}).finally(() => { if (window.__siteReadyRes) window.__siteReadyRes(); });
 
 $('#regBtn').onclick = async () => {
   if (regBusy) return;
@@ -999,44 +1297,39 @@ $('#regBtn').onclick = async () => {
   regBusy = true; const btn = $('#regBtn'); btn.disabled = true; btn.innerHTML = '<span class="spin"></span> جاري الإرسال... لا تغلق الصفحة';
   const r = await api('register', { data: d, profile: regHost._photos.profile, idCard: regHost._photos.idCard }, 120000);
   regBusy = false; btn.disabled = !regOpen; btn.textContent = 'إرسال الطلب';
-  if (r.ok) {
-    $('#regWrap').hidden = true; $('#doneBox').hidden = false; window.scrollTo({ top: 0, behavior: 'smooth' });
-  } else showErr('#regErr', r.error + ((r.error || '').includes('الاتصال') || (r.error || '').includes('مهلة') ? ' (قد يكون طلبك وصل، تحقق من تبويب الاستعلام قبل إعادة الإرسال).' : ''));
+  if (r.ok) { $('#regWrap').hidden = true; $('#haveAcct').hidden = true; $('#doneBox').hidden = false; window.scrollTo({ top: 0, behavior: 'smooth' }); }
+  else showErr('#regErr', r.error + ((r.error || '').includes('الاتصال') || (r.error || '').includes('مهلة') ? ' (قد يكون طلبك وصل، تحقق من تبويب الاستعلام قبل إعادة الإرسال).' : ''));
 };
-$('#newReg').onclick = () => { mountForm(regHost, { photos: true }); $('#doneBox').hidden = true; $('#regWrap').hidden = false; };
+$('#newReg').onclick = () => { mountForm(regHost, { photos: true }); $('#doneBox').hidden = true; $('#regWrap').hidden = false; $('#haveAcct').hidden = false; };
 
 /* =========================================================
    الاستعلام (بالرقم القومي فقط) + تعديل المرفوض
-   زر Enter (كمبيوتر) أو Go (موبايل) يشغّل الاستعلام عن طريق <form>
    ========================================================= */
 const resubHost = $('#resubForm');
 let SQ = null, resubBusy = false;
-
-$('#stForm').onsubmit = e => e.preventDefault();      // منع إعادة تحميل الصفحة (الاستعلام يتم عبر زر الإرسال)
+$('#stForm').onsubmit = e => e.preventDefault();
 $('#stBtn').onclick = async () => {
   showErr('#stErr', ''); $('#stResult').innerHTML = '';
   const nid = digits($('#stNid').value);
   if (!nid) return showErr('#stErr', 'أدخل الرقم القومي.');
   if (nid.length !== 14) return showErr('#stErr', 'الرقم القومي يجب أن يكون 14 رقمًا.');
   const pn = parseNid(nid); if (pn.error) return showErr('#stErr', pn.error);
-  const q = { nid };
-  const b = $('#stBtn'); b.disabled = true; b.innerHTML = '<span class="spin"></span>';
+  const q = { nid }, b = $('#stBtn'); b.disabled = true; b.innerHTML = '<span class="spin"></span>';
   const r = await api('status', q);
   b.disabled = false; b.textContent = 'استعلام';
   if (!r.ok) return showErr('#stErr', r.error);
   SQ = { q, r };
   const box = $('#stResult');
   if (r.status === 'مقبول') {
-    box.innerHTML = `<div class="notice good"><b>${esc(r.name)}</b><br>تم قبول طلبك ✔ وهذا كودك الخاص، احتفظ به:</div><div class="code">${esc(r.code)}</div><div id="cardBox"></div>`;
+    box.innerHTML = `<div class="notice good"><b>${esc(r.name)}</b><br>تم قبول طلبك ✔ وهذا كودك الخاص، احتفظ به:</div><div class="code">${esc(r.code)}</div>
+      <div class="notice info">تقدر تدخل <a href="#" id="stGoMember">دخول الأعضاء</a> بالكود ده وكلمة المرور = رقم الواتساب، عشان تتابع الأخبار وتحجز في الرحلات.</div><div id="cardBox"></div>`;
+    $('#stGoMember').onclick = e => { e.preventDefault(); gotoTab('member'); const c = $('#memCode'); if (c) c.value = r.code; };
     buildCard(nid, r.name, r.code);
   } else if (r.status === 'مرفوض') {
     box.innerHTML = `<div class="notice bad"><b>${esc(r.name)}</b><br>تم رفض الطلب.<br><b>السبب:</b> ${esc(r.reason)}</div><button class="btn pri" id="goEdit">تعديل البيانات وإعادة الإرسال</button>`;
     $('#goEdit').onclick = startResubmit;
-  } else {
-    box.innerHTML = `<div class="notice warn"><b>${esc(r.name)}</b><br>طلبك <b>قيد المراجعة</b>. سيتم إبلاغك بعد القبول.</div>`;
-  }
+  } else box.innerHTML = `<div class="notice warn"><b>${esc(r.name)}</b><br>طلبك <b>قيد المراجعة</b>. سيتم إبلاغك بعد القبول.</div>`;
 };
-
 function startResubmit() {
   mountForm(resubHost, { photos: true, optionalPhotos: true, photoNote: 'اترك الصور كما هي للإبقاء على الصور الحالية، أو اختر صورة جديدة لاستبدالها.' });
   fillForm(resubHost, SQ.r.data);
@@ -1061,42 +1354,37 @@ $('#resubBtn').onclick = async () => {
    الأدمن
    ========================================================= */
 const A = {
-  token: sessionStorage.getItem('adm_tok') || '', user: sessionStorage.getItem('adm_user') || '',
-  role: sessionStorage.getItem('adm_role') || 'admin',
-  rows: [], view: [], open: true, cur: null, img: {}
+  token: sessionStorage.getItem('adm_tok') || '', user: sessionStorage.getItem('adm_user') || '', role: sessionStorage.getItem('adm_role') || 'admin',
+  rows: [], view: [], open: true, cur: null, img: {}, pend: {}, tab: 'regs', trash: 0
 };
 const isSuper = () => A.role === 'super';
 
 async function adm(action, payload, t) {
   const r = await api(action, { token: A.token, ...(payload || {}) }, t);
-  if (r.auth) { logout('انتهت الجلسة، سجّل الدخول مرة أخرى.'); }
+  if (r.auth) logout('انتهت الجلسة، سجّل الدخول مرة أخرى.');
   return r;
 }
-
 function saveSession(token, user, role) {
   A.token = token; A.user = user; A.role = role === 'super' ? 'super' : 'admin';
   sessionStorage.setItem('adm_tok', A.token); sessionStorage.setItem('adm_user', A.user); sessionStorage.setItem('adm_role', A.role);
 }
-
 function logout(msg) {
-  A.token = ''; A.user = ''; A.role = 'admin';
+  A.token = ''; A.user = ''; A.role = 'admin'; A.trash = 0;
   ['adm_tok', 'adm_user', 'adm_role'].forEach(k => sessionStorage.removeItem(k));
   $('#admDash').hidden = true; $('#admLogin').hidden = false;
   ['detailModal', 'acctModal', 'adminsModal', 'askModal'].forEach(id => $('#' + id).hidden = true);
-  A.rows = []; A.img = {};
+  $$('.ov[data-admin]').forEach(o => { if (o._close) o._close(); else o.remove(); });
+  A.rows = []; A.img = {}; A.pend = {};
+  if (typeof portalAdminReset === 'function') portalAdminReset();
+  updateTrashNotice();
   if (msg) showErr('#admErr', msg);
 }
 
-// Enter من لوحة مفاتيح الكمبيوتر أو الموبايل (Go) يشغّل الدخول عن طريق <form>
 $('#admForm').onsubmit = e => e.preventDefault();
 $('#admBtn').onclick = async () => {
   showErr('#admErr', '');
   const u = $('#admUser').value.trim().toLowerCase(), p = $('#admPass').value;
-  if (!u || !p) {
-    showErr('#admErr', !u ? 'أدخل اسم المستخدم.' : 'أدخل كلمة المرور.');
-    (!u ? $('#admUser') : $('#admPass')).focus();      // Enter في خانة اليوزر ينقلك لكلمة المرور
-    return;
-  }
+  if (!u || !p) { showErr('#admErr', !u ? 'أدخل اسم المستخدم.' : 'أدخل كلمة المرور.'); (!u ? $('#admUser') : $('#admPass')).focus(); return; }
   const b = $('#admBtn'); b.disabled = true; b.innerHTML = '<span class="spin"></span>';
   const r = await api('login', { username: u, password: p });
   b.disabled = false; b.textContent = 'دخول';
@@ -1105,15 +1393,52 @@ $('#admBtn').onclick = async () => {
   $('#admPass').value = ''; enterDash();
 };
 $('#admLogout').onclick = () => logout();
-$('#admRefresh').onclick = () => loadList();
 
-function applyRole() {
-  $('#admName').textContent = A.user;
-  $('#admRole').hidden = !isSuper();
-  $('#admAdmins').hidden = !isSuper();
+/* ---------- التابات: من غير slider (بتنزل سطر تاني لو مفيش مكان). سجل التدقيق والمحذوفات للسوبر أدمن بس ---------- */
+const ADM_BOX = { regs: '#admRegs', news: '#admNews', trips: '#admTrips', conf: '#admConf', audit: '#admAudit', trash: '#admTrash' };
+function admLoader(name) {
+  return {
+    regs: () => loadList(),
+    news: typeof loadNewsAdmin === 'function' ? loadNewsAdmin : null,
+    trips: typeof loadTripsAdmin === 'function' ? loadTripsAdmin : null,
+    conf: window.confModule ? window.confModule.loadAdmin : null,
+    audit: typeof loadAuditAdmin === 'function' ? loadAuditAdmin : null,
+    trash: typeof loadTrashAdmin === 'function' ? loadTrashAdmin : null
+  }[name];
 }
-function enterDash() {
-  $('#admLogin').hidden = true; $('#admDash').hidden = false; applyRole(); loadList();
+function applyRole() {
+  $('#admName').textContent = A.user; $('#admRole').hidden = !isSuper(); $('#admAdmins').hidden = !isSuper();
+  $('#admTabAudit').hidden = !(isSuper() && typeof loadAuditAdmin === 'function');
+  $('#admTabTrash').hidden = !(isSuper() && typeof loadTrashAdmin === 'function');
+  $('#admTabNews').hidden = typeof loadNewsAdmin !== 'function';
+  $('#admTabTrips').hidden = typeof loadTripsAdmin !== 'function';
+  $('#admTabConf').hidden = !window.confModule;
+}
+function enterDash() { $('#admLogin').hidden = true; $('#admDash').hidden = false; applyRole(); showAdminTab('regs'); }
+function showAdminTab(name) {
+  if ((name === 'audit' || name === 'trash') && !isSuper()) name = 'regs';
+  if (name === 'trash' && A.tab !== 'trash' && typeof PA !== 'undefined') PA.trashView = 'deleted';   // سلة المحذوفات بتفتح دايمًا على «المحذوفات»
+  A.tab = name;
+  $$('#admTabs button').forEach(b => b.classList.toggle('on', b.dataset.at === name));
+  Object.keys(ADM_BOX).forEach(k => { const e = $(ADM_BOX[k]); if (e) e.hidden = k !== name; });
+  const f = admLoader(name); if (f) f();
+  updateTrashNotice();
+}
+$$('#admTabs button').forEach(b => b.onclick = () => showAdminTab(b.dataset.at));
+$('#admRefresh').onclick = () => { const f = admLoader(A.tab); if (f) f(); };
+
+/* ---------- تنبيه المحذوفات (سوبر أدمن) ---------- */
+function setTrashCount(n) { A.trash = n || 0; updateTrashNotice(); }
+function updateTrashNotice() {
+  const n = A.trash || 0, show = isSuper() && n > 0;
+  $('#trashBadge').hidden = !show; $('#trashBadge').textContent = n;
+  $('#trashNotice').hidden = !(show && A.tab !== 'trash'); $('#trashN').textContent = n;
+}
+$('#trashGo').onclick = e => { e.preventDefault(); showAdminTab('trash'); };
+async function refreshTrashCount() {
+  if (!isSuper() || !A.token) return;
+  const r = await adm('trashList', {}, 30000);
+  if (r.ok) setTrashCount(r.count);
 }
 
 async function loadList() {
@@ -1122,13 +1447,10 @@ async function loadList() {
   if (!r.ok) { $('#admBody').innerHTML = ''; return toast(r.error, 'err'); }
   A.rows = r.rows; setToggle(r.open);
   if (r.role && r.role !== A.role) { A.role = r.role; sessionStorage.setItem('adm_role', A.role); applyRole(); }
+  if (r.trashCount !== undefined) setTrashCount(r.trashCount);
   renderList();
 }
-
-function setToggle(open) {
-  A.open = open; const b = $('#admToggle');
-  b.textContent = open ? '🟢 التسجيل مفتوح (اضغط للإغلاق)' : '🔴 التسجيل مغلق (اضغط للفتح)';
-}
+function setToggle(open) { A.open = open; $('#admToggle').textContent = open ? '🟢 التسجيل مفتوح (اضغط للإغلاق)' : '🔴 التسجيل مغلق (اضغط للفتح)'; }
 $('#admToggle').onclick = async () => {
   const r = await adm('adminSetOpen', { open: !A.open });
   if (r.ok) { setToggle(r.open); toast(r.open ? 'تم فتح التسجيل' : 'تم غلق التسجيل', 'ok'); } else toast(r.error, 'err');
@@ -1138,8 +1460,7 @@ const badge = s => `<span class="badge ${s === 'مقبول' ? 'o' : s === 'مر�
 
 function renderList() {
   const q = $('#admSearch').value.toLowerCase().trim(), f = $('#admFilter').value;
-  A.view = A.rows.filter(r => (!f || r.status === f) &&
-    (!q || [r.fullName, r.nid, r.code, r.whatsapp, r.phone, r.phone2].join(' ').toLowerCase().includes(q)));
+  A.view = A.rows.filter(r => (!f || r.status === f) && (!q || [r.fullName, r.nid, r.code, r.whatsapp, r.phone, r.phone2].join(' ').toLowerCase().includes(q)));
   const c = s => A.rows.filter(r => r.status === s).length;
   $('#sTotal').textContent = A.rows.length; $('#sPend').textContent = c('قيد المراجعة'); $('#sOk').textContent = c('مقبول'); $('#sNo').textContent = c('مرفوض');
   $('#admBody').innerHTML = A.view.map((r, i) => `<tr class="r" data-nid="${esc(r.nid)}">
@@ -1150,14 +1471,12 @@ function renderList() {
   $('#admCount').textContent = `المعروض: ${A.view.length} من ${A.rows.length}`;
 }
 $('#admSearch').oninput = renderList; $('#admFilter').onchange = renderList;
-
 $('#admBody').onclick = e => {
   const tr = e.target.closest('tr.r'); if (!tr) return;
   const nid = tr.dataset.nid, a = e.target.closest('[data-a]');
   if (!a) return openDetail(nid);
   if (a.dataset.a === 'acc') doAccept(nid); else if (a.dataset.a === 'rej') doReject(nid); else doDelete(nid);
 };
-
 function upsertRow(row, oldNid) {
   const i = A.rows.findIndex(r => r.nid === (oldNid || row.nid));
   if (i >= 0) A.rows[i] = row; else A.rows.unshift(row);
@@ -1165,7 +1484,7 @@ function upsertRow(row, oldNid) {
 }
 const byNid = n => A.rows.find(r => r.nid === n);
 
-/* نافذة تأكيد/إدخال. input: false | true (سبب في مربع نص) | 'line' (سطر واحد LTR مثل كلمة المرور) */
+/* نافذة تأكيد/إدخال. input: false | true (سبب) | 'line' (سطر: اسم نمط، كلمة مرور...) */
 function ask({ title, msg, input, okText }) {
   return new Promise(res => {
     $('#askTitle').textContent = title; $('#askMsg').textContent = msg || '';
@@ -1176,7 +1495,7 @@ function ask({ title, msg, input, okText }) {
     const close = v => { $('#askModal').hidden = true; ln.onkeydown = null; res(v); };
     $('#askOk').onclick = () => {
       if (input === true && !ta.value.trim()) return toast('اكتب السبب أولًا', 'err');
-      if (input === 'line' && !ln.value.trim()) return toast('اكتب كلمة المرور أولًا', 'err');
+      if (input === 'line' && !ln.value.trim()) return toast('اكتب القيمة أولًا', 'err');
       close(input === true ? ta.value.trim() : input === 'line' ? ln.value.trim() : true);
     };
     ln.onkeydown = e => { if (e.key === 'Enter') { e.preventDefault(); $('#askOk').click(); } };
@@ -1199,16 +1518,21 @@ async function doReject(nid) {
 }
 async function doDelete(nid) {
   const r0 = byNid(nid); if (!r0) return;
-  if (!await ask({ title: 'حذف نهائي', msg: `سيتم حذف «${r0.fullName}» وصوره نهائيًا، ويصبح الرقم القومي متاحًا للتسجيل من جديد. متأكد؟`, okText: 'حذف' })) return;
+  const hint = isSuper() ? 'هتتنقل لسلة المحذوفات وتقدر ترجّعها.' : 'هتتنقل لسلة المحذوفات (السوبر أدمن بس هو اللي يقدر يرجّعها).';
+  if (!await ask({ title: 'حذف', msg: `حذف «${r0.fullName}» وحجوزاته؟ ${hint} الرقم القومي هيبقى متاح للتسجيل من جديد.`, okText: 'حذف' })) return;
   const r = await adm('adminDelete', { nid });
-  if (r.ok) { A.rows = A.rows.filter(x => x.nid !== nid); renderList(); toast('تم الحذف', 'ok'); if (A.cur === nid) $('#detailModal').hidden = true; } else toast(r.error, 'err');
+  if (r.ok) {
+    A.rows = A.rows.filter(x => x.nid !== nid); renderList(); toast('تم الحذف (في سلة المحذوفات)', 'ok');
+    if (A.cur === nid) $('#detailModal').hidden = true;
+    if (r.trashCount !== undefined) setTrashCount(r.trashCount);
+  } else toast(r.error, 'err');
 }
 
-/* نافذة التفاصيل */
+/* ---------------- نافذة التفاصيل (تعديل البيانات + الصور) ---------------- */
 const dHost = $('#dForm');
 function openDetail(nid) {
   const r = byNid(nid); if (!r) return;
-  A.cur = nid; $('#detailModal').hidden = false; showErr('#dErr', '');
+  A.cur = nid; A.pend = {}; $('#detailModal').hidden = false; showErr('#dErr', '');
   mountForm(dHost, { photos: false }); fillForm(dHost, r);
   refreshDetail();
   loadImg(nid, 'profile', '#dImgP'); loadImg(nid, 'idCard', '#dImgI');
@@ -1216,28 +1540,38 @@ function openDetail(nid) {
 function refreshDetail() {
   const r = byNid(A.cur); if (!r || $('#detailModal').hidden) return;
   $('#dName').textContent = r.fullName;
-  $('#dHead').innerHTML = badge(r.status) + (r.code ? ` <span class="ltr"><b>الكود: ${esc(r.code)}</b></span>` : '') +
-    (r.status === 'مرفوض' && r.rejectReason ? ` <span style="color:var(--bad)">السبب: ${esc(r.rejectReason)}</span>` : '');
+  $('#dHead').innerHTML = badge(r.status) + (r.code ? ` <span class="ltr"><b>الكود: ${esc(r.code)}</b></span>` : '') + (r.status === 'مرفوض' && r.rejectReason ? ` <span style="color:var(--bad)">السبب: ${esc(r.rejectReason)}</span>` : '');
   const wa = 'https://wa.me/2' + digits(r.whatsapp) + '?text=' + encodeURIComponent(
-    `أهلًا ${r.fullName.split(' ')[0]}،\nتم قبول تسجيلك في اجتماع شباب «اتبعني» - كاتدرائية مارمينا والبابا كيرلس بالعاشر من رمضان ✝️\nكودك الخاص: ${r.code}\nاحتفظ به، وستحتاجه عند الحضور.`);
+    `أهلًا ${r.fullName.split(' ')[0]}،\nتم قبول تسجيلك في ${EVENT_NAME} - ${CHURCH_NAME} ✝️\nكودك الخاص: ${r.code}\nتقدر تدخل الموقع من «دخول الأعضاء»: اليوزر = كودك، وكلمة المرور = رقم الواتساب.`);
   $('#dActions').innerHTML = `<button class="btn pri" id="dSave">💾 حفظ التعديلات</button>` +
-    (r.status !== 'مقبول' ? `<button class="btn ok" id="dAcc">قبول</button>` : '') +
-    (r.status !== 'مرفوض' ? `<button class="btn bad" id="dRej">رفض</button>` : '') +
+    (r.status !== 'مقبول' ? `<button class="btn ok" id="dAcc">قبول</button>` : '') + (r.status !== 'مرفوض' ? `<button class="btn bad" id="dRej">رفض</button>` : '') +
     `<button class="btn" id="dDel">🗑 حذف</button>` +
-    (r.status === 'مقبول' ? `<a class="btn gold" style="text-decoration:none" target="_blank" rel="noopener" href="${wa}">إرسال الكود واتساب</a>` : '');
+    (r.status === 'مقبول' ? `<button class="btn" id="dResetPw">🔑 إرجاع باسورد العضو للواتساب</button><a class="btn gold" style="text-decoration:none" target="_blank" rel="noopener" href="${wa}">إرسال الكود واتساب</a>` : '');
   $('#dSave').onclick = saveDetail; $('#dDel').onclick = () => doDelete(A.cur);
   if ($('#dAcc')) $('#dAcc').onclick = () => doAccept(A.cur);
   if ($('#dRej')) $('#dRej').onclick = () => doReject(A.cur);
+  if ($('#dResetPw')) $('#dResetPw').onclick = async () => {
+    if (!await ask({ title: 'إرجاع كلمة المرور', msg: `كلمة مرور «${r.fullName}» هترجع لرقم الواتساب (${r.whatsapp}) وأي جلسة مفتوحة له هتتقفل. متأكد؟`, okText: 'إرجاع' })) return;
+    const x = await adm('adminResetMemberPassword', { nid: A.cur });
+    toast(x.ok ? 'تم إرجاع كلمة المرور لرقم الواتساب' : x.error, x.ok ? 'ok' : 'err');
+    if (x.ok) refreshTrashCount();
+  };
 }
 async function saveDetail() {
   showErr('#dErr', '');
-  const d = readForm(dHost), err = validateClient(d, dHost, false);
+  const r0 = byNid(A.cur), legacy = !!(r0 && r0.occupation !== 'طالب' && !r0.lastEduStage);       // تسجيل قديم من غير بيانات تعليم
+  const d = readForm(dHost), err = validateClient(d, dHost, false, { lenientEdu: legacy });
   if (err) return markError(dHost, err, '#dErr');
   const b = $('#dSave'); b.disabled = true; b.innerHTML = '<span class="spin"></span>';
-  const r = await adm('adminUpdate', { nid: A.cur, data: d });
+  const r = await adm('adminUpdate', { nid: A.cur, data: d, profile: A.pend.profile || null, idCard: A.pend.idCard || null }, 120000);
   b.disabled = false; b.textContent = '💾 حفظ التعديلات';
   if (!r.ok) return showErr('#dErr', r.error);
-  const old = A.cur; A.cur = r.row.nid; upsertRow(r.row, old); refreshDetail(); toast('تم حفظ التعديلات', 'ok');
+  const old = A.cur, changed = Object.keys(A.pend).length;
+  A.cur = r.row.nid; A.pend = {};
+  Object.keys(A.img).forEach(k => { if (k.indexOf(old) === 0) delete A.img[k]; });
+  $$('#dImgP,#dImgI').forEach(x => x.classList.remove('pend'));
+  upsertRow(r.row, old); refreshDetail(); toast('تم حفظ التعديلات', 'ok');
+  if (changed) { loadImg(A.cur, 'profile', '#dImgP'); loadImg(A.cur, 'idCard', '#dImgI'); }
 }
 async function loadImg(nid, which, sel) {
   const box = $(sel), key = nid + which;
@@ -1252,7 +1586,24 @@ async function loadImg(nid, which, sel) {
   box.innerHTML = `<img src="${src}" alt="">`;
   box.querySelector('img').onclick = () => { $('#lbImg').src = src; $('#lightbox').hidden = false; };
 }
-$('#dClose').onclick = () => { $('#detailModal').hidden = true; A.cur = null; };
+// استبدال الصورة الشخصية (بقص مربع) أو صورة البطاقة — بتتحفظ مع «حفظ التعديلات»
+function bindAdminPhoto(btnId, fileId, kind, boxSel) {
+  $(btnId).onclick = () => $(fileId).click();
+  $(fileId).onchange = async e => {
+    const f = e.target.files[0]; e.target.value = ''; if (!f) return;
+    try {
+      const bmp = await loadBitmap(f);
+      const url = kind === 'profile' ? await openCropper(bmp) : resizeToJpeg(bmp, 1280, 0.78);
+      if (!url) return;
+      A.pend[kind] = url;
+      const box = $(boxSel); box.innerHTML = `<img src="${url}" alt="">`; box.classList.add('pend');
+      box.querySelector('img').onclick = () => { $('#lbImg').src = url; $('#lightbox').hidden = false; };
+    } catch (err) { toast('تعذر قراءة الصورة. جرّب صورة أخرى.', 'err'); }
+  };
+}
+bindAdminPhoto('#dChgP', '#dFileP', 'profile', '#dImgP');
+bindAdminPhoto('#dChgI', '#dFileI', 'idCard', '#dImgI');
+$('#dClose').onclick = () => { $('#detailModal').hidden = true; A.cur = null; A.pend = {}; };
 $('#lightbox').onclick = () => $('#lightbox').hidden = true;
 
 /* تصدير Excel (حسب الفلتر الحالي) */
@@ -1261,14 +1612,12 @@ $('#admExport').onclick = () => {
   const aoa = [EXPORT_COLS.map(c => c[1])].concat(A.view.map(r => EXPORT_COLS.map(c => String(r[c[0]] ?? ''))));
   const stamp = new Date().toISOString().slice(0, 10);
   if (window.XLSX) {
-    const ws = XLSX.utils.aoa_to_sheet(aoa);
-    ws['!cols'] = EXPORT_COLS.map(c => ({ wch: Math.max(12, c[1].length + 4) }));
+    const ws = XLSX.utils.aoa_to_sheet(aoa); ws['!cols'] = EXPORT_COLS.map(c => ({ wch: Math.max(12, c[1].length + 4) }));
     const wb = XLSX.utils.book_new(); wb.Workbook = { Views: [{ RTL: true }] };
     XLSX.utils.book_append_sheet(wb, ws, 'التسجيلات'); XLSX.writeFile(wb, `registrations_${stamp}.xlsx`);
   } else {
     const csv = '\uFEFF' + aoa.map(r => r.map(v => '"' + v.replace(/"/g, '""') + '"').join(',')).join('\n');
-    const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
-    a.download = `registrations_${stamp}.csv`; a.click();
+    const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' })); a.download = `registrations_${stamp}.csv`; a.click();
   }
 };
 
@@ -1295,7 +1644,7 @@ $('#acctSave').onclick = async () => {
   const r = await adm('adminChangePassword', { oldPassword: o, newPassword: n }, 60000);
   b.disabled = false; b.textContent = '💾 حفظ';
   if (!r.ok) return showErr('#acctErr', r.error);
-  saveSession(r.token, A.user, A.role);            // توكن جديد (القديم بطل بعد تغيير الباسورد)
+  saveSession(r.token, A.user, A.role);
   $('#acctModal').hidden = true; toast('تم تغيير كلمة المرور ✔', 'ok');
 };
 
@@ -1303,11 +1652,10 @@ $('#acctSave').onclick = async () => {
    إدارة الأدمنز (سوبر أدمن فقط)
    ========================================================= */
 function randomPassword(len = 10) {
-  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789';
-  const a = new Uint32Array(len); (window.crypto || window.msCrypto).getRandomValues(a);
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789', a = new Uint32Array(len);
+  (window.crypto || window.msCrypto).getRandomValues(a);
   return Array.from(a, n => chars[n % chars.length]).join('');
 }
-
 function renderAdmins(list) {
   $('#admsBody').innerHTML = list.map(a => `<tr>
     <td><b class="ltr" style="display:inline-block">${esc(a.username)}</b><br>${a.role === 'super' ? '<span class="badge s">سوبر أدمن</span>' : '<span class="badge p">أدمن</span>'}</td>
@@ -1321,7 +1669,6 @@ async function loadAdmins() {
   if (!r.ok) { $('#admsBody').innerHTML = `<tr><td colspan="3" style="color:var(--bad);text-align:center">${esc(r.error)}</td></tr>`; return; }
   renderAdmins(r.admins);
 }
-
 $('#admAdmins').onclick = () => {
   if (!isSuper()) return;
   showErr('#naErr', ''); $('#naUser').value = ''; $('#naPass').value = ''; $('#naPass').type = 'password'; $('#naShow').checked = false;
@@ -1355,13 +1702,15 @@ $('#admsBody').onclick = async e => {
     if (r.ok) { renderAdmins(r.admins); toast('تم تغيير كلمة مرور ' + u, 'ok'); } else toast(r.error, 'err');
   } else if (b.dataset.del) {
     const u = b.dataset.del;
-    if (!await ask({ title: 'حذف أدمن', msg: `حذف حساب «${u}»؟ هيتسجل خروجه فورًا ومش هيقدر يدخل تاني.`, okText: 'حذف' })) return;
+    if (!await ask({ title: 'حذف أدمن', msg: `حذف حساب «${u}»؟ هيتسجل خروجه فورًا ومش هيقدر يدخل تاني، والحساب بيتنقل لسلة المحذوفات.`, okText: 'حذف' })) return;
     const r = await adm('adminDeleteAdmin', { username: u }, 60000);
-    if (r.ok) { renderAdmins(r.admins); toast('تم حذف ' + u, 'ok'); } else toast(r.error, 'err');
+    if (r.ok) { renderAdmins(r.admins); toast('تم حذف ' + u, 'ok'); refreshTrashCount(); } else toast(r.error, 'err');
   }
 };
 
+/* ============ تشغيل ============ */
 if (A.token) enterDash();
+if (typeof portalInit === 'function') portalInit();
 </script>
 </body>
 </html>
