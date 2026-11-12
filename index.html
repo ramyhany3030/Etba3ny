@@ -38,7 +38,7 @@ body.lock{overflow:hidden}
 </style>
 
 <!-- ?v=رقم النسخة: بيجبر المتصفح يحمّل الملفات الجديدة بعد كل تحديث (بدل النسخة القديمة المخزّنة). لازم يطابق EXPECTED_VERSION تحت -->
-<script src="config.js?v=2026-10-26-poster-v9"></script>
+<script src="config.js?v=2026-11-09-pay-v11"></script>
 <!-- محمّل الشعار: بيجرّب المصادر بالترتيب لحد ما واحد يشتغل: LOGO_URL (من config.js) ← logo.png (جنب index.html) ← Drive -->
 <script>
 (function () {
@@ -65,8 +65,10 @@ body.lock{overflow:hidden}
   document.addEventListener('DOMContentLoaded', L.apply);
 })();
 </script>
-<script src="portal.js?v=2026-10-26-poster-v9"></script>
-<script src="conferences.js?v=2026-10-26-poster-v9"></script>
+<script src="portal.js?v=2026-11-09-pay-v11"></script>
+<script src="conferences.js?v=2026-11-09-pay-v11"></script>
+<!-- المدفوعات والأقساط + الكوبونات + ملفات ومرفقات الرحلات والمؤتمرات (بيركّب نفسه في الصفحة لوحده) -->
+<script src="extras.js?v=2026-11-09-pay-v11"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" defer></script>
 <style>
 /* ===== لوحة الألوان (مأخوذة من الشعار): بني #3c2412 · كريمي #f4ecdc · ذهبي #c38622 ===== */
@@ -181,7 +183,7 @@ tr.grow.pend td{background:#fff1d6}
 .adm-photos figcaption{font-size:13px;margin-top:3px;color:var(--mut)}
 #toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:#2e1d10;color:#fff;padding:10px 18px;border-radius:24px;z-index:99;max-width:92%;text-align:center;box-shadow:0 6px 18px rgba(0,0,0,.35)}
 #toast.err{background:var(--bad)}#toast.ok{background:var(--ok)}
-canvas#cropCanvas{width:100%;max-width:320px;aspect-ratio:1;touch-action:none;border-radius:12px;background:#000;display:block;margin:0 auto;cursor:grab}
+canvas#cropCanvas{width:100%;max-width:360px;aspect-ratio:1;touch-action:none;border-radius:12px;background:#000;display:block;margin:0 auto;cursor:grab}
 .spin{display:inline-block;width:16px;height:16px;border:3px solid #dccfb4;border-top-color:var(--gold-d);border-radius:50%;animation:sp 1s linear infinite;vertical-align:middle}
 @keyframes sp{to{transform:rotate(360deg)}}
 .lead{color:var(--mut);margin:0 0 12px}
@@ -267,6 +269,17 @@ input.tcode{text-transform:uppercase;letter-spacing:4px;text-align:center;font-w
 .bus.edit{touch-action:none;user-select:none}
 .bus.edit .c{cursor:pointer}
 .bus.adm .c.taken{cursor:pointer}
+/* مقاعد الشباب / البنات + أكتر من أتوبيس */
+.bus .c.M{background:#e6f0fb;border-color:#2b6cb0;color:#1e4e8c}
+.bus .c.W{background:#fbe9f1;border-color:#b83280;color:#97266d}
+.bus .c.free{cursor:pointer}
+.bus .c.glock{background:repeating-linear-gradient(45deg,#f4efe3,#f4efe3 4px,#e9e1cf 4px,#e9e1cf 8px)!important;opacity:.75;cursor:not-allowed}
+.buses{display:flex;flex-wrap:wrap;gap:14px;justify-content:center;align-items:flex-start}
+.busBox{text-align:center;max-width:100%}
+.busName{font-weight:700;color:var(--brown);margin-bottom:2px}
+.busTabs{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0}
+.busTabs button{border:1.5px solid #e0d4bb;background:#fff;border-radius:999px;padding:5px 12px;font:inherit;font-size:13px;cursor:pointer;color:var(--brown)}
+.busTabs button.on{background:linear-gradient(135deg,var(--brown),var(--brown2));color:#fff;border-color:var(--brown)}
 .legend{display:flex;gap:12px;flex-wrap:wrap;font-size:12.5px;color:var(--mut);margin:8px 0}
 .legend i{display:inline-block;width:14px;height:14px;border-radius:4px;vertical-align:-2px;margin-left:4px;border:2px solid}
 .tools{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}
@@ -582,8 +595,8 @@ input.tcode{text-transform:uppercase;letter-spacing:4px;text-align:center;font-w
 <!-- ============ نوافذ ثابتة ============ -->
 <div class="modal" id="cropModal" hidden>
   <div class="box sm">
-    <h3 class="mt">اضبط الصورة الشخصية</h3>
-    <p class="lead" style="margin:0 0 8px">اسحب الصورة لتحريكها، واستخدم الشريط للتكبير.</p>
+    <h3 class="mt" id="cropTitle">اضبط الصورة الشخصية</h3>
+    <p class="lead" style="margin:0 0 8px">اسحب الصورة لتحريكها، واستخدم الشريط للتكبير والتصغير.</p>
     <canvas id="cropCanvas"></canvas>
     <input type="range" id="cropZoom" min="1" max="4" step="0.01" value="1" style="margin:12px 0">
     <div class="row"><button class="btn pri" id="cropOk">تأكيد</button><button class="btn" id="cropCancel">إلغاء</button></div>
@@ -595,8 +608,8 @@ input.tcode{text-transform:uppercase;letter-spacing:4px;text-align:center;font-w
     <div class="row" style="justify-content:space-between"><h3 class="mt" id="dName"></h3><button class="btn sm" id="dClose">إغلاق ✕</button></div>
     <div class="row" id="dHead" style="margin-bottom:8px"></div>
     <div class="adm-photos">
-      <figure><div class="im" id="dImgP"><span class="spin"></span></div><figcaption>الصورة الشخصية <button class="btn sm" id="dChgP" type="button">🖼️ تغيير</button></figcaption></figure>
-      <figure><div class="im" id="dImgI"><span class="spin"></span></div><figcaption>صورة البطاقة <button class="btn sm" id="dChgI" type="button">🖼️ تغيير</button></figcaption></figure>
+      <figure><div class="im" id="dImgP"><span class="spin"></span></div><figcaption>الصورة الشخصية <button class="btn sm" id="dChgP" type="button">🖼️ تغيير</button> <button class="btn sm" id="dCropP" type="button">✂️ قص وتكبير</button></figcaption></figure>
+      <figure><div class="im" id="dImgI"><span class="spin"></span></div><figcaption>صورة البطاقة <button class="btn sm" id="dChgI" type="button">🖼️ تغيير</button> <button class="btn sm" id="dCropI" type="button">✂️ قص وتكبير</button></figcaption></figure>
     </div>
     <input type="file" accept="image/*" hidden id="dFileP"><input type="file" accept="image/*" hidden id="dFileI">
     <div id="dForm"></div>
@@ -657,7 +670,7 @@ input.tcode{text-transform:uppercase;letter-spacing:4px;text-align:center;font-w
 // رابط الـ Web App يُقرأ من ملف config.js (لا تعدّل هنا)
 const API_URL = (window.APP_CONFIG && window.APP_CONFIG.API_URL) || '';
 // لازم يطابق APP_VERSION في Code.gs، وPORTAL_VER في portal.js، وCONF_VER في conferences.js، ورقم ?v= في أول index.html.
-const EXPECTED_VERSION = '2026-10-26-poster-v9';
+const EXPECTED_VERSION = '2026-11-09-pay-v11';
 
 /* =========================================================
    الاسم المعتمد (مكان واحد): أي مكان في الموقع فيه اسم الكنيسة أو الاجتماع بيقرأ من هنا
@@ -1231,26 +1244,35 @@ function bindPhoto(host, kind) {
     } catch (e) { toast('تعذر قراءة الصورة. جرّب صورة أخرى.', 'err'); }
   }));
 }
-function openCropper(bmp) {
+// قص وتكبير/تصغير: o.aspect = العرض/الارتفاع (1 للصورة الشخصية، 85.6/54 لكارت البطاقة)، o.outW = عرض الصورة الناتجة
+// التصغير لأقل من 100% بيسمح الصورة كلها تبان (والفراغ بيبقى أبيض)
+function openCropper(bmp, o) {
+  o = o || {};
   return new Promise(resolve => {
     const modal = $('#cropModal'), cv = $('#cropCanvas'), ctx = cv.getContext('2d'), zoom = $('#cropZoom');
-    const S = 320; cv.width = cv.height = S;
-    const iw = bw(bmp), ih = bh(bmp), base = S / Math.min(iw, ih);
+    const aspect = o.aspect || 1, SW = 360, SH = Math.round(SW / aspect), OW = o.outW || 800, OH = Math.round(OW / aspect);
+    cv.width = SW; cv.height = SH; cv.style.aspectRatio = SW + ' / ' + SH;
+    $('#cropTitle').textContent = o.title || 'اضبط الصورة الشخصية';
+    const iw = bw(bmp), ih = bh(bmp), base = Math.max(SW / iw, SH / ih), minZ = Math.min(1, Math.min(SW / iw, SH / ih) / base);
     let z = 1, ox, oy; const sc = () => base * z;
-    const clamp = () => { ox = Math.min(0, Math.max(S - iw * sc(), ox)); oy = Math.min(0, Math.max(S - ih * sc(), oy)); };
-    const draw = () => { ctx.fillStyle = '#000'; ctx.fillRect(0, 0, S, S); ctx.drawImage(bmp, ox, oy, iw * sc(), ih * sc()); };
-    ox = (S - iw * sc()) / 2; oy = (S - ih * sc()) / 2; zoom.value = 1; clamp(); draw();
+    const clamp = () => {
+      const w = iw * sc(), h = ih * sc();
+      ox = w >= SW ? Math.min(0, Math.max(SW - w, ox)) : (SW - w) / 2;
+      oy = h >= SH ? Math.min(0, Math.max(SH - h, oy)) : (SH - h) / 2;
+    };
+    const draw = () => { ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, SW, SH); ctx.drawImage(bmp, ox, oy, iw * sc(), ih * sc()); };
+    ox = (SW - iw * sc()) / 2; oy = (SH - ih * sc()) / 2; zoom.min = String(Math.round(minZ * 100) / 100); zoom.max = '4'; zoom.value = 1; clamp(); draw();
     let drag = null;
     cv.onpointerdown = e => { cv.setPointerCapture(e.pointerId); drag = { x: e.clientX, y: e.clientY }; cv.style.cursor = 'grabbing'; };
-    cv.onpointermove = e => { if (!drag) return; const r = S / cv.clientWidth; ox += (e.clientX - drag.x) * r; oy += (e.clientY - drag.y) * r; drag = { x: e.clientX, y: e.clientY }; clamp(); draw(); };
+    cv.onpointermove = e => { if (!drag) return; const r = SW / cv.clientWidth; ox += (e.clientX - drag.x) * r; oy += (e.clientY - drag.y) * r; drag = { x: e.clientX, y: e.clientY }; clamp(); draw(); };
     cv.onpointerup = cv.onpointercancel = () => { drag = null; cv.style.cursor = 'grab'; };
-    zoom.oninput = () => { const cx = (S / 2 - ox) / sc(), cy = (S / 2 - oy) / sc(); z = +zoom.value; ox = S / 2 - cx * sc(); oy = S / 2 - cy * sc(); clamp(); draw(); };
+    zoom.oninput = () => { const cx = (SW / 2 - ox) / sc(), cy = (SH / 2 - oy) / sc(); z = Math.max(minZ, +zoom.value); ox = SW / 2 - cx * sc(); oy = SH / 2 - cy * sc(); clamp(); draw(); };
     const done = v => { modal.hidden = true; resolve(v); };
     $('#cropCancel').onclick = () => done(null);
     $('#cropOk').onclick = () => {
-      const o = document.createElement('canvas'); o.width = o.height = 800; const k = 800 / S, x = o.getContext('2d');
-      x.fillStyle = '#fff'; x.fillRect(0, 0, 800, 800); x.drawImage(bmp, ox * k, oy * k, iw * sc() * k, ih * sc() * k);
-      done(o.toDataURL('image/jpeg', 0.82));
+      const out = document.createElement('canvas'); out.width = OW; out.height = OH; const k = OW / SW, x = out.getContext('2d');
+      x.fillStyle = '#fff'; x.fillRect(0, 0, OW, OH); x.drawImage(bmp, ox * k, oy * k, iw * sc() * k, ih * sc() * k);
+      done(out.toDataURL('image/jpeg', o.quality || 0.85));
     };
     modal.hidden = false;
   });
@@ -1271,6 +1293,7 @@ function sysBanner(msg, key) {
   const stale = [];
   if (typeof PORTAL_VER === 'undefined' || PORTAL_VER !== EXPECTED_VERSION) stale.push('portal.js');
   if (window.CONF_VER !== EXPECTED_VERSION) stale.push('conferences.js');
+  if (window.EXTRAS_VER !== EXPECTED_VERSION) stale.push('extras.js');
   if (stale.length) sysBanner('ملف ' + stale.join(' و ') + ' على موقعك نسخة قديمة (إما مخزّنة في المتصفح أو لسه ما اترفعش الجديد على GitHub). ارفع النسخة الجديدة وبعدها اعمل تحديث إجباري Ctrl+F5 (على الموبايل: امسح بيانات الموقع). لحد ما ده يحصل ممكن الاشتراك والحجز يدّوا أخطاء.', 'files');
 })();
 
@@ -1603,6 +1626,24 @@ function bindAdminPhoto(btnId, fileId, kind, boxSel) {
 }
 bindAdminPhoto('#dChgP', '#dFileP', 'profile', '#dImgP');
 bindAdminPhoto('#dChgI', '#dFileI', 'idCard', '#dImgI');
+// قص وتكبير الصورة الحالية (من غير حذفها): النسخة المعدّلة بتتحفظ كملف جديد مع «حفظ التعديلات»، والأصلية بتفضل في Drive
+async function cropExisting(kind, boxSel) {
+  if (!A.cur) return;
+  const src = A.pend[kind] || A.img[A.cur + kind];
+  if (!src) return toast('الصورة لسه بتتحمّل أو مش موجودة.', 'err');
+  const img = await loadImage(src);
+  if (!img) return toast('تعذر قراءة الصورة.', 'err');
+  const url = await openCropper(img, kind === 'profile'
+    ? { aspect: 1, outW: 800, title: '✂️ قص وتكبير الصورة الشخصية' }
+    : { aspect: 85.6 / 54, outW: 1280, title: '✂️ قص وتكبير صورة البطاقة' });
+  if (!url) return;
+  A.pend[kind] = url;
+  const box = $(boxSel); box.innerHTML = `<img src="${url}" alt="">`; box.classList.add('pend');
+  box.querySelector('img').onclick = () => { $('#lbImg').src = url; $('#lightbox').hidden = false; };
+  toast('اتعدّلت — اضغط «💾 حفظ التعديلات» عشان تتحفظ (الصورة الأصلية بتفضل محفوظة).', 'ok');
+}
+$('#dCropP').onclick = () => cropExisting('profile', '#dImgP');
+$('#dCropI').onclick = () => cropExisting('idCard', '#dImgI');
 $('#dClose').onclick = () => { $('#detailModal').hidden = true; A.cur = null; A.pend = {}; };
 $('#lightbox').onclick = () => $('#lightbox').hidden = true;
 
