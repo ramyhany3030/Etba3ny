@@ -4,7 +4,7 @@
    بيتحمّل بعد portal.js. التابات والحاويات (#memConf / #admConf) موجودة في index.html، والملف ده بيعرّف window.confModule
    وبيستخدم الدوال الموجودة (pModal / busHTML / BusEditor / askGuest / askJoinGuests / openGuestsManager / mcall / adm / ask / toast ...).
    ===================================================================== */
-window.CONF_VER = '2026-10-26-poster-v9';             // لازم يطابق EXPECTED_VERSION في index.html (لو اختلف بيظهر تنبيه "ملف قديم")
+window.CONF_VER = '2026-11-09-pay-v11';             // لازم يطابق EXPECTED_VERSION في index.html (لو اختلف بيظهر تنبيه "ملف قديم")
 (function () {
   'use strict';
   if (window.__confModule) return; window.__confModule = true;
@@ -37,6 +37,9 @@ window.CONF_VER = '2026-10-26-poster-v9';             // لازم يطابق EXP
   .cf-sec{margin:14px 0 4px;color:var(--brown)}
   .cf-acc{margin-top:6px;font-size:12.5px;min-height:34px;padding:4px 6px;max-width:210px}
   .cf-accl{display:block;font-size:11.5px;color:var(--mut);margin-top:4px}
+  .cf-hotel{margin:14px 0 6px;color:var(--brown);font-size:15.5px;border-right:4px solid var(--gold);padding-right:8px}
+  .cf-hbox{border:1.5px dashed #d6c7a6;border-radius:14px;padding:10px;margin-bottom:12px;background:#fdfaf3}
+  .cf-hhead{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:8px}.cf-hhead input{flex:1 1 180px;padding:7px 8px;font-weight:700}
   @media(max-width:640px){.cf-rrow{grid-template-columns:1fr 1fr}.cf-rrow button{grid-column:2}.cf-rrow [data-r=name]{grid-column:1/-1}.cf-rrow [data-r=note]{grid-column:1/-1}}
   `;
 
@@ -59,6 +62,17 @@ window.CONF_VER = '2026-10-26-poster-v9';             // لازم يطابق EXP
   // الغرف المسموحة: own = غرفة من نفس جنسه فقط | mixed = غرفة مشتركة فقط | both = الاتنين
   const ACC = { own: 'غرفة من نفس جنسه فقط', mixed: 'غرفة مشتركة فقط', both: 'غرفة من نفس جنسه أو مشتركة' };
   const accConflict = (room, acc) => (!room.gender && acc === 'own') || (!!room.gender && acc === 'mixed');
+  // الفنادق: الغرف متقسّمة حسب hotel بالترتيب (الغرف القديمة من غير فندق بتظهر تحت «السكن»)
+  function hotelsOf(rooms) {
+    const out = [], idx = {};
+    (rooms || []).forEach(r => { const h = r.hotel || ''; if (!(h in idx)) { idx[h] = out.length; out.push({ name: h, rooms: [] }); } out[idx[h]].rooms.push(r); });
+    return out;
+  }
+  const roomLabel = r => (r.hotel ? r.hotel + ' · ' : '') + r.name;
+  function roomsByHotelHTML(rooms, one) {
+    const hs = hotelsOf(rooms), show = hs.length > 1 || (hs[0] && hs[0].name);
+    return hs.map(h => (show ? `<h4 class="cf-hotel">🏨 ${esc(h.name || 'السكن')} <small class="hint" style="display:inline">(${h.rooms.length} غرفة)</small></h4>` : '') + h.rooms.map(one).join('')).join('');
+  }
   const ST = { draft: ['مسودة', 'g'], open: ['مفتوح للحجز', 'o'], closed: ['مغلق', 'p'] };
   const BK = { requested: ['طلب جديد', 'p'], accepted: ['مقبول', 'o'], rejected: ['مرفوض', 'n'], cancelled: ['ملغي', 'g'] };
   let probed = false;
@@ -166,7 +180,7 @@ window.CONF_VER = '2026-10-26-poster-v9';             // لازم يطابق EXP
     const body = m.q('.bd'); bindDraft(body, draft);
     const persons = () => [{ id: 'me', name: 'أنا', seat: st.my.seat || 0, roomId: st.my.roomId || '', bed: st.my.bed || 0, gender: st.myGender, st: 'a' }]
       .concat((st.my.guests || []).map(g => ({ id: g.id, name: g.name, seat: g.seat || 0, roomId: g.roomId || '', bed: g.bed || 0, gender: g.gender, st: gstOf(g), guest: true })));
-    const rName = id => { const r = (st.rooms || []).find(x => x.id === id); return r ? r.name : ''; };
+    const rName = id => { const r = (st.rooms || []).find(x => x.id === id); return r ? roomLabel(r) : ''; };
 
     const roomHTML = (r, cur) => {
       const genderBad = !!(r.gender && r.gender !== cur.gender), accessBad = accConflict(r, st.my.roomAccess || 'both'), restricted = genderBad || accessBad;
@@ -206,14 +220,14 @@ window.CONF_VER = '2026-10-26-poster-v9';             // لازم يطابق EXP
       if (tab === 'bus') {
         const set = {}, names = {}; ps.forEach(p => { if (p.seat && p.st === 'a') { set[p.seat] = true; names[p.seat] = p.guest ? p.name : 'أنا'; } });
         const act = open ? `<div class="row" style="justify-content:center;margin-top:8px">${selSeat && selSeat !== cur.seat ? `<button class="btn gold" data-do="takeSeat">${cur.seat ? 'نقل مقعد ' + esc(who_) + ' إلى ' : 'احجز المقعد '}${selSeat}${cur.seat ? '' : ' لـ ' + esc(who_)}</button>` : ''}${cur.seat ? `<button class="btn" data-do="relSeat">إلغاء مقعد ${esc(who_)}</button>` : ''}</div>` : '';
-        main = `<div style="text-align:center">${open ? `<div class="hint">${multi ? 'اختار الشخص فوق، وبعدين اضغط على مقعد أخضر واضغط «احجز».' : 'اضغط على مقعد أخضر، وبعدين اضغط «احجز».'}</div>` : ''}${BUS_LEGEND}${busHTML(st.layout, { mode: 'pick', occupied: st.occupied, mine: cur.seat, mineSet: set, sel: selSeat, names })}${act}</div>`;
+        main = `<div style="text-align:center">${open ? `<div class="hint">${multi ? 'اختار الشخص فوق، وبعدين اضغط على مقعد أخضر واضغط «احجز».' : 'اضغط على مقعد أخضر، وبعدين اضغط «احجز».'}</div>` : ''}${BUS_LEGEND}${busHTML(st.layout, { mode: 'pick', occupied: st.occupied, mine: cur.seat, mineSet: set, sel: selSeat, names, gender: cur.gender || '' })}${act}</div>`;
       } else {
         const sel = selBed && st.rooms.find(r => r.id === selBed.room), acc = my.roomAccess || 'both';
         const accNote = acc !== 'both' ? `<div class="notice info" style="margin:6px 0">🛏️ الإدارة سمحتلك بـ: <b>${esc(ACC[acc])}</b>${multi ? ' (وده بينطبق على ضيوفك كمان)' : ''}.</div>` : '';
-        const act = open ? `<div class="row" style="justify-content:center;margin:8px 0">${selBed && !(selBed.room === cur.roomId && selBed.bed === cur.bed) ? `<button class="btn gold" data-do="takeBed">${cur.bed ? 'نقل سرير ' : 'احجز '}${esc(who_)} · ${esc(sel ? sel.name : '')} · سرير ${selBed.bed}</button>` : ''}${cur.bed ? `<button class="btn" data-do="relBed">إلغاء سرير ${esc(who_)}</button>` : ''}</div>` : '';
+        const act = open ? `<div class="row" style="justify-content:center;margin:8px 0">${selBed && !(selBed.room === cur.roomId && selBed.bed === cur.bed) ? `<button class="btn gold" data-do="takeBed">${cur.bed ? 'نقل سرير ' : 'احجز '}${esc(who_)} · ${esc(sel ? roomLabel(sel) : '')} · سرير ${selBed.bed}</button>` : ''}${cur.bed ? `<button class="btn" data-do="relBed">إلغاء سرير ${esc(who_)}</button>` : ''}</div>` : '';
         main = `${accNote}${open ? `<div class="hint" style="text-align:center">${multi ? 'اختار الشخص فوق، وبعدين اضغط على سرير أخضر واضغط «احجز». ' : 'اضغط على سرير أخضر، وبعدين اضغط «احجز». '}الأسماء ظاهرة عشان تعرف مين حاجز فين.</div>` : ''}
           <div class="legend"><span><i style="background:#e8f4ec;border-color:#1f7a45"></i>متاح</span><span><i style="background:#e9e3d6;border-color:#cfc4ad"></i>محجوز</span><span><i style="background:#c8a24a;border-color:#96601a"></i>حجزك</span><span><i style="background:#f4efe3;border-color:#cfc4ad"></i>مش مسموح للشخص ده</span></div>
-          ${act}${st.rooms.map(r => roomHTML(r, cur)).join('')}`;
+          ${act}${roomsByHotelHTML(st.rooms, r => roomHTML(r, cur))}`;
       }
       body.innerHTML = head + tabs + note + main;
       applyDraft(body, draft);
@@ -256,7 +270,9 @@ window.CONF_VER = '2026-10-26-poster-v9';             // لازم يطابق EXP
         if (!r.ok) return toast(r.error, 'err');
         ['name', 'phone', 'gender'].forEach(k => delete draft[k]); dirty = true; toast('تمت إضافة الضيف — بانتظار موافقة الإدارة', 'ok'); return refresh(true);
       }
-      const seat = e.target.closest('.bus .c.S.free');
+      const gl = e.target.closest('.bus .c.glock');
+      if (gl) return toast('المقعد ده ' + (gl.dataset.k === 'M' ? 'للشباب' : 'للبنات') + ' بس.', 'err');
+      const seat = e.target.closest('.bus .c.free');
       if (seat && st.conf.status === 'open') { const n = +seat.dataset.n; selSeat = selSeat === n ? 0 : n; return draw(); }
       const bed = e.target.closest('.cf-bed.free');
       if (bed && st.conf.status === 'open') { const k = { room: bed.dataset.room, bed: +bed.dataset.bed }; selBed = selBed && selBed.room === k.room && selBed.bed === k.bed ? null : k; return draw(); }
@@ -321,12 +337,10 @@ window.CONF_VER = '2026-10-26-poster-v9';             // لازم يطابق EXP
       <h4 class="cf-sec">🚌 الأتوبيس</h4>
       <label class="chk"><input type="checkbox" data-e="useBus"> فيه حجز أتوبيس للمؤتمر ده</label>
       <div data-e="busBox"><div data-e="bus"></div></div>
-      <h4 class="cf-sec">🛏️ الغرف</h4>
-      <div class="hint">كل غرفة بتتعمل لوحدها بعدد أسرّتها واسمها. الأعضاء بيشوفوا كل الغرف ومين حاجز فين ويختاروا سريرهم.</div>
-      <div class="cf-quick">⚡ إنشاء سريع: <input type="number" data-q="count" min="1" max="40" value="5" style="width:68px"> غرفة × <input type="number" data-q="beds" min="1" max="12" value="2" style="width:62px"> سرير
-        <select data-q="gender"><option value="">للجميع (مشتركة)</option><option value="ذكر">للشباب</option><option value="أنثى">للبنات</option></select><button type="button" class="btn sm pri" data-q="go">إنشاء</button></div>
-      <div data-e="rooms"></div>
-      <div class="row"><button type="button" class="btn sm ok" data-q="add">➕ إضافة غرفة</button><span class="hint" data-e="rsum"></span></div>
+      <h4 class="cf-sec">🛏️ السكن: الفنادق والغرف</h4>
+      <div class="hint">تقدر تعمل أكتر من فندق، ولكل فندق غرفه بعدد أسرّتها ونوعها. الأعضاء بيشوفوا الغرف متقسّمة على الفنادق ومين حاجز فين ويختاروا سريرهم.</div>
+      <div data-e="hotels"></div>
+      <div class="row"><button type="button" class="btn sm ok" data-q="addHotel">🏨 إضافة فندق</button><span class="hint" data-e="rsum"></span></div>
       <div class="formerr" data-e="err" hidden></div>`,
       '<button class="btn pri" data-e="save">💾 حفظ المؤتمر</button><button class="btn" data-e="cancel">إلغاء</button>', { tag: 'admin' });
     const e = k => m.q(`[data-e="${k}"]`), q = k => m.q(`[data-q="${k}"]`);
@@ -340,28 +354,54 @@ window.CONF_VER = '2026-10-26-poster-v9';             // لازم يطابق EXP
     };
     e('dateFrom').onchange = e('dateTo').onchange = e('dateFrom').oninput = e('dateTo').oninput = spanBox; spanBox();
 
-    const bus = BusEditor(e('bus'), c && c.layout ? { cells: c.layout.cells, nums: c.layout.nums, locked: c.seatsBooked } : null);
+    const bus = BusEditor(e('bus'), { layout: c && c.layout, locked: !!(c && c.seatsBooked) });
     const busToggle = () => { e('busBox').hidden = !e('useBus').checked; }; e('useBus').onchange = busToggle; busToggle();
 
     const gOpts = g => `<option value=""${g === '' ? ' selected' : ''}>للجميع (مشتركة)</option><option value="ذكر"${g === 'ذكر' ? ' selected' : ''}>للشباب</option><option value="أنثى"${g === 'أنثى' ? ' selected' : ''}>للبنات</option>`;
+    const H = hotelsOf(rooms).map(h => ({ name: h.name, rooms: h.rooms }));
+    if (!H.length) H.push({ name: '', rooms: [] });
+    const roomCount = () => H.reduce((a, h) => a + h.rooms.length, 0);
+    const sum = () => {
+      let beds = 0; H.forEach(h => h.rooms.forEach(r => { beds += (+r.beds || 0); }));
+      e('rsum').textContent = roomCount() ? `الإجمالي: ${H.filter(h => h.rooms.length).length} فندق · ${roomCount()} غرفة · ${beds} سرير` : 'مفيش غرف (المؤتمر من غير سكن)';
+    };
+    const roomRow = (r, hi, i) => { const o = r.id && occ[r.id] ? occ[r.id] : [], mx = o.length ? Math.max.apply(null, o) : 0;
+      return `<div class="cf-rrow" data-h="${hi}" data-i="${i}"><input data-r="name" maxlength="40" placeholder="اسم / رقم الغرفة" value="${esc(r.name)}">
+        <input data-r="beds" type="number" min="${Math.max(mx, 1)}" max="12" value="${esc(r.beds)}" title="عدد الأسرّة"><select data-r="gender">${gOpts(r.gender || '')}</select>
+        <input data-r="note" maxlength="80" placeholder="ملاحظة (اختياري)" value="${esc(r.note || '')}"><button type="button" data-r="del" title="${o.length ? 'فيها محجوزين' : 'حذف'}"${o.length ? ' disabled' : ''}>×</button>
+        ${o.length ? `<div class="lk">🔒 ${o.length} سرير محجوز (آخر سرير محجوز رقم ${mx}) — مينفعش تحذفها ولا تقلل أسرّتها لأقل من كده</div>` : ''}</div>`; };
     const drawRooms = () => {
-      e('rooms').innerHTML = rooms.map((r, i) => { const o = r.id && occ[r.id] ? occ[r.id] : [], mx = o.length ? Math.max.apply(null, o) : 0;
-        return `<div class="cf-rrow" data-i="${i}"><input data-r="name" maxlength="40" placeholder="اسم الغرفة" value="${esc(r.name)}">
-          <input data-r="beds" type="number" min="${Math.max(mx, 1)}" max="12" value="${esc(r.beds)}" title="عدد الأسرّة"><select data-r="gender">${gOpts(r.gender || '')}</select>
-          <input data-r="note" maxlength="80" placeholder="ملاحظة (اختياري)" value="${esc(r.note || '')}"><button type="button" data-r="del" title="${o.length ? 'فيها محجوزين' : 'حذف'}"${o.length ? ' disabled' : ''}>×</button>
-          ${o.length ? `<div class="lk">🔒 ${o.length} سرير محجوز (آخر سرير محجوز رقم ${mx}) — مينفعش تحذفها ولا تقلل أسرّتها لأقل من كده</div>` : ''}</div>`; }).join('');
-      let beds = 0; rooms.forEach(r => { beds += (+r.beds || 0); });
-      e('rsum').textContent = rooms.length ? `الإجمالي: ${rooms.length} غرفة · ${beds} سرير` : 'مفيش غرف (المؤتمر من غير سكن)';
+      e('hotels').innerHTML = H.map((h, hi) => { const locked = h.rooms.some(r => r.id && occ[r.id] && occ[r.id].length);
+        return `<div class="cf-hbox" data-hb="${hi}"><div class="cf-hhead">🏨<input data-hn="${hi}" maxlength="60" placeholder="اسم الفندق / مكان السكن" value="${esc(h.name)}">
+          <button type="button" class="btn sm bad" data-hdel="${hi}"${locked || H.length < 2 ? ' disabled' : ''} title="${locked ? 'فيه غرف محجوزة' : 'حذف الفندق وغرفه'}">🗑 حذف الفندق</button></div>
+          <div class="cf-quick">⚡ إنشاء سريع: <input type="number" data-qc="${hi}" min="1" max="40" value="5" style="width:68px"> غرفة × <input type="number" data-qb="${hi}" min="1" max="12" value="2" style="width:62px"> سرير
+            <select data-qg="${hi}"><option value="">للجميع (مشتركة)</option><option value="ذكر">للشباب</option><option value="أنثى">للبنات</option></select><button type="button" class="btn sm pri" data-qgo="${hi}">إنشاء</button></div>
+          ${h.rooms.map((r, i) => roomRow(r, hi, i)).join('')}
+          <div class="row"><button type="button" class="btn sm ok" data-hadd="${hi}">➕ إضافة غرفة</button><small class="hint">${h.rooms.length} غرفة · ${h.rooms.reduce((a, r) => a + (+r.beds || 0), 0)} سرير</small></div></div>`; }).join('');
+      sum();
     };
-    e('rooms').oninput = ev => { const row = ev.target.closest('.cf-rrow'); if (!row) return; const r = rooms[+row.dataset.i], k = ev.target.dataset.r; if (!r || !k || k === 'del') return; r[k] = ev.target.value; if (k === 'beds') { let b = 0; rooms.forEach(x => { b += (+x.beds || 0); }); e('rsum').textContent = `الإجمالي: ${rooms.length} غرفة · ${b} سرير`; } };
-    e('rooms').onclick = ev => { const b = ev.target.closest('[data-r="del"]'); if (!b || b.disabled) return; rooms.splice(+b.closest('.cf-rrow').dataset.i, 1); drawRooms(); };
-    q('add').onclick = () => { const last = rooms[rooms.length - 1]; rooms.push({ name: 'غرفة ' + (rooms.length + 1), beds: last ? +last.beds || 2 : 2, gender: last ? last.gender || '' : '', note: '' }); drawRooms(); };
-    q('go').onclick = () => {
-      const n = Math.min(40, Math.max(1, parseInt(q('count').value, 10) || 0)), bd = Math.min(12, Math.max(1, parseInt(q('beds').value, 10) || 0)), g = q('gender').value;
-      if (rooms.length + n > 80) return toast('أقصى عدد غرف 80', 'err');
-      for (let i = 0; i < n; i++) rooms.push({ name: 'غرفة ' + (rooms.length + 1), beds: bd, gender: g, note: '' });
-      drawRooms();
+    e('hotels').oninput = ev => {
+      const hn = ev.target.dataset.hn; if (hn != null) { H[+hn].name = ev.target.value; return; }
+      const row = ev.target.closest('.cf-rrow'); if (!row) return;
+      const r = H[+row.dataset.h].rooms[+row.dataset.i], k = ev.target.dataset.r; if (!r || !k || k === 'del') return;
+      r[k] = ev.target.value; if (k === 'beds') sum();
     };
+    e('hotels').onchange = e('hotels').oninput;
+    e('hotels').onclick = async ev => {
+      const t = ev.target, del = t.closest('[data-r="del"]');
+      if (del) { if (del.disabled) return; const row = del.closest('.cf-rrow'); H[+row.dataset.h].rooms.splice(+row.dataset.i, 1); return drawRooms(); }
+      const hd = t.closest('[data-hdel]');
+      if (hd && !hd.disabled) { const h = H[+hd.dataset.hdel]; if (h.rooms.length && !await ask({ title: 'حذف فندق', msg: `حذف «${h.name || 'الفندق'}» و${h.rooms.length} غرفة؟`, okText: 'حذف' })) return; H.splice(+hd.dataset.hdel, 1); return drawRooms(); }
+      const ha = t.closest('[data-hadd]');
+      if (ha) { if (roomCount() >= 80) return toast('أقصى عدد غرف 80', 'err'); const h = H[+ha.dataset.hadd], last = h.rooms[h.rooms.length - 1]; h.rooms.push({ name: 'غرفة ' + (h.rooms.length + 1), beds: last ? +last.beds || 2 : 2, gender: last ? last.gender || '' : '', note: '' }); return drawRooms(); }
+      const qg = t.closest('[data-qgo]');
+      if (qg) { const hi = qg.dataset.qgo, h = H[+hi], box = e('hotels');
+        const n = Math.min(40, Math.max(1, parseInt(box.querySelector(`[data-qc="${hi}"]`).value, 10) || 0)), bd = Math.min(12, Math.max(1, parseInt(box.querySelector(`[data-qb="${hi}"]`).value, 10) || 0)), g = box.querySelector(`[data-qg="${hi}"]`).value;
+        if (roomCount() + n > 80) return toast('أقصى عدد غرف 80', 'err');
+        for (let i = 0; i < n; i++) h.rooms.push({ name: 'غرفة ' + (h.rooms.length + 1), beds: bd, gender: g, note: '' });
+        return drawRooms(); }
+    };
+    q('addHotel').onclick = () => { if (H.length >= 20) return toast('أقصى عدد فنادق 20', 'err'); H.push({ name: 'فندق ' + (H.length + 1), rooms: [] }); drawRooms(); };
     drawRooms();
     e('cancel').onclick = m.close;
     e('save').onclick = async () => {
@@ -369,11 +409,14 @@ window.CONF_VER = '2026-10-26-poster-v9';             // لازم يطابق EXP
       const body = { id: c ? c.id : undefined, title: e('title').value.trim(), status: e('status').value, destination: e('destination').value.trim(), price: e('price').value.trim(),
         dateFrom: e('dateFrom').value, dateTo: e('dateTo').value, details: e('details').value, useCode: e('useCode').checked, useBus: e('useBus').checked, maxPeople: +e('maxPeople').value, roomAccess: e('roomAccess').value,
         layout: e('useBus').checked ? bus.getLayout() : null,
-        rooms: rooms.map(r => ({ id: r.id, name: String(r.name || '').trim(), beds: parseInt(r.beds, 10), gender: r.gender || '', note: String(r.note || '').trim() })) };
+        rooms: [].concat(...H.map(h => h.rooms.map(r => ({ id: r.id, hotel: String(h.name || '').trim(), name: String(r.name || '').trim(), beds: parseInt(r.beds, 10), gender: r.gender || '', note: String(r.note || '').trim() })))) };
       if (!body.title) return bad('اكتب اسم المؤتمر.');
       if (!body.destination) return bad('اكتب الوجهة.');
       if (!body.dateFrom || !body.dateTo) return bad('اختر تاريخ البداية والنهاية.');
       if (!calcSpan(body.dateFrom, body.dateTo)) return bad('تاريخ النهاية لازم يكون بعد تاريخ البداية (أو نفس اليوم).');
+      const used = H.filter(h => h.rooms.length), hn = used.map(h => String(h.name || '').trim());
+      if (used.length > 1 && hn.some(x => !x)) return bad('اكتب اسم كل فندق (عندك أكتر من فندق).');
+      if (new Set(hn).size !== hn.length) return bad('فيه فندقين بنفس الاسم: غيّر اسم واحد منهم.');
       for (let i = 0; i < body.rooms.length; i++) { const r = body.rooms[i]; if (!r.name) return bad('اكتب اسم الغرفة رقم ' + (i + 1) + '.'); if (!(r.beds >= 1 && r.beds <= 12)) return bad('عدد الأسرّة في «' + r.name + '» من 1 إلى 12.'); }
       const b = e('save'); b.disabled = true; b.innerHTML = '<span class="spin"></span>';
       const r = await adm('confSave', body, 60000);
@@ -396,7 +439,7 @@ window.CONF_VER = '2026-10-26-poster-v9';             // لازم يطابق EXP
       const cand = []; D.bookings.forEach(b => { if (b.status === 'accepted') peopleOf(b).forEach(p => { if (!(p.roomId && p.bed)) cand.push(p); }); });
       if (!cand.length) return toast('مفيش حد مقبول من غير سرير', 'err');
       cand.sort((a, b) => a.name < b.name ? -1 : 1);
-      const pm = pModal('تسكين: ' + room.name + ' — سرير ' + bedNo, `<div class="field"><label>اختر الشخص</label><select data-p="who">${cand.map(p => `<option value="${esc(p.bk.id + '|' + p.who)}">${esc(p.name)} (${p.gender === 'أنثى' ? 'أنثى' : 'ذكر'})${p.guest ? ' — ضيف ' + esc(shortName(p.bk.name)) : ''}${(room.gender && room.gender !== p.gender) || accConflict(room, p.bk.roomAccessEff) ? ' ⚠' : ''}</option>`).join('')}</select></div><div class="hint">⚠ = نوعه أو «الغرف المسموحة» ليه مختلفة عن الغرفة دي (الأدمن يقدر يتخطى القيد ده).</div>`,
+      const pm = pModal('تسكين: ' + roomLabel(room) + ' — سرير ' + bedNo, `<div class="field"><label>اختر الشخص</label><select data-p="who">${cand.map(p => `<option value="${esc(p.bk.id + '|' + p.who)}">${esc(p.name)} (${p.gender === 'أنثى' ? 'أنثى' : 'ذكر'})${p.guest ? ' — ضيف ' + esc(shortName(p.bk.name)) : ''}${(room.gender && room.gender !== p.gender) || accConflict(room, p.bk.roomAccessEff) ? ' ⚠' : ''}</option>`).join('')}</select></div><div class="hint">⚠ = نوعه أو «الغرف المسموحة» ليه مختلفة عن الغرفة دي (الأدمن يقدر يتخطى القيد ده).</div>`,
         '<button class="btn pri" data-p="ok">تسكين</button><button class="btn" data-p="no">إلغاء</button>', { narrow: true, tag: 'admin' });
       pm.q('[data-p="no"]').onclick = pm.close;
       pm.q('[data-p="ok"]').onclick = async () => { const [bid, w] = pm.q('[data-p="who"]').value.split('|'); pm.close(); await act('confAssignBed', { id: bid, who: w, roomId: room.id, bed: bedNo }, 'تم التسكين'); };
@@ -414,9 +457,8 @@ window.CONF_VER = '2026-10-26-poster-v9';             // لازم يطابق EXP
           if (p.roomId && p.bed) { byBed[p.roomId + ':' + p.bed] = { bid: b.id, who: p.who, name: p.name, label }; placed++; } else unplaced++;
         });
       });
-      const seatOpts = cur => { if (!L) return ''; const o = ['<option value="0">— بدون مقعد —</option>']; L.cells.forEach((row, r) => { for (let k = 0; k < row.length; k++) { const ch = row.charAt(k), n = L.nums[r][k];
-        if ((ch === 'S' || ch === 'X') && n) o.push(`<option value="${n}"${n === cur ? ' selected' : ''}${occSeat[n] && n !== cur ? ' disabled' : ''}>مقعد ${n}${ch === 'X' ? ' (غير متاح للأعضاء)' : ''}${occSeat[n] && n !== cur ? ' - ' + esc(shortName(names[n])) : ''}</option>`); } }); return o.join(''); };
-      const bedOpts = (cur, gender) => { let o = '<option value="">— بدون سرير —</option>'; rooms.forEach(r => { o += `<optgroup label="${esc(r.name)} (${r.beds} · ${gLabel(r.gender)})">`;
+      const seatOpts = cur => L ? seatOptionsHTML(L, occSeat, names, cur) : '';
+      const bedOpts = (cur, gender) => { let o = '<option value="">— بدون سرير —</option>'; rooms.forEach(r => { o += `<optgroup label="${esc(roomLabel(r))} (${r.beds} · ${gLabel(r.gender)})">`;
         for (let i = 1; i <= r.beds; i++) { const k = r.id + ':' + i, who = byBed[k], me = cur === k, mis = r.gender && r.gender !== gender ? ' ⚠' : '';
           o += `<option value="${k}"${me ? ' selected' : ''}${who && !me ? ' disabled' : ''}>سرير ${i}${mis}${who && !me ? ' - ' + esc(shortName(who.name)) : ''}</option>`; } o += '</optgroup>'; }); return o; };
       const selects = p => `<td>${c.useBus ? `<select data-seat style="min-width:110px">${seatOpts(p.seat)}</select>` : '—'}</td><td>${rooms.length ? `<select data-bed style="min-width:150px">${bedOpts(p.roomId && p.bed ? p.roomId + ':' + p.bed : '', p.gender)}</select>` : '—'}</td>`;
@@ -438,10 +480,10 @@ window.CONF_VER = '2026-10-26-poster-v9';             // لازم يطابق EXP
           return `<tr class="grow${gs === 'p' ? ' pend' : ''}" data-b="${esc(b.id)}" data-g="${esc(g.id)}"><td>↳ <b>${esc(g.name)}</b> <span class="badge ${g.gender === 'أنثى' ? 's' : 'g'}">${g.gender === 'أنثى' ? 'أنثى' : 'ذكر'}</span><br><small class="ltr" style="display:inline-block">📞 ${esc(g.phone || '—')}</small><br><small style="color:var(--mut)">ضيف ${esc(shortName(b.name))}</small>${gs === 'r' && g.note ? `<br><small style="color:var(--bad)">${esc(g.note)}</small>` : ''}</td><td>${gstBadge(g)}</td>
             ${sel ? selects(g) : '<td>—</td><td>—</td>'}<td><div class="acts">${ga}</div></td></tr>`; }).join('') : '';
         return main + gr; }).join('');
-      const roomsBoard = rooms.map(r => { const beds = []; let taken = 0;
+      const roomsBoard = roomsByHotelHTML(rooms, r => { const beds = []; let taken = 0;
         for (let i = 1; i <= r.beds; i++) { const w = byBed[r.id + ':' + i]; if (w) taken++;
           beds.push(`<button type="button" class="cf-bed adm ${w ? 'taken' : 'free'}" data-room="${esc(r.id)}" data-bed="${i}" title="${w ? esc(w.label) : 'سرير فاضي — اضغط للتسكين'}"><span class="n">${i}</span><span class="w">${w ? esc(shortName(w.name)) : ''}</span></button>`); }
-        return `<div class="cf-room"><div class="cf-rh"><b>🛏️ ${esc(r.name)}</b><span class="badge ${gBadge(r.gender)}">${gLabel(r.gender)}</span><small>${taken}/${r.beds}</small></div>${r.note ? `<div class="hint">${esc(r.note)}</div>` : ''}<div class="cf-beds">${beds.join('')}</div></div>`; }).join('');
+        return `<div class="cf-room"><div class="cf-rh"><b>🛏️ ${esc(r.name)}</b><span class="badge ${gBadge(r.gender)}">${gLabel(r.gender)}</span><small>${taken}/${r.beds}</small></div>${r.note ? `<div class="hint">${esc(r.note)}</div>` : ''}<div class="cf-beds">${beds.join('')}</div></div>`; });
       body.innerHTML = `<div class="row" style="justify-content:space-between"><div><b>${esc(c.title)}</b> <span class="badge ${s[1]}">${s[0]}</span>
         <div class="hint">📍 ${esc(c.destination)} · ${esc(range(c))} · ⏱ ${esc(spanText(c.days, c.nights))}${c.price ? ' · 💰 ' + esc(c.price) : ''} · الأشخاص: ${people}${c.maxPeople > 1 ? ' · الحد لكل عضو: ' + c.maxPeople : ''}${rooms.length ? ' · الغرف المسموحة افتراضيًا: ' + esc(ACC[c.roomAccess] || ACC.both) : ''}</div></div>
         <div class="acts"><button class="btn sm" data-t2="edit">✎ تعديل المؤتمر</button><button class="btn sm" data-t2="xls">⬇ Excel</button><button class="btn sm bad" data-t2="del">🗑 حذف المؤتمر</button></div></div>
@@ -473,7 +515,7 @@ window.CONF_VER = '2026-10-26-poster-v9';             // لازم يطابق EXP
       const bed = ev.target.closest('.cf-bed.adm');
       if (bed) {
         const roomId = bed.dataset.room, n = +bed.dataset.bed, room = D.conf.rooms.find(r => r.id === roomId), w = m._D.byBed[roomId + ':' + n];
-        if (w) { if (await ask({ title: 'تحرير السرير', msg: `السرير ${n} في «${room.name}» محجوز لـ ${w.name}. تحريره؟`, okText: 'تحرير' })) act('confAssignBed', { id: w.bid, who: w.who, roomId: '', bed: 0 }, 'تم تحرير السرير'); }
+        if (w) { if (await ask({ title: 'تحرير السرير', msg: `السرير ${n} في «${roomLabel(room)}» محجوز لـ ${w.name}. تحريره؟`, okText: 'تحرير' })) act('confAssignBed', { id: w.bid, who: w.who, roomId: '', bed: 0 }, 'تم تحرير السرير'); }
         else pickPerson(room, n);
         return;
       }
@@ -496,7 +538,7 @@ window.CONF_VER = '2026-10-26-poster-v9';             // لازم يطابق EXP
       if (t2 === 'add') { const code = toEn(m.q('[data-addcode]').value).replace(/\D/g, ''); if (code.length !== 7) return toast('الكود 7 أرقام', 'err'); return act('confAddMember', { confId: id, code }, 'تمت الإضافة — ابعت له الكود'); }
       if (t2 === 'xls') {
         if (!window.XLSX) return toast('مكتبة Excel لم تُحمّل', 'err');
-        const roomName = {}; (D.conf.rooms || []).forEach(r => { roomName[r.id] = r.name; });
+        const roomName = {}; (D.conf.rooms || []).forEach(r => { roomName[r.id] = roomLabel(r); });
         const aoa = [['الاسم', 'النوع', 'عضو/ضيف', 'صاحب الحجز', 'كود العضو', 'الواتساب / تليفون الضيف', 'حالة الحجز', 'موافقة الضيف', 'الغرف المسموحة', 'كود المؤتمر', 'المقعد', 'الغرفة', 'السرير']];
         D.bookings.forEach(b => { const stl = (BK[b.status] || [''])[0];
           aoa.push([b.name, b.gender, 'عضو', '', b.code, b.whatsapp, stl, '', ACC[b.roomAccessEff] || '', b.confCode || '', b.seat || '', roomName[b.roomId] || '', b.bed || '']);
